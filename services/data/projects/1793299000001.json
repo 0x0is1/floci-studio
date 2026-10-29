@@ -1,0 +1,253 @@
+{
+  "id": "1793299000001",
+  "name": "Bedrock GenAI Pipeline",
+  "description": "",
+  "nodes": [
+    {
+      "id": "ec2-1",
+      "type": "custom",
+      "position": {
+        "x": 100,
+        "y": 180
+      },
+      "data": {
+        "serviceType": "ec2",
+        "label": "GenAI API Server",
+        "status": "draft",
+        "config": {
+          "ami": "ami-ubuntu2404-amd64",
+          "instanceType": "t3.medium",
+          "template": "fastapi",
+          "port": 8092,
+          "name": "genai-fastapi",
+          "iamPolicies": [
+            "bedrock:InvokeModel",
+            "s3:PutObject",
+            "s3:GetObject"
+          ]
+        }
+      }
+    },
+    {
+      "id": "bedrock-1",
+      "type": "custom",
+      "position": {
+        "x": 513.2165688403894,
+        "y": 71.20138523630244
+      },
+      "data": {
+        "serviceType": "bedrock",
+        "label": "Claude 3 Sonnet",
+        "status": "draft",
+        "config": {
+          "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+          "temperature": 0.7,
+          "maxTokens": 2048,
+          "guardrails": "default"
+        }
+      }
+    },
+    {
+      "id": "s3-1",
+      "type": "custom",
+      "position": {
+        "x": 535.9523173380454,
+        "y": 318.3550878106503
+      },
+      "data": {
+        "serviceType": "s3",
+        "label": "Prompt Cache Bucket",
+        "status": "draft",
+        "config": {
+          "bucketName": "genai-prompt-cache-1793",
+          "networkAccess": "public_external"
+        },
+        "resourceId": "genai-prompt-cache-1793"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-ec2-bedrock",
+      "source": "ec2-1",
+      "target": "bedrock-1",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "bedrock:InvokeModel",
+        "envVarName": "MODEL_ID",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-s3",
+      "source": "ec2-1",
+      "target": "s3-1",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "s3:PutObject,s3:GetObject",
+        "envVarName": "S3_BUCKET_NAME",
+        "isConfigured": true
+      }
+    }
+  ],
+  "createdAt": "2026-10-29T18:30:08.829Z",
+  "updatedAt": "2026-10-29T18:30:08.874Z",
+  "status": "draft",
+  "logs": [
+    {
+      "id": "log_1793298606559_pm44",
+      "timestamp": "18:30:06.559",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 3 nodes execution order."
+    },
+    {
+      "id": "log_1793298606559_zhdr",
+      "timestamp": "18:30:06.559",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-1",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name genai-api-server-role",
+      "message": "$ aws iam create-role --role-name genai-api-server-role"
+    },
+    {
+      "id": "log_1793298606570_ke3b",
+      "timestamp": "18:30:06.570",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-1",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name genai-api-server-role --policy-name genai-api-server-role-policy",
+      "message": "$ aws iam put-role-policy --role-name genai-api-server-role --policy-name genai-api-server-role-policy"
+    },
+    {
+      "id": "log_1793298606605_n46t",
+      "timestamp": "18:30:06.605",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-1",
+      "serviceType": "iam",
+      "message": "Attached policy 'genai-api-server-role-policy' with [bedrock:InvokeModel, s3:PutObject, s3:GetObject].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"096d00cc-47bd-4b2e-8a0a-33fc081f64da\",\n    \"extendedRequestId\": \"096d00cc-47bd-4b2e-8a0a-33fc081f64da\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793298606605_zouq",
+      "timestamp": "18:30:06.605",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "message": "Provisioning GenAI API Server..."
+    },
+    {
+      "id": "log_1793298606720_92pu",
+      "timestamp": "18:30:06.720",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "command": "aws ec2 run-instances --image-id ami-ubuntu2404-amd64 --instance-type t3.medium --count 1",
+      "message": "$ aws ec2 run-instances --image-id ami-ubuntu2404-amd64 --instance-type t3.medium --count 1"
+    },
+    {
+      "id": "log_1793298606764_wag2",
+      "timestamp": "18:30:06.763",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "message": "EC2 Instance i-35743122859fb85ea state: RUNNING",
+      "rawOutput": "{\n  \"ReservationId\": \"r-aab9055853323e080\",\n  \"OwnerId\": \"000000000000\",\n  \"Groups\": [],\n  \"Instances\": [\n    {\n      \"Architecture\": \"x86_64\",\n      \"BlockDeviceMappings\": [\n        {\n          \"DeviceName\": \"/dev/xvda\",\n          \"Ebs\": {\n            \"AttachTime\": \"2026-10-29T18:30:06.723Z\",\n            \"DeleteOnTermination\": true,\n            \"Status\": \"attached\",\n            \"VolumeId\": \"vol-a77623eb14d44f8df\"\n          }\n        }\n      ],\n      \"ClientToken\": \"40b5f0d1-f477-4cf1-b40a-7278c352931f\",\n      \"EbsOptimized\": false,\n      \"EnaSupport\": true,\n      \"Hypervisor\": \"xen\",\n      \"NetworkInterfaces\": [\n        {\n          \"Attachment\": {\n            \"AttachTime\": \"2026-10-29T18:30:06.723Z\",\n            \"AttachmentId\": \"eni-attach-cafbdc2537f91ad62\",\n            \"DeleteOnTermination\": true,\n            \"DeviceIndex\": 0,\n            \"Status\": \"attached\"\n          },\n          \"Groups\": [\n            {\n              \"GroupId\": \"sg-default-us-east-1\",\n              \"GroupName\": \"default\"\n            }\n          ],\n          \"NetworkInterfaceId\": \"eni-8833fca9a2787a5e9\",\n          \"OwnerId\": \"000000000000\",\n          \"PrivateDnsName\": \"ip-172-31-32-155.ec2.internal\",\n          \"PrivateIpAddress\": \"172.31.32.155\",\n          \"PrivateIpAddresses\": [\n            {\n              \"Primary\": true,\n              \"PrivateDnsName\": \"ip-172-31-32-155.ec2.internal\",\n              \"PrivateIpAddress\": \"172.31.32.155\"\n            }\n          ],\n          \"SourceDestCheck\": true,\n          \"Status\": \"in-use\",\n          \"SubnetId\": \"subnet-default-us-east-1-c\",\n          \"VpcId\": \"vpc-default-us-east-1\"\n        }\n      ],\n      \"RootDeviceName\": \"/dev/xvda\",\n      \"RootDeviceType\": \"ebs\",\n      \"SecurityGroups\": [\n        {\n          \"GroupId\": \"sg-default-us-east-1\",\n          \"GroupName\": \"default\"\n        }\n      ],\n      \"SourceDestCheck\": true,\n      \"Tags\": [\n        {\n          \"Key\": \"Name\",\n          \"Value\": \"GenAI API Server\"\n        }\n      ],\n      \"VirtualizationType\": \"hvm\",\n      \"CpuOptions\": {\n        \"CoreCount\": 1,\n        \"ThreadsPerCore\": 1\n      },\n      \"CapacityReservationSpecification\": {\n        \"CapacityReservationPreference\": \"open\"\n      },\n      \"HibernationOptions\": {\n        \"Configured\": false\n      },\n      \"MetadataOptions\": {\n        \"State\": \"applied\",\n        \"HttpTokens\": \"optional\",\n        \"HttpPutResponseHopLimit\": 1,\n        \"HttpEndpoint\": \"enabled\",\n        \"HttpProtocolIpv6\": \"disabled\",\n        \"InstanceMetadataTags\": \"disabled\"\n      },\n      \"EnclaveOptions\": {\n        \"Enabled\": false\n      },\n      \"PlatformDetails\": \"Linux/UNIX\",\n      \"PrivateDnsNameOptions\": {\n        \"HostnameType\": \"ip-name\",\n        \"EnableResourceNameDnsARecord\": false,\n        \"EnableResourceNameDnsAAAARecord\": false\n      },\n      \"MaintenanceOptions\": {\n        \"AutoRecovery\": \"default\"\n      },\n      \"InstanceId\": \"i-35743122859fb85ea\",\n      \"ImageId\": \"ami-ubuntu2404-amd64\",\n      \"State\": {\n        \"Code\": 0,\n        \"Name\": \"pending\"\n      },\n      \"PrivateDnsName\": \"ip-172-31-32-155.ec2.internal\",\n      \"AmiLaunchIndex\": 0,\n      \"InstanceType\": \"t3.medium\",\n      \"LaunchTime\": \"2026-10-29T18:30:06.723Z\",\n      \"Placement\": {\n        \"Tenancy\": \"default\",\n        \"AvailabilityZone\": \"us-east-1c\"\n      },\n      \"Monitoring\": {\n        \"State\": \"disabled\"\n      },\n      \"SubnetId\": \"subnet-default-us-east-1-c\",\n      \"VpcId\": \"vpc-default-us-east-1\",\n      \"PrivateIpAddress\": \"172.31.32.155\"\n    }\n  ],\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"f7351a09-3257-4a57-98b9-38445f3e8439\",\n    \"extendedRequestId\": \"f7351a09-3257-4a57-98b9-38445f3e8439\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793298606764_imv0",
+      "timestamp": "18:30:06.764",
+      "source": "docker",
+      "type": "stdin",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "command": "docker run -d --name floci-ec2-web-8092 -p 8092:80 nginx:alpine",
+      "message": "$ docker run -d --name floci-ec2-web-8092 -p 8092:80 nginx:alpine"
+    },
+    {
+      "id": "log_1793298607346_npey",
+      "timestamp": "18:30:07.346",
+      "source": "docker",
+      "type": "stdout",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "message": "Container running on host port 8092 -> http://localhost:8092",
+      "rawOutput": "{\n  \"port\": 8092,\n  \"liveUrl\": \"http://localhost:8092\",\n  \"instanceId\": \"i-35743122859fb85ea\"\n}"
+    },
+    {
+      "id": "log_1793298607346_eiqs",
+      "timestamp": "18:30:07.346",
+      "source": "system",
+      "type": "info",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Provisioning Claude 3 Sonnet..."
+    },
+    {
+      "id": "log_1793298607346_f2be",
+      "timestamp": "18:30:07.346",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "command": "aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'",
+      "message": "$ aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'"
+    },
+    {
+      "id": "log_1793298607379_m2ls",
+      "timestamp": "18:30:07.379",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Bedrock Foundation Model 'anthropic.claude-3-sonnet-20240229-v1:0' provisioned & active.",
+      "rawOutput": "{\n  \"modelId\": \"anthropic.claude-3-sonnet-20240229-v1:0\",\n  \"status\": \"AVAILABLE\",\n  \"temperature\": 0.7,\n  \"maxTokens\": 2048,\n  \"probeResponse\": \"{\\\"id\\\":\\\"msg_stub\\\",\\\"type\\\":\\\"message\\\",\\\"role\\\":\\\"assistant\\\",\\\"content\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"Floci stub response\\\"}],\\\"model\\\":\\\"anthropic.claude-3-sonnet-20240229-v1:0\\\",\\\"stop_reason\\\":\\\"end_turn\\\",\\\"usage\\\":{\\\"input_tokens\\\":10,\\\"output_tokens\\\":12}}\"\n}"
+    },
+    {
+      "id": "log_1793298607379_ostv",
+      "timestamp": "18:30:07.379",
+      "source": "system",
+      "type": "info",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Provisioning Prompt Cache Bucket..."
+    },
+    {
+      "id": "log_1793298607379_8tod",
+      "timestamp": "18:30:07.379",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "command": "aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external",
+      "message": "$ aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external"
+    },
+    {
+      "id": "log_1793298607388_4odd",
+      "timestamp": "18:30:07.388",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Bucket 'genai-prompt-cache-1793' ready (public_external).",
+      "rawOutput": "{\n  \"Location\": \"/genai-prompt-cache-1793\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"4f2727ef-3f5a-4b0d-9fb1-aecb0c029755\",\n    \"extendedRequestId\": \"4f2727ef-3f5a-4b0d-9fb1-aecb0c029755\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793298607388_au92",
+      "timestamp": "18:30:07.388",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 15."
+    }
+  ]
+}

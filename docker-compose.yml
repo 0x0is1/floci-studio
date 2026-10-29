@@ -1,0 +1,41 @@
+services:
+  floci:
+    image: floci/floci:latest-compat
+    container_name: oss-floci
+    ports:
+      - "4566:4566"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./services/data/floci:/app/data
+    environment:
+      - FLOCI_STORAGE_MODE=persistent
+      - AWS_DEFAULT_REGION=us-east-1
+    networks:
+      - floci_net
+
+  floci-api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    container_name: oss-floci-api
+    ports:
+      - "4501:4501"
+    environment:
+      - PORT=4501
+      - FLOCI_ENDPOINT=http://floci:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - DATA_DIR=/app/data
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./services/data:/app/data
+      - ./services/api/src:/app/src
+    depends_on:
+      - floci
+    networks:
+      - floci_net
+
+networks:
+  floci_net:
+    name: oss_floci_net

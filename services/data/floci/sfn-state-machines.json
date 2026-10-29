@@ -1,0 +1,226 @@
+{
+  "000000000000/arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793298596161" : {
+    "stateMachineArn" : "arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793298596161",
+    "name" : "sm-1793298596161",
+    "definition" : "{\"Comment\":\"Test State Machine\",\"StartAt\":\"PassState\",\"States\":{\"PassState\":{\"Type\":\"Pass\",\"End\":true}}}",
+    "roleArn" : "arn:aws:iam::000000000000:role/sfn-role",
+    "type" : "STANDARD",
+    "status" : "ACTIVE",
+    "creationDate" : 1.793298596163E9,
+    "updateDate" : null,
+    "revisionId" : "8e776cc3-adf6-4809-b7ac-833084c4975b",
+    "description" : null,
+    "loggingConfiguration" : {
+      "level" : "OFF",
+      "includeExecutionData" : false,
+      "destinations" : [ ]
+    },
+    "tracingConfiguration" : {
+      "enabled" : false
+    },
+    "encryptionConfiguration" : {
+      "type" : "AWS_OWNED_KEY"
+    },
+    "tags" : { },
+    "creationVersionArn" : null,
+    "creationVersionDescription" : null,
+    "versionCounter" : 0,
+    "versions" : [ ]
+  },
+  "000000000000/arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793296829607" : {
+    "stateMachineArn" : "arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793296829607",
+    "name" : "sm-1793296829607",
+    "definition" : "{\"Comment\":\"Test State Machine\",\"StartAt\":\"PassState\",\"States\":{\"PassState\":{\"Type\":\"Pass\",\"End\":true}}}",
+    "roleArn" : "arn:aws:iam::000000000000:role/sfn-role",
+    "type" : "STANDARD",
+    "status" : "ACTIVE",
+    "creationDate" : 1.793296829615E9,
+    "updateDate" : null,
+    "revisionId" : "f6470cd3-8232-4b84-bbe0-ea66c2c6151f",
+    "description" : null,
+    "loggingConfiguration" : {
+      "level" : "OFF",
+      "includeExecutionData" : false,
+      "destinations" : [ ]
+    },
+    "tracingConfiguration" : {
+      "enabled" : false
+    },
+    "encryptionConfiguration" : {
+      "type" : "AWS_OWNED_KEY"
+    },
+    "tags" : { },
+    "creationVersionArn" : null,
+    "creationVersionDescription" : null,
+    "versionCounter" : 0,
+    "versions" : [ ]
+  },
+  "000000000000/arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793294554644" : {
+    "stateMachineArn" : "arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793294554644",
+    "name" : "sm-1793294554644",
+    "definition" : "{\"Comment\":\"Test State Machine\",\"StartAt\":\"PassState\",\"States\":{\"PassState\":{\"Type\":\"Pass\",\"End\":true}}}",
+    "roleArn" : "arn:aws:iam::000000000000:role/sfn-role",
+    "type" : "STANDARD",
+    "status" : "ACTIVE",
+    "creationDate" : 1.793294554645E9,
+    "updateDate" : null,
+    "revisionId" : "6ad23c0e-6cda-4c70-91df-e60775f29c56",
+    "description" : null,
+    "loggingConfiguration" : {
+      "level" : "OFF",
+      "includeExecutionData" : false,
+      "destinations" : [ ]
+    },
+    "tracingConfiguration" : {
+      "enabled" : false
+    },
+    "encryptionConfiguration" : {
+      "type" : "AWS_OWNED_KEY"
+    },
+    "tags" : { },
+    "creationVersionArn" : null,
+    "creationVersionDescription" : null,
+    "versionCounter" : 0,
+    "versions" : [ ]
+  },
+  "000000000000/arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793297592530" : {
+    "stateMachineArn" : "arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793297592530",
+    "name" : "sm-1793297592530",
+    "definition" : "{\"Comment\":\"Test State Machine\",\"StartAt\":\"PassState\",\"States\":{\"PassState\":{\"Type\":\"Pass\",\"End\":true}}}",
+    "roleArn" : "arn:aws:iam::000000000000:role/sfn-role",
+    "type" : "STANDARD",
+    "status" : "ACTIVE",
+    "creationDate" : 1.793297592534E9,
+    "updateDate" : null,
+    "revisionId" : "5fd9a14f-c587-4db9-98d1-f1672afd95ae",
+    "description" : null,
+    "loggingConfiguration" : {
+      "level" : "OFF",
+      "includeExecutionData" : false,
+      "destinations" : [ ]
+    },
+    "tracingConfiguration" : {
+      "enabled" : false
+    },
+    "encryptionConfiguration" : {
+      "type" : "AWS_OWNED_KEY"
+    },
+    "tags" : { },
+    "creationVersionArn" : null,
+    "creationVersionDescription" : null,
+    "versionCounter" : 0,
+    "versions" : [ ]
+  },
+  "000000000000/arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793295794294" : {
+    "stateMachineArn" : "arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793295794294",
+    "name" : "sm-1793295794294",
+    "definition" : "{\"Comment\":\"Test State Machine\",\"StartAt\":\"PassState\",\"States\":{\"PassState\":{\"Type\":\"Pass\",\"End\":true}}}",
+    "roleArn" : "arn:aws:iam::000000000000:role/sfn-role",
+    "type" : "STANDARD",
+    "status" : "ACTIVE",
+    "creationDate" : 1.793295794298E9,
+    "updateDate" : null,
+    "revisionId" : "6cfbacc6-20be-4df0-95a8-990edfb53f2c",
+    "description" : null,
+    "loggingConfiguration" : {
+      "level" : "OFF",
+      "includeExecutionData" : false,
+      "destinations" : [ ]
+    },
+    "tracingConfiguration" : {
+      "enabled" : false
+    },
+    "encryptionConfiguration" : {
+      "type" : "AWS_OWNED_KEY"
+    },
+    "tags" : { },
+    "creationVersionArn" : null,
+    "creationVersionDescription" : null,
+    "versionCounter" : 0,
+    "versions" : [ ]
+  },
+  "000000000000/arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793293372010" : {
+    "stateMachineArn" : "arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793293372010",
+    "name" : "sm-1793293372010",
+    "definition" : "{\"Comment\":\"Test State Machine\",\"StartAt\":\"PassState\",\"States\":{\"PassState\":{\"Type\":\"Pass\",\"End\":true}}}",
+    "roleArn" : "arn:aws:iam::000000000000:role/sfn-role",
+    "type" : "STANDARD",
+    "status" : "ACTIVE",
+    "creationDate" : 1.793293372027E9,
+    "updateDate" : null,
+    "revisionId" : "78e55ccc-4357-4ac0-a79d-e35dda5ccc7e",
+    "description" : null,
+    "loggingConfiguration" : {
+      "level" : "OFF",
+      "includeExecutionData" : false,
+      "destinations" : [ ]
+    },
+    "tracingConfiguration" : {
+      "enabled" : false
+    },
+    "encryptionConfiguration" : {
+      "type" : "AWS_OWNED_KEY"
+    },
+    "tags" : { },
+    "creationVersionArn" : null,
+    "creationVersionDescription" : null,
+    "versionCounter" : 0,
+    "versions" : [ ]
+  },
+  "000000000000/arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793295801532" : {
+    "stateMachineArn" : "arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793295801532",
+    "name" : "sm-1793295801532",
+    "definition" : "{\"Comment\":\"Test State Machine\",\"StartAt\":\"PassState\",\"States\":{\"PassState\":{\"Type\":\"Pass\",\"End\":true}}}",
+    "roleArn" : "arn:aws:iam::000000000000:role/sfn-role",
+    "type" : "STANDARD",
+    "status" : "ACTIVE",
+    "creationDate" : 1.793295801536E9,
+    "updateDate" : null,
+    "revisionId" : "bbb92804-6dc4-47c1-8897-e4fb43845ce1",
+    "description" : null,
+    "loggingConfiguration" : {
+      "level" : "OFF",
+      "includeExecutionData" : false,
+      "destinations" : [ ]
+    },
+    "tracingConfiguration" : {
+      "enabled" : false
+    },
+    "encryptionConfiguration" : {
+      "type" : "AWS_OWNED_KEY"
+    },
+    "tags" : { },
+    "creationVersionArn" : null,
+    "creationVersionDescription" : null,
+    "versionCounter" : 0,
+    "versions" : [ ]
+  },
+  "000000000000/arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793297176448" : {
+    "stateMachineArn" : "arn:aws:states:us-east-1:000000000000:stateMachine:sm-1793297176448",
+    "name" : "sm-1793297176448",
+    "definition" : "{\"Comment\":\"Test State Machine\",\"StartAt\":\"PassState\",\"States\":{\"PassState\":{\"Type\":\"Pass\",\"End\":true}}}",
+    "roleArn" : "arn:aws:iam::000000000000:role/sfn-role",
+    "type" : "STANDARD",
+    "status" : "ACTIVE",
+    "creationDate" : 1.793297176453E9,
+    "updateDate" : null,
+    "revisionId" : "e3f1ca91-fce8-4044-be34-a2f64cca8e8a",
+    "description" : null,
+    "loggingConfiguration" : {
+      "level" : "OFF",
+      "includeExecutionData" : false,
+      "destinations" : [ ]
+    },
+    "tracingConfiguration" : {
+      "enabled" : false
+    },
+    "encryptionConfiguration" : {
+      "type" : "AWS_OWNED_KEY"
+    },
+    "tags" : { },
+    "creationVersionArn" : null,
+    "creationVersionDescription" : null,
+    "versionCounter" : 0,
+    "versions" : [ ]
+  }
+}

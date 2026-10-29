@@ -1,0 +1,22 @@
+{
+  "name": "oss-floci-sim-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "bun --cwd frontends/playground dev",
+    "dev": "bun --cwd frontends/playground dev",
+    "dev:frontend": "bun --cwd frontends/playground dev",
+    "dev:backend": "bun --cwd services/api dev",
+    "test:backend": "bun --cwd services/api test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "docker:up": "docker compose -f services/docker-compose.yml up -d",
+    "docker:down": "docker compose -f services/docker-compose.yml down"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.1",
+    "@types/node": "^22.13.1",
+    "typescript": "^5.7.3"
+  }
+}
+

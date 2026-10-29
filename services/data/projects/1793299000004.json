@@ -1,0 +1,92 @@
+{
+  "id": "1793299000004",
+  "name": "Serverless Event Pipeline",
+  "description": "",
+  "nodes": [
+    {
+      "id": "sqs-1",
+      "type": "custom",
+      "position": {
+        "x": -47.35599079429447,
+        "y": -13.02445370684898
+      },
+      "data": {
+        "serviceType": "sqs",
+        "label": "Ingestion Queue",
+        "status": "draft",
+        "config": {
+          "queueName": "event-ingestion-queue",
+          "queueType": "standard",
+          "visibilityTimeout": 30,
+          "networkAccess": "public_external"
+        }
+      }
+    },
+    {
+      "id": "lambda-1",
+      "type": "custom",
+      "position": {
+        "x": 420,
+        "y": 160
+      },
+      "data": {
+        "serviceType": "lambda",
+        "label": "Event Processor",
+        "status": "draft",
+        "config": {
+          "functionName": "event-processor-fn",
+          "runtime": "nodejs20.x",
+          "memorySize": 256,
+          "timeout": 15,
+          "networkAccess": "public_external"
+        }
+      }
+    },
+    {
+      "id": "ddb-1",
+      "type": "custom",
+      "position": {
+        "x": 740,
+        "y": 160
+      },
+      "data": {
+        "serviceType": "dynamodb",
+        "label": "Events Document Store",
+        "status": "draft",
+        "config": {
+          "tableName": "EventsStore",
+          "partitionKey": "eventId",
+          "partitionKeyType": "S",
+          "billingMode": "PAY_PER_REQUEST"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-sqs-lambda",
+      "source": "sqs-1",
+      "target": "lambda-1",
+      "type": "custom",
+      "data": {
+        "protocol": "Event Source Mapping",
+        "envVarName": "EVENT_SOURCE_ARN",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-lambda-ddb",
+      "source": "lambda-1",
+      "target": "ddb-1",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "dynamodb:GetItem,dynamodb:PutItem",
+        "envVarName": "DATABASE_TABLE",
+        "isConfigured": true
+      }
+    }
+  ],
+  "createdAt": "2026-10-29T18:05:50.351Z",
+  "updatedAt": "2026-10-29T18:05:50.390Z",
+  "status": "draft"
+}

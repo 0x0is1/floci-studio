@@ -1,0 +1,102 @@
+{
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-1793263454292/error::2026/10/29/8beee774" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-1793263454292/error",
+    "logStreamName" : "2026/10/29/8beee774",
+    "createdTime" : 1793263467365,
+    "firstEventTimestamp" : 1793263467373,
+    "lastEventTimestamp" : 1793263771453,
+    "lastIngestionTime" : 1793263771453,
+    "uploadSequenceToken" : "a5d2b885-24ad-4dc6-8c4c-e84013450ac5",
+    "storedBytes" : 4760
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793263480333/error::2026/10/29/56fd2cff" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793263480333/error",
+    "logStreamName" : "2026/10/29/56fd2cff",
+    "createdTime" : 1793263483029,
+    "firstEventTimestamp" : 1793263483038,
+    "lastEventTimestamp" : 1793263786863,
+    "lastIngestionTime" : 1793263786863,
+    "uploadSequenceToken" : "cb85715a-ac8a-4732-b7cc-bcbb50b4f12f",
+    "storedBytes" : 4760
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793294554856/error::2026/10/29/bb0ead34" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793294554856/error",
+    "logStreamName" : "2026/10/29/bb0ead34",
+    "createdTime" : 1793294560801,
+    "firstEventTimestamp" : 1793294560834,
+    "lastEventTimestamp" : 1793294863187,
+    "lastIngestionTime" : 1793294863187,
+    "uploadSequenceToken" : "3dd57933-dcdb-4f8d-9c4f-83ee03dfa8b1",
+    "storedBytes" : 4760
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793267059430/error::2026/10/29/f27458f5" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793267059430/error",
+    "logStreamName" : "2026/10/29/f27458f5",
+    "createdTime" : 1793267062617,
+    "firstEventTimestamp" : 1793267062628,
+    "lastEventTimestamp" : 1793267366824,
+    "lastIngestionTime" : 1793267366824,
+    "uploadSequenceToken" : "1787548a-e152-40c3-aa53-00d8e371e6ab",
+    "storedBytes" : 4760
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793297176512/error::2026/10/29/2d524b99" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793297176512/error",
+    "logStreamName" : "2026/10/29/2d524b99",
+    "createdTime" : 1793297179309,
+    "firstEventTimestamp" : 1793297179317,
+    "lastEventTimestamp" : 1793297483282,
+    "lastIngestionTime" : 1793297483282,
+    "uploadSequenceToken" : "dee73529-689e-42a0-a8ff-a9b31036cdbe",
+    "storedBytes" : 4760
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793297592602/error::2026/10/29/72669477" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793297592602/error",
+    "logStreamName" : "2026/10/29/72669477",
+    "createdTime" : 1793297595467,
+    "firstEventTimestamp" : 1793297595479,
+    "lastEventTimestamp" : 1793297899540,
+    "lastIngestionTime" : 1793297899540,
+    "uploadSequenceToken" : "9d6eea1b-8b11-490b-b5f2-96556ca92c32",
+    "storedBytes" : 4760
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793295801596/error::2026/10/29/ee4e0e74" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793295801596/error",
+    "logStreamName" : "2026/10/29/ee4e0e74",
+    "createdTime" : 1793295804318,
+    "firstEventTimestamp" : 1793295804333,
+    "lastEventTimestamp" : 1793296108218,
+    "lastIngestionTime" : 1793296108218,
+    "uploadSequenceToken" : "c33b0294-bcf4-40e9-aa91-791919232b9f",
+    "storedBytes" : 4760
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793298596234/error::2026/10/29/28313a22" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793298596234/error",
+    "logStreamName" : "2026/10/29/28313a22",
+    "createdTime" : 1793298599050,
+    "firstEventTimestamp" : 1793298599059,
+    "lastEventTimestamp" : 1793298599407,
+    "lastIngestionTime" : 1793298599407,
+    "uploadSequenceToken" : "f3aa5fb7-2eee-449d-8099-f547bb0c5092",
+    "storedBytes" : 4355
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793295794368/error::2026/10/29/e9d160a5" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793295794368/error",
+    "logStreamName" : "2026/10/29/e9d160a5",
+    "createdTime" : 1793295797169,
+    "firstEventTimestamp" : 1793295797179,
+    "lastEventTimestamp" : 1793296101150,
+    "lastIngestionTime" : 1793296101150,
+    "uploadSequenceToken" : "61bba0f7-72a6-4c35-9296-99785040717b",
+    "storedBytes" : 4760
+  },
+  "000000000000/us-east-1::/aws/rds/instance/test-pg-fast-1793296829693/error::2026/10/29/5568e11a" : {
+    "logGroupName" : "/aws/rds/instance/test-pg-fast-1793296829693/error",
+    "logStreamName" : "2026/10/29/5568e11a",
+    "createdTime" : 1793296832533,
+    "firstEventTimestamp" : 1793296832544,
+    "lastEventTimestamp" : 1793297136723,
+    "lastIngestionTime" : 1793297136723,
+    "uploadSequenceToken" : "b397be90-03b8-467a-845c-cd201754199e",
+    "storedBytes" : 4760
+  }
+}

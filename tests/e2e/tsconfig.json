@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../../frontends/playground/src/*"]
+    },
+    "types": ["node", "@playwright/test"]
+  },
+  "include": ["**/*.ts"]
+}

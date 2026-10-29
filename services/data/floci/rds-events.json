@@ -1,0 +1,29 @@
+{
+  "000000000000/runtime-failure:arn:aws:rds:us-east-1:000000000000:db:test-pg-fast-1793267059430" : {
+    "id" : "runtime-failure:arn:aws:rds:us-east-1:000000000000:db:test-pg-fast-1793267059430",
+    "sourceIdentifier" : "test-pg-fast-1793267059430",
+    "sourceType" : "db-instance",
+    "message" : "DB instance backing database process is unavailable.",
+    "eventCategories" : [ "availability" ],
+    "date" : "2026-10-29T12:46:05.528091402Z",
+    "sourceArn" : "arn:aws:rds:us-east-1:000000000000:db:test-pg-fast-1793267059430"
+  },
+  "000000000000/runtime-failure:arn:aws:rds:us-east-1:000000000000:db:test-pg-1793263454292" : {
+    "id" : "runtime-failure:arn:aws:rds:us-east-1:000000000000:db:test-pg-1793263454292",
+    "sourceIdentifier" : "test-pg-1793263454292",
+    "sourceType" : "db-instance",
+    "message" : "DB instance backing database process is unavailable.",
+    "eventCategories" : [ "availability" ],
+    "date" : "2026-10-29T12:46:05.639678062Z",
+    "sourceArn" : "arn:aws:rds:us-east-1:000000000000:db:test-pg-1793263454292"
+  },
+  "000000000000/runtime-failure:arn:aws:rds:us-east-1:000000000000:db:test-pg-fast-1793263480333" : {
+    "id" : "runtime-failure:arn:aws:rds:us-east-1:000000000000:db:test-pg-fast-1793263480333",
+    "sourceIdentifier" : "test-pg-fast-1793263480333",
+    "sourceType" : "db-instance",
+    "message" : "DB instance backing database process is unavailable.",
+    "eventCategories" : [ "availability" ],
+    "date" : "2026-10-29T12:46:05.652043716Z",
+    "sourceArn" : "arn:aws:rds:us-east-1:000000000000:db:test-pg-fast-1793263480333"
+  }
+}

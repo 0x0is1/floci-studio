@@ -1,0 +1,106 @@
+{
+  "000000000000/topic::us-east-1::arn:aws:sns:us-east-1:000000000000:test-topic-1793298596042" : {
+    "Name" : "test-topic-1793298596042",
+    "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793298596042",
+    "Attributes" : {
+      "Policy" : "",
+      "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793298596042",
+      "EffectiveDeliveryPolicy" : "",
+      "DisplayName" : "",
+      "DeliveryPolicy" : ""
+    },
+    "Tags" : { },
+    "CreatedAt" : "2026-10-29T18:29:56.046130538Z"
+  },
+  "000000000000/topic::us-east-1::arn:aws:sns:us-east-1:000000000000:test-topic-1793297592419" : {
+    "Name" : "test-topic-1793297592419",
+    "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793297592419",
+    "Attributes" : {
+      "Policy" : "",
+      "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793297592419",
+      "EffectiveDeliveryPolicy" : "",
+      "DisplayName" : "",
+      "DeliveryPolicy" : ""
+    },
+    "Tags" : { },
+    "CreatedAt" : "2026-10-29T18:13:12.424579724Z"
+  },
+  "000000000000/topic::us-east-1::arn:aws:sns:us-east-1:000000000000:test-topic-1793296829448" : {
+    "Name" : "test-topic-1793296829448",
+    "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793296829448",
+    "Attributes" : {
+      "Policy" : "",
+      "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793296829448",
+      "EffectiveDeliveryPolicy" : "",
+      "DisplayName" : "",
+      "DeliveryPolicy" : ""
+    },
+    "Tags" : { },
+    "CreatedAt" : "2026-10-29T18:00:29.453421465Z"
+  },
+  "000000000000/topic::us-east-1::arn:aws:sns:us-east-1:000000000000:test-topic-1793295794185" : {
+    "Name" : "test-topic-1793295794185",
+    "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793295794185",
+    "Attributes" : {
+      "Policy" : "",
+      "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793295794185",
+      "EffectiveDeliveryPolicy" : "",
+      "DisplayName" : "",
+      "DeliveryPolicy" : ""
+    },
+    "Tags" : { },
+    "CreatedAt" : "2026-10-29T17:43:14.189679508Z"
+  },
+  "000000000000/topic::us-east-1::arn:aws:sns:us-east-1:000000000000:test-topic-1793295801437" : {
+    "Name" : "test-topic-1793295801437",
+    "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793295801437",
+    "Attributes" : {
+      "Policy" : "",
+      "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793295801437",
+      "EffectiveDeliveryPolicy" : "",
+      "DisplayName" : "",
+      "DeliveryPolicy" : ""
+    },
+    "Tags" : { },
+    "CreatedAt" : "2026-10-29T17:43:21.442370428Z"
+  },
+  "000000000000/topic::us-east-1::arn:aws:sns:us-east-1:000000000000:test-topic-1793293371211" : {
+    "Name" : "test-topic-1793293371211",
+    "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793293371211",
+    "Attributes" : {
+      "Policy" : "",
+      "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793293371211",
+      "EffectiveDeliveryPolicy" : "",
+      "DisplayName" : "",
+      "DeliveryPolicy" : ""
+    },
+    "Tags" : { },
+    "CreatedAt" : "2026-10-29T17:02:51.432664862Z"
+  },
+  "000000000000/topic::us-east-1::arn:aws:sns:us-east-1:000000000000:test-topic-1793297176344" : {
+    "Name" : "test-topic-1793297176344",
+    "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793297176344",
+    "Attributes" : {
+      "Policy" : "",
+      "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793297176344",
+      "EffectiveDeliveryPolicy" : "",
+      "DisplayName" : "",
+      "DeliveryPolicy" : ""
+    },
+    "Tags" : { },
+    "CreatedAt" : "2026-10-29T18:06:16.349367086Z"
+  },
+  "000000000000/topic::us-east-1::arn:aws:sns:us-east-1:000000000000:test-topic-1793294554401" : {
+    "Name" : "test-topic-1793294554401",
+    "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793294554401",
+    "Attributes" : {
+      "Policy" : "",
+      "TopicArn" : "arn:aws:sns:us-east-1:000000000000:test-topic-1793294554401",
+      "EffectiveDeliveryPolicy" : "",
+      "DisplayName" : "",
+      "DeliveryPolicy" : ""
+    },
+    "Tags" : { },
+    "CreatedAt" : "2026-10-29T17:22:34.400371044Z"
+  }
+}

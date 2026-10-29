@@ -1,0 +1,59 @@
+{
+  "id": "1793299000003",
+  "name": "Relational Database Cluster",
+  "description": "High-throughput EC2 backend application wired directly to RDS PostgreSQL relational database instance",
+  "nodes": [
+    {
+      "id": "ec2-1",
+      "type": "custom",
+      "position": { "x": 120, "y": 160 },
+      "data": {
+        "serviceType": "ec2",
+        "label": "App Backend Server",
+        "status": "draft",
+        "config": {
+          "ami": "ami-ubuntu2404-amd64",
+          "instanceType": "t3.small",
+          "template": "fastapi",
+          "port": 8085,
+          "name": "app-backend-server"
+        }
+      }
+    },
+    {
+      "id": "rds-1",
+      "type": "custom",
+      "position": { "x": 480, "y": 160 },
+      "data": {
+        "serviceType": "rds",
+        "label": "PostgreSQL Primary",
+        "status": "draft",
+        "config": {
+          "dbInstanceIdentifier": "postgres-primary-db",
+          "engine": "postgres",
+          "dbInstanceClass": "db.t3.micro",
+          "allocatedStorage": 20,
+          "databaseName": "production_db",
+          "port": 5432
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-ec2-rds",
+      "source": "ec2-1",
+      "target": "rds-1",
+      "type": "custom",
+      "data": {
+        "protocol": "TCP",
+        "port": 5432,
+        "envVarName": "DATABASE_URL",
+        "isConfigured": true
+      }
+    }
+  ],
+  "createdAt": "2026-10-29T18:00:00.000Z",
+  "updatedAt": "2026-10-29T18:00:00.000Z",
+  "status": "draft"
+}

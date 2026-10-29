@@ -1,0 +1,122 @@
+{
+  "000000000000/us-east-1::/000000000000/test-queue-1793297176174" : {
+    "queueName" : "test-queue-1793297176174",
+    "queueUrl" : "http://localhost:4566/000000000000/test-queue-1793297176174",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-29T18:06:16.180120174Z",
+    "lastModifiedTimestamp" : "2026-10-29T18:06:16.180120645Z"
+  },
+  "000000000000/us-east-1::/000000000000/test-queue-1793296829283" : {
+    "queueName" : "test-queue-1793296829283",
+    "queueUrl" : "http://localhost:4566/000000000000/test-queue-1793296829283",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-29T18:00:29.289813949Z",
+    "lastModifiedTimestamp" : "2026-10-29T18:00:29.289814400Z"
+  },
+  "000000000000/us-east-1::/000000000000/test-queue-1793295801277" : {
+    "queueName" : "test-queue-1793295801277",
+    "queueUrl" : "http://localhost:4566/000000000000/test-queue-1793295801277",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-29T17:43:21.283641752Z",
+    "lastModifiedTimestamp" : "2026-10-29T17:43:21.283642183Z"
+  },
+  "000000000000/us-east-1::/000000000000/jobs-1494" : {
+    "queueName" : "jobs-1494",
+    "queueUrl" : "http://localhost:4566/000000000000/jobs-1494",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-29T18:06:48.879198699Z",
+    "lastModifiedTimestamp" : "2026-10-29T18:06:48.879199190Z"
+  },
+  "000000000000/us-east-1::/000000000000/test-queue-1793294553993" : {
+    "queueName" : "test-queue-1793294553993",
+    "queueUrl" : "http://localhost:4566/000000000000/test-queue-1793294553993",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-29T17:22:33.996356138Z",
+    "lastModifiedTimestamp" : "2026-10-29T17:22:33.996356709Z"
+  },
+  "000000000000/us-east-1::/000000000000/test-queue-1793298595811" : {
+    "queueName" : "test-queue-1793298595811",
+    "queueUrl" : "http://localhost:4566/000000000000/test-queue-1793298595811",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-29T18:29:55.819211558Z",
+    "lastModifiedTimestamp" : "2026-10-29T18:29:55.819212059Z"
+  },
+  "000000000000/us-east-1::/000000000000/test-queue-1793297592221" : {
+    "queueName" : "test-queue-1793297592221",
+    "queueUrl" : "http://localhost:4566/000000000000/test-queue-1793297592221",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-29T18:13:12.227124165Z",
+    "lastModifiedTimestamp" : "2026-10-29T18:13:12.227124556Z"
+  },
+  "000000000000/us-east-1::/000000000000/test-queue-1793295794017" : {
+    "queueName" : "test-queue-1793295794017",
+    "queueUrl" : "http://localhost:4566/000000000000/test-queue-1793295794017",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-29T17:43:14.022473924Z",
+    "lastModifiedTimestamp" : "2026-10-29T17:43:14.022474906Z"
+  }
+}
