@@ -16,15 +16,23 @@ export async function provisionDatabase(
     const cmd = `aws dynamodb create-table --table-name ${table} --billing-mode PAY_PER_REQUEST --network-access ${access}`;
     logs.push(logStdin(nodeId, type, cmd));
 
-    const res = await awsClients.dynamodb.send(
-      new CreateTableCommand({
-        TableName: table,
-        AttributeDefinitions: [{ AttributeName: 'id', AttributeType: 'S' }],
-        KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
-        BillingMode: 'PAY_PER_REQUEST',
-      })
-    );
-    logs.push(logStdout(nodeId, type, res, `DynamoDB Table '${table}' ready (${access}).`));
+    try {
+      const res = await awsClients.dynamodb.send(
+        new CreateTableCommand({
+          TableName: table,
+          AttributeDefinitions: [{ AttributeName: 'id', AttributeType: 'S' }],
+          KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+          BillingMode: 'PAY_PER_REQUEST',
+        })
+      );
+      logs.push(logStdout(nodeId, type, res, `DynamoDB Table '${table}' ready (${access}).`));
+    } catch (err: any) {
+      if (err.name === 'ResourceInUseException' || err.message?.includes('already exists')) {
+        logs.push(logStdout(nodeId, type, { TableName: table, Status: 'ACTIVE' }, `DynamoDB Table '${table}' ready (${access}).`));
+      } else {
+        throw err;
+      }
+    }
     return { resourceId: table };
   }
 

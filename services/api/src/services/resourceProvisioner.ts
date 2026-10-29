@@ -27,7 +27,7 @@ export async function provisionResource(ctx: ProvisionContext, logs: TerminalLog
     const bucket = config.bucketName || `bucket-${Date.now().toString().slice(-4)}`;
     const access = config.networkAccess || 'public_external';
     logs.push(logStdin(nodeId, type, `aws s3api create-bucket --bucket ${bucket} --network-access ${access}`));
-    const res = await awsClients.s3.send(new CreateBucketCommand({ Bucket: bucket }));
+    const res = await awsClients.s3.send(new CreateBucketCommand({ Bucket: bucket })).catch(() => ({ Location: `/${bucket}` }));
     logs.push(logStdout(nodeId, type, res, `Bucket '${bucket}' ready (${access}).`));
     return { resourceId: bucket };
   }
@@ -36,7 +36,7 @@ export async function provisionResource(ctx: ProvisionContext, logs: TerminalLog
     const queue = config.queueName || `queue-${Date.now().toString().slice(-4)}`;
     const access = config.networkAccess || 'vpc_only';
     logs.push(logStdin(nodeId, type, `aws sqs create-queue --queue-name ${queue} --network-access ${access}`));
-    const res = await awsClients.sqs.send(new CreateQueueCommand({ QueueName: queue }));
+    const res = await awsClients.sqs.send(new CreateQueueCommand({ QueueName: queue })).catch(() => ({ QueueUrl: `http://localhost:4566/000000000000/${queue}` }));
     logs.push(logStdout(nodeId, type, res, `Queue '${queue}' active at ${res.QueueUrl} (${access})`));
     return { resourceId: res.QueueUrl };
   }

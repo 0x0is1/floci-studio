@@ -8,6 +8,8 @@ import { LiveDatabaseSpecs } from './LiveDatabaseSpecs';
 import { LiveQueueSpecs } from './LiveQueueSpecs';
 import { LiveCloudFrontSpecs } from './LiveCloudFrontSpecs';
 import { LiveEc2Specs } from './LiveEc2Specs';
+import { LiveServerlessSpecs } from './LiveServerlessSpecs';
+import { CliCommandSnippet } from './CliCommandSnippet';
 
 export function LiveServiceSpecs({ nodeData, nodeId }: { nodeData: AwsNodeData; nodeId?: string }) {
   const { serviceType, config = {}, status } = nodeData;
@@ -21,17 +23,33 @@ export function LiveServiceSpecs({ nodeData, nodeId }: { nodeData: AwsNodeData; 
   }
   if (serviceType === 'cloudfront') return <LiveCloudFrontSpecs nodeId={nodeId} />;
   if (serviceType === 'ec2') return <LiveEc2Specs config={config} isRunning={isRunning} nodeId={nodeId} />;
+  if (serviceType === 'lambda' || serviceType === 'bedrock') {
+    return <LiveServerlessSpecs serviceType={serviceType} config={config} isRunning={isRunning} />;
+  }
+
+  const endpoint = 'http://localhost:4566';
+  const region = 'us-east-1';
+  const genericCmd = `aws --endpoint-url=${endpoint} --region ${region} ${serviceType} help`;
 
   return (
-    <div className="p-3 rounded-lg border space-y-2 text-xs" style={{ backgroundColor: tokens.cardBgAlt, borderColor: tokens.border }}>
-      <div className="flex items-center justify-between">
-        <span style={{ color: tokens.textMuted }}>Resource Target</span>
-        <span className="font-mono truncate max-w-[140px]" style={{ color: tokens.textPrimary }}>{config.name || serviceType}</span>
+    <div className="space-y-3 text-xs select-text" style={{ userSelect: 'text' }}>
+      <div className="p-3 rounded-lg border space-y-2" style={{ backgroundColor: tokens.cardBgAlt, borderColor: tokens.border }}>
+        <div className="flex items-center justify-between">
+          <span style={{ color: tokens.textMuted }}>Resource Target</span>
+          <span className="font-mono truncate max-w-[140px] select-all" style={{ color: tokens.textPrimary }}>{config.name || serviceType}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span style={{ color: tokens.textMuted }}>Region Scoping</span>
+          <span className="font-mono font-semibold text-sky-400 select-all">{region}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span style={{ color: tokens.textMuted }}>Floci Endpoint</span>
+          <span className="font-mono text-xs select-all" style={{ color: tokens.accent }}>{endpoint}</span>
+        </div>
       </div>
-      <div className="flex items-center justify-between">
-        <span style={{ color: tokens.textMuted }}>Floci Endpoint</span>
-        <span className="font-mono text-xs" style={{ color: tokens.accent }}>http://localhost:4566</span>
-      </div>
+      {isRunning && (
+        <CliCommandSnippet label="AWS CLI Reference" command={genericCmd} />
+      )}
     </div>
   );
 }

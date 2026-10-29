@@ -4,11 +4,13 @@ import React from 'react';
 import { usePlaygroundStore } from '@/store/playgroundStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import { LuExternalLink, LuCircleDot } from 'react-icons/lu';
+import { CliCommandSnippet } from './CliCommandSnippet';
 
 export function LiveCloudFrontSpecs({ nodeId }: { nodeId?: string }) {
   const { tokens } = useTheme();
   const { nodes, edges, selectedNodeId } = usePlaygroundStore();
   const activeId = nodeId || selectedNodeId;
+  const region = 'us-east-1';
 
   const cfEdge = edges.find((e) => e.source === activeId || e.target === activeId);
   const targetId = cfEdge ? (cfEdge.source === activeId ? cfEdge.target : cfEdge.source) : null;
@@ -19,20 +21,25 @@ export function LiveCloudFrontSpecs({ nodeId }: { nodeId?: string }) {
     ? `http://localhost:4566/${originNode?.data.config?.bucketName || 'assets'}`
     : `http://localhost:${originPort}`;
   const isOriginRunning = originNode?.data.status === 'running';
+  const curlCmd = `curl ${cfUrl}`;
 
   return (
-    <div className="space-y-3 text-xs">
+    <div className="space-y-3 text-xs select-text" style={{ userSelect: 'text' }}>
       <div className="p-3 rounded-lg border space-y-2" style={{ backgroundColor: tokens.cardBgAlt, borderColor: tokens.border }}>
         <div className="flex items-center justify-between">
           <span style={{ color: tokens.textMuted }}>Connected Origin</span>
-          <span className="font-mono font-medium truncate max-w-[150px] flex items-center gap-1.5" style={{ color: originNode ? tokens.textPrimary : tokens.statusError }}>
+          <span className="font-mono font-medium truncate max-w-[150px] flex items-center gap-1.5 select-all" style={{ color: originNode ? tokens.textPrimary : tokens.statusError }}>
             {originNode && <LuCircleDot className={`w-3 h-3 ${isOriginRunning ? 'text-emerald-400' : 'text-slate-400'}`} />}
             {originNode ? `${originNode.data.label} (${originNode.data.serviceType.toUpperCase()})` : 'Not Connected'}
           </span>
         </div>
         <div className="flex items-center justify-between">
+          <span style={{ color: tokens.textMuted }}>Region Scoping</span>
+          <span className="font-mono font-semibold text-sky-400 select-all">{region}</span>
+        </div>
+        <div className="flex items-center justify-between">
           <span style={{ color: tokens.textMuted }}>Origin Status</span>
-          <span className="font-mono font-medium" style={{ color: isOriginRunning ? tokens.statusRunning : tokens.textMuted }}>
+          <span className="font-mono font-medium select-all" style={{ color: isOriginRunning ? tokens.statusRunning : tokens.textMuted }}>
             {originNode ? (isOriginRunning ? 'Active & Serving' : 'Origin Standby') : 'No Target Linked'}
           </span>
         </div>
@@ -44,7 +51,7 @@ export function LiveCloudFrontSpecs({ nodeId }: { nodeId?: string }) {
               target="_blank"
               rel="noreferrer"
               style={{ color: tokens.accent, borderColor: tokens.border }}
-              className="flex items-center gap-1.5 p-2 rounded bg-sky-500/10 border font-mono truncate hover:underline"
+              className="flex items-center gap-1.5 p-2 rounded bg-sky-500/10 border font-mono truncate hover:underline select-all"
             >
               <LuExternalLink className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{cfUrl}</span>
@@ -56,6 +63,10 @@ export function LiveCloudFrontSpecs({ nodeId }: { nodeId?: string }) {
           )}
         </div>
       </div>
+
+      {isOriginRunning && originNode && (
+        <CliCommandSnippet label="Test CDN Edge CLI" command={curlCmd} />
+      )}
     </div>
   );
 }
