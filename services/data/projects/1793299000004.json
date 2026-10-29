@@ -13,7 +13,7 @@
       "data": {
         "serviceType": "sqs",
         "label": "Ingestion Queue",
-        "status": "running",
+        "status": "draft",
         "config": {
           "queueName": "event-ingestion-queue",
           "queueType": "standard",
@@ -32,15 +32,14 @@
       "data": {
         "serviceType": "lambda",
         "label": "Event Processor",
-        "status": "running",
+        "status": "draft",
         "config": {
           "functionName": "event-processor-fn",
           "runtime": "nodejs20.x",
           "memorySize": 256,
           "timeout": 15,
           "networkAccess": "public_external"
-        },
-        "liveUrl": "http://localhost:4566/2015-03-31/functions/event-processor-fn/invocations"
+        }
       }
     },
     {
@@ -53,13 +52,14 @@
       "data": {
         "serviceType": "dynamodb",
         "label": "Events Document Store",
-        "status": "running",
+        "status": "draft",
         "config": {
           "tableName": "EventsStore",
           "partitionKey": "eventId",
           "partitionKeyType": "S",
           "billingMode": "PAY_PER_REQUEST"
-        }
+        },
+        "resourceId": "EventsStore"
       }
     }
   ],
@@ -87,9 +87,9 @@
       }
     }
   ],
-  "createdAt": "2026-10-29T18:43:15.913Z",
-  "updatedAt": "2026-10-29T18:45:51.321Z",
-  "status": "running",
+  "createdAt": "2026-10-29T19:10:00.874Z",
+  "updatedAt": "2026-10-29T19:10:00.940Z",
+  "status": "draft",
   "logs": [
     {
       "id": "log_1793299551240_0d1i",

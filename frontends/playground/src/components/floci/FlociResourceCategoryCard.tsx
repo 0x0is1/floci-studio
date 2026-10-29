@@ -63,3 +63,4 @@ export function FlociResourceCategoryCard({ title, items = [], service, onDelete
     </div>
   );
 }
+
