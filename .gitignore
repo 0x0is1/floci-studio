@@ -42,3 +42,7 @@ Thumbs.db
 # Temporary files
 floci.svg
 floci.png
+services/api/scratch_*
+
+# Floci runtime database
+services/data/floci/
