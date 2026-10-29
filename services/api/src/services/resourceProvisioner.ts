@@ -43,7 +43,7 @@ export async function provisionResource(ctx: ProvisionContext, logs: TerminalLog
 
   if (type === 'dynamodb' || type === 'rds') return provisionDatabase(nodeId, type, label, config, logs);
   if (['vpc', 'subnet', 'alb', 'cloudfront', 'apigateway'].includes(type)) return provisionNetworkResource(nodeId, type, label, config, resourceMap, logs, edges);
-  if (type === 'lambda') return provisionServerless(nodeId, type, label, config, logs);
+  if (type === 'lambda') return provisionServerless(nodeId, type, label, config, logs, edges as any, resourceMap);
   if (type === 'bedrock') return provisionAiResource(nodeId, type, label, config, logs);
 
   if (type === 'ec2') {

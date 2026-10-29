@@ -34,6 +34,8 @@ Floci AWS Visual Playground is a real local cloud infrastructure playground. Use
    - Do NOT create unnecessary markdown docs. All architecture and stage plans live in plans/ and are tracked via plans/INDEX.md.
 8. PULSE ANIMATIONS ARE STRICTLY BANNED:
    - Never use `animate-pulse` or pulse animations anywhere in the UI or codebase. All status indicators must use steady, crisp colors.
+9. AUTOMATIC ENVIRONMENT VARIABLE INJECTION:
+   - Compute nodes (EC2, Lambda, ECS) connected to downstream resources (S3, SQS, DynamoDB, RDS, SNS, Secrets, Bedrock) MUST have their environment variables automatically injected with real provisioned resource references in both backend SDK provisioners (`Environment.Variables` / process env) and visual inspector sidebars.
 
 ## 4. Workspaces & Directories
 - frontends/playground: Next.js 15 UI

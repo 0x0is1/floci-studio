@@ -12,4 +12,5 @@ This file serves as the core reference for coding, architecture, and procedural 
 - Strict Connection Matrix: Reject invalid edges with shadcn destructive toasts. Apply hybrid auto-configuration for valid connections.
 - Floci Integration: Floci mounts /var/run/docker.sock to enable native EC2 container execution, providing real localhost port exposure for EC2 web services.
 - ZERO PULSE ANIMATION POLICY: Pulse animations (animate-pulse) are strictly banned from the codebase.
+- ACTIVE ENVIRONMENT VARIABLE INJECTION: Compute nodes (EC2, Lambda, ECS) connected to downstream resources (S3, SQS, DynamoDB, RDS, SNS, Secrets, Bedrock) MUST actively receive injected environment variables with real provisioned references in both backend SDK provisioners (`Environment.Variables`) and visual inspector sidebars.
 - No Docs Bloat: Do not write miscellaneous documentation files; maintain only plans/INDEX.md and stage files.

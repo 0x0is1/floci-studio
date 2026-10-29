@@ -20,7 +20,7 @@ export function Ec2EnvSection({ envEdges, nodes }: Props) {
   };
 
   return (
-    <div className="p-3 rounded-lg border space-y-2 text-xs" style={{ backgroundColor: tokens.cardBgAlt, borderColor: tokens.border }}>
+    <div className="p-3 rounded-lg border space-y-2 text-xs select-text" style={{ backgroundColor: tokens.cardBgAlt, borderColor: tokens.border, userSelect: 'text' }}>
       <div className="flex items-center gap-1.5 font-semibold" style={{ color: tokens.textPrimary }}>
         <LuVariable className="w-3.5 h-3.5 text-sky-400" />
         <span>Injected Environment Variables</span>
@@ -28,11 +28,12 @@ export function Ec2EnvSection({ envEdges, nodes }: Props) {
       <div className="space-y-1.5">
         {envEdges.map((e) => {
           const targetNode = nodes.find((n) => n.id === e.target);
-          const val = targetNode?.data.config?.bucketName || targetNode?.data.config?.queueName || targetNode?.data.config?.tableName || 'configured';
+          const cfg = targetNode?.data.config || {};
+          const val = cfg.bucketName || cfg.queueName || cfg.tableName || cfg.dbName || cfg.topicName || cfg.modelId || cfg.functionName || targetNode?.data.label || 'configured';
           const varName = e.data?.envVarName || 'ENV_VAR';
           return (
             <div key={e.id} className="flex items-center justify-between p-1.5 rounded border font-mono text-[11px]" style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border }}>
-              <div className="truncate mr-2">
+              <div className="truncate mr-2 select-all">
                 <span className="text-sky-400 font-semibold">{varName}=</span>
                 <span style={{ color: tokens.textSecondary }}>&quot;{val}&quot;</span>
               </div>

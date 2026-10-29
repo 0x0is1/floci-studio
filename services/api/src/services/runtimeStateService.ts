@@ -6,6 +6,11 @@ import { ListQueuesCommand } from '@aws-sdk/client-sqs';
 import { ListTablesCommand } from '@aws-sdk/client-dynamodb';
 import { DescribeDBInstancesCommand } from '@aws-sdk/client-rds';
 import { ListFunctionsCommand } from '@aws-sdk/client-lambda';
+import { ListTopicsCommand } from '@aws-sdk/client-sns';
+import { ListSecretsCommand } from '@aws-sdk/client-secrets-manager';
+import { ListKeysCommand } from '@aws-sdk/client-kms';
+import { DescribeLogGroupsCommand } from '@aws-sdk/client-cloudwatch-logs';
+import { ListEventBusesCommand } from '@aws-sdk/client-eventbridge';
 
 export async function getRuntimeState(projectId?: string) {
   const list = await dockerReq('GET', '/containers/json');
@@ -31,25 +36,31 @@ export async function getRuntimeState(projectId?: string) {
     }
   }
 
-  const [s3Res, sqsRes, ddbRes, rdsRes, lamRes] = await Promise.all([
+  const [s3R, sqsR, ddbR, rdsR, lamR, snsR, secR, kmsR, logR, ebR] = await Promise.all([
     awsClients.s3.send(new ListBucketsCommand({})).catch(() => ({ Buckets: [] })),
     awsClients.sqs.send(new ListQueuesCommand({})).catch(() => ({ QueueUrls: [] })),
     awsClients.dynamodb.send(new ListTablesCommand({})).catch(() => ({ TableNames: [] })),
     awsClients.rds.send(new DescribeDBInstancesCommand({})).catch(() => ({ DBInstances: [] })),
     awsClients.lambda.send(new ListFunctionsCommand({})).catch(() => ({ Functions: [] })),
+    awsClients.sns.send(new ListTopicsCommand({})).catch(() => ({ Topics: [] })),
+    awsClients.secrets.send(new ListSecretsCommand({})).catch(() => ({ SecretList: [] })),
+    awsClients.kms.send(new ListKeysCommand({})).catch(() => ({ Keys: [] })),
+    awsClients.logs.send(new DescribeLogGroupsCommand({})).catch(() => ({ logGroups: [] })),
+    awsClients.eventbridge.send(new ListEventBusesCommand({})).catch(() => ({ EventBuses: [] })),
   ]);
 
-  const buckets = (s3Res.Buckets || []).map((b) => b.Name || '');
-  const queues = sqsRes.QueueUrls || [];
-  const tables = ddbRes.TableNames || [];
-  const instances = (rdsRes.DBInstances || [])
-    .filter((i) => i.DBInstanceStatus !== 'deleting' && i.DBInstanceStatus !== 'deleted')
-    .map((i) => i.DBInstanceIdentifier || '');
-  const functions = (lamRes.Functions || []).map((f) => f.FunctionName || '');
+  const buckets = (s3R.Buckets || []).map((b) => b.Name || '');
+  const queues = sqsR.QueueUrls || [];
+  const tables = ddbR.TableNames || [];
+  const instances = (rdsR.DBInstances || []).filter((i) => i.DBInstanceStatus !== 'deleted').map((i) => i.DBInstanceIdentifier || '');
+  const functions = (lamR.Functions || []).map((f) => f.FunctionName || '');
+  const topics = (snsR.Topics || []).map((t) => t.TopicArn || '');
+  const secrets = (secR.SecretList || []).map((s) => s.Name || '');
+  const keys = (kmsR.Keys || []).map((k) => k.KeyId || '');
+  const logGroups = (logR.logGroups || []).map((l) => l.logGroupName || '');
+  const buses = (ebR.EventBuses || []).map((b) => b.Name || '');
 
-  const isRunning = projectId
-    ? projectService.getProject(projectId)?.status === 'running'
-    : runningPorts.length > 0;
+  const isRunning = projectId ? projectService.getProject(projectId)?.status === 'running' : runningPorts.length > 0;
 
   return {
     success: true,
@@ -63,5 +74,10 @@ export async function getRuntimeState(projectId?: string) {
     dynamodb: { tables },
     rds: { instances },
     lambda: { functions },
+    sns: { topics },
+    secrets: { secrets },
+    kms: { keys },
+    logs: { logGroups },
+    eventbridge: { buses },
   };
 }

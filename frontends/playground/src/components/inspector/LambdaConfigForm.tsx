@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { useTheme } from '@/theme/ThemeProvider';
+import { usePlaygroundStore } from '@/store/playgroundStore';
+import { Ec2EnvSection } from './Ec2EnvSection';
 
 interface Props {
   config: Record<string, any>;
@@ -10,6 +12,8 @@ interface Props {
 
 export function LambdaConfigForm({ config, onChange }: Props) {
   const { tokens } = useTheme();
+  const { edges, nodes, selectedNodeId } = usePlaygroundStore();
+  const envEdges = edges.filter((e) => e.source === selectedNodeId && e.data?.envVarName);
   const inputStyle = { backgroundColor: tokens.cardBgAlt, borderColor: tokens.border, color: tokens.textPrimary };
 
   return (
@@ -38,7 +42,7 @@ export function LambdaConfigForm({ config, onChange }: Props) {
           <option value="nodejs18.x">Node.js 18.x</option>
           <option value="python3.11">Python 3.11</option>
           <option value="python3.12">Python 3.12</option>
-          <option value="provided.al2023">Custom Runtime (Amazon Linux 2023)</option>
+          <option value="provided.al2023">Custom Runtime (AL2023)</option>
         </select>
       </div>
 
@@ -50,9 +54,9 @@ export function LambdaConfigForm({ config, onChange }: Props) {
           style={inputStyle}
           className="w-full rounded border px-2.5 py-1.5 text-xs focus:outline-none focus:border-sky-500 font-mono"
         >
-          <option value={128}>128 MB (Standard Micro-execution)</option>
+          <option value={128}>128 MB</option>
           <option value={256}>256 MB</option>
-          <option value={512}>512 MB (Optimal for I/O SDKs)</option>
+          <option value={512}>512 MB (Optimal)</option>
           <option value={1024}>1024 MB (1 GB)</option>
         </select>
       </div>
@@ -66,9 +70,9 @@ export function LambdaConfigForm({ config, onChange }: Props) {
           className="w-full rounded border px-2.5 py-1.5 text-xs focus:outline-none focus:border-sky-500 font-mono"
         >
           <option value={3}>3 Seconds</option>
-          <option value={15}>15 Seconds (Default)</option>
+          <option value={15}>15 Seconds</option>
           <option value={30}>30 Seconds</option>
-          <option value={60}>60 Seconds (1 Minute)</option>
+          <option value={60}>60 Seconds</option>
         </select>
       </div>
 
@@ -83,6 +87,8 @@ export function LambdaConfigForm({ config, onChange }: Props) {
           className="w-full rounded border px-2.5 py-1.5 text-xs focus:outline-none focus:border-sky-500 font-mono"
         />
       </div>
+
+      <Ec2EnvSection envEdges={envEdges} nodes={nodes} />
     </div>
   );
 }

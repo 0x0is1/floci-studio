@@ -24,7 +24,7 @@ export function LiveServiceSpecs({ nodeData, nodeId }: { nodeData: AwsNodeData; 
   if (serviceType === 'cloudfront') return <LiveCloudFrontSpecs nodeId={nodeId} />;
   if (serviceType === 'ec2') return <LiveEc2Specs config={config} isRunning={isRunning} nodeId={nodeId} />;
   if (serviceType === 'lambda' || serviceType === 'bedrock') {
-    return <LiveServerlessSpecs serviceType={serviceType} config={config} isRunning={isRunning} />;
+    return <LiveServerlessSpecs serviceType={serviceType} config={config} isRunning={isRunning} nodeId={nodeId} />;
   }
 
   const endpoint = 'http://localhost:4566';

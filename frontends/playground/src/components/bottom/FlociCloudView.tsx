@@ -5,6 +5,7 @@ import { fetchFlociResources, deleteFlociResource, purgeAllFlociResources } from
 import { useTheme } from '@/theme/ThemeProvider';
 import { LuCloud, LuRefreshCw, LuTrash2 } from 'react-icons/lu';
 import { toast } from 'sonner';
+import { FlociResourceCategoryCard } from '@/components/floci/FlociResourceCategoryCard';
 
 export function FlociCloudView() {
   const [data, setData] = useState<any>(null);
@@ -32,17 +33,12 @@ export function FlociCloudView() {
     else { toast.error('Purge failed'); }
   };
 
-  const buckets = data?.s3?.buckets || [];
-  const queues = data?.sqs?.queues || [];
-  const tables = data?.dynamodb?.tables || [];
-  const ports = data?.runningPorts || [];
-
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs font-mono transition-colors" style={{ backgroundColor: tokens.trayBg }}>
       <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: tokens.border }}>
         <div className="flex items-center gap-2">
           <LuCloud className="w-4 h-4 text-sky-400" />
-          <span className="font-semibold" style={{ color: tokens.textPrimary }}>Floci Cloud Resource Inventory</span>
+          <span className="font-semibold text-sm" style={{ color: tokens.textPrimary }}>Floci Cloud Resource Inventory (All Services)</span>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} disabled={loading} style={{ backgroundColor: tokens.btnBg, borderColor: tokens.border, color: tokens.textPrimary }} className="flex items-center gap-1.5 px-2.5 py-1 rounded border hover:opacity-85 cursor-pointer">
@@ -56,28 +52,19 @@ export function FlociCloudView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-        <ResourceGroup title={`S3 Buckets (${buckets.length})`} items={buckets} onDelete={(b: string) => handleDelete('s3', b)} tokens={tokens} />
-        <ResourceGroup title={`SQS Queues (${queues.length})`} items={queues} onDelete={(q: string) => handleDelete('sqs', q)} tokens={tokens} isUrl />
-        <ResourceGroup title={`DynamoDB (${tables.length})`} items={tables} onDelete={(t: string) => handleDelete('dynamodb', t)} tokens={tokens} />
-        <ResourceGroup title={`EC2 Web (${ports.length})`} items={ports.map((p: any) => `localhost:${p}`)} onDelete={(p: string) => handleDelete('ec2', p.replace('localhost:', ''))} tokens={tokens} isPort />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <FlociResourceCategoryCard title="S3 Buckets" items={data?.s3?.buckets || []} service="s3" onDelete={handleDelete} tokens={tokens} />
+        <FlociResourceCategoryCard title="SQS Queues" items={data?.sqs?.queues || []} service="sqs" onDelete={handleDelete} tokens={tokens} isUrl />
+        <FlociResourceCategoryCard title="DynamoDB Tables" items={data?.dynamodb?.tables || []} service="dynamodb" onDelete={handleDelete} tokens={tokens} />
+        <FlociResourceCategoryCard title="EC2 Web Servers" items={(data?.runningPorts || []).map((p: any) => `localhost:${p}`)} service="ec2" onDelete={(s, p) => handleDelete(s, p.replace('localhost:', ''))} tokens={tokens} isPort />
+        <FlociResourceCategoryCard title="RDS Databases" items={data?.rds?.instances || []} service="rds" onDelete={handleDelete} tokens={tokens} />
+        <FlociResourceCategoryCard title="Lambda Functions" items={data?.lambda?.functions || []} service="lambda" onDelete={handleDelete} tokens={tokens} />
+        <FlociResourceCategoryCard title="SNS Topics" items={data?.sns?.topics || []} service="sns" onDelete={handleDelete} tokens={tokens} isUrl />
+        <FlociResourceCategoryCard title="Secrets Manager" items={data?.secrets?.secrets || []} service="secrets" onDelete={handleDelete} tokens={tokens} />
+        <FlociResourceCategoryCard title="KMS Encryption Keys" items={data?.kms?.keys || []} service="kms" onDelete={handleDelete} tokens={tokens} />
+        <FlociResourceCategoryCard title="CloudWatch Log Groups" items={data?.logs?.logGroups || []} service="logs" onDelete={handleDelete} tokens={tokens} />
+        <FlociResourceCategoryCard title="EventBridge Buses" items={data?.eventbridge?.buses || []} service="eventbridge" onDelete={handleDelete} tokens={tokens} />
       </div>
-    </div>
-  );
-}
-
-function ResourceGroup({ title, items, onDelete, tokens, isUrl, isPort }: any) {
-  return (
-    <div className="p-3 rounded-lg border space-y-2" style={{ backgroundColor: tokens.cardBgAlt, borderColor: tokens.border }}>
-      <span className="font-semibold block text-[11px]" style={{ color: tokens.textPrimary }}>{title}</span>
-      {items.length === 0 ? <p className="text-[10px]" style={{ color: tokens.textMuted }}>No active items.</p> : (
-        <div className="space-y-1">{items.map((item: string) => (
-          <div key={item} className="flex items-center justify-between p-1.5 rounded border text-[11px]" style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border }}>
-            <span className={`truncate ${isPort ? 'text-emerald-400' : ''}`}>{isUrl ? item.split('/').pop() : item}</span>
-            <button onClick={() => onDelete(item)} className="text-red-400 p-0.5 hover:opacity-85 cursor-pointer"><LuTrash2 className="w-3 h-3" /></button>
-          </div>
-        ))}</div>
-      )}
     </div>
   );
 }

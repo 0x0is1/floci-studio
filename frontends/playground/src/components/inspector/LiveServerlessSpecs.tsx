@@ -2,19 +2,26 @@
 
 import React from 'react';
 import { useTheme } from '@/theme/ThemeProvider';
+import { usePlaygroundStore } from '@/store/playgroundStore';
 import { CliCommandSnippet } from './CliCommandSnippet';
+import { Ec2EnvSection } from './Ec2EnvSection';
 
 interface Props {
   serviceType: 'lambda' | 'bedrock';
   config: Record<string, any>;
   isRunning: boolean;
+  nodeId?: string;
 }
 
-export function LiveServerlessSpecs({ serviceType, config, isRunning }: Props) {
+export function LiveServerlessSpecs({ serviceType, config, isRunning, nodeId }: Props) {
   const { tokens } = useTheme();
+  const { edges, nodes, selectedNodeId } = usePlaygroundStore();
+  const activeId = nodeId || selectedNodeId;
   const isLambda = serviceType === 'lambda';
   const name = isLambda ? (config.functionName || 'event-processor-fn') : (config.modelId || 'anthropic.claude-3-sonnet');
   const region = 'us-east-1';
+
+  const envEdges = edges.filter((e) => e.source === activeId && e.data?.envVarName);
 
   const lambdaCli = `aws --endpoint-url=http://localhost:4566 --region ${region} lambda invoke --function-name ${name} output.json`;
   const lambdaCurl = `curl -X POST http://localhost:4566/2015-03-31/functions/${name}/invocations -d '{"event":"test"}'`;
@@ -40,6 +47,8 @@ export function LiveServerlessSpecs({ serviceType, config, isRunning }: Props) {
           <span className="font-mono text-[11px] select-all" style={{ color: tokens.textSecondary }}>http://localhost:4566</span>
         </div>
       </div>
+
+      {isLambda && <Ec2EnvSection envEdges={envEdges} nodes={nodes} />}
 
       {isRunning && isLambda && (
         <>
