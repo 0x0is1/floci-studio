@@ -8,7 +8,11 @@ node_modules/
 .next/
 */.next/
 out/
+*/out/
 dist/
+*/dist/
+dist-package/
+*/dist-package/
 build/
 .turbo/
 *.tsbuildinfo

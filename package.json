@@ -7,6 +7,12 @@
     "dev": "bun --cwd frontends/playground dev",
     "dev:frontend": "bun --cwd frontends/playground dev",
     "dev:backend": "bun --cwd services/api dev",
+    "electron": "bun run --cwd electron start",
+    "electron:build": "bun run --cwd electron build",
+    "electron:dist": "bun run --cwd electron dist",
+    "electron:exe": "bun run --cwd electron dist:exe",
+    "test:electron": "playwright test tests/e2e/electron.spec.ts",
+    "test:electron:unit": "bun test --cwd electron tests/checkers.test.ts",
     "test:backend": "bun --cwd services/api test",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
@@ -19,4 +25,3 @@
     "typescript": "^5.7.3"
   }
 }
-
