@@ -36,6 +36,9 @@ Floci AWS Visual Playground is a real local cloud infrastructure playground. Use
    - Never use `animate-pulse` or pulse animations anywhere in the UI or codebase. All status indicators must use steady, crisp colors.
 9. AUTOMATIC ENVIRONMENT VARIABLE INJECTION:
    - Compute nodes (EC2, Lambda, ECS) connected to downstream resources (S3, SQS, DynamoDB, RDS, SNS, Secrets, Bedrock) MUST have their environment variables automatically injected with real provisioned resource references in both backend SDK provisioners (`Environment.Variables` / process env) and visual inspector sidebars.
+10. STRICT BAN ON GIT PUSH AND RELEASE UPLOADS WITHOUT EXPLICIT CONSENT:
+   - NEVER execute `git push` or release uploads (`gh release upload` / `gh release create`) automatically.
+   - Pushes and releases are STRICTLY BANNED without direct, explicit permission given by the user in the prompt.
 
 ## 4. Workspaces & Directories
 - frontends/playground: Next.js 15 UI

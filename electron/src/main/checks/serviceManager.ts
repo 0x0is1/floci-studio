@@ -25,13 +25,15 @@ export function getServicesDir(): string {
 }
 
 function runDockerCompose(
-  composePath: string,
   cwd: string,
   onProgress?: (msg: string) => void
 ): Promise<{ ok: boolean; error?: string }> {
   return new Promise((resolve) => {
     onProgress?.('Initializing Docker containers...');
-    const proc = spawn('docker', ['compose', '-f', composePath, 'up', '-d', '--build'], { cwd, shell: true });
+    const proc = spawn('docker', ['compose', '-f', 'docker-compose.yml', 'up', '-d', '--build'], {
+      cwd,
+      shell: false,
+    });
     let stderr = '';
     const parse = (data: Buffer | string) => {
       const text = data.toString();
@@ -62,7 +64,7 @@ export async function startBackendServices(onProgress?: (msg: string) => void): 
     return { ok: false, detail: 'Compose file not found', error: `Missing ${composePath}` };
   }
 
-  const composeRes = await runDockerCompose(composePath, servicesDir, onProgress);
+  const composeRes = await runDockerCompose(servicesDir, onProgress);
   if (!composeRes.ok) {
     return { ok: false, detail: 'Failed to start Docker Compose services', error: composeRes.error };
   }

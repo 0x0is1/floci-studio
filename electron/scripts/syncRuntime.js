@@ -32,11 +32,12 @@ fs.mkdirSync(dataProjects, { recursive: true });
 const dataFloci = path.join(dest, 'data/floci');
 fs.mkdirSync(dataFloci, { recursive: true });
 
-if (fs.existsSync(path.join(repoRoot, 'services/data/projects/proj-starter.json'))) {
-  fs.copyFileSync(
-    path.join(repoRoot, 'services/data/projects/proj-starter.json'),
-    path.join(dataProjects, 'proj-starter.json')
-  );
+const srcProjectsDir = path.join(repoRoot, 'services/data/projects');
+if (fs.existsSync(srcProjectsDir)) {
+  const files = fs.readdirSync(srcProjectsDir).filter((f) => f.endsWith('.json'));
+  for (const file of files) {
+    fs.copyFileSync(path.join(srcProjectsDir, file), path.join(dataProjects, file));
+  }
 }
 
 console.log('Successfully synced runtime-services for packaging.');
