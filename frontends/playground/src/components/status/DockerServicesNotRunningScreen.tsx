@@ -17,7 +17,7 @@ export function DockerServicesNotRunningScreen() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-zinc-950/95 backdrop-blur-md select-none">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-zinc-950/95 backdrop-blur-md select-none">
       <div
         className="w-full max-w-lg rounded-2xl border p-6 md:p-8 shadow-2xl flex flex-col items-center text-center space-y-5"
         style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border }}
@@ -43,7 +43,7 @@ export function DockerServicesNotRunningScreen() {
           </div>
           <div className="pl-5 text-zinc-400 space-y-0.5">
             <div>1. Resume or unpause Docker Desktop.</div>
-            <div>2. Ensure container `oss-floci` is running.</div>
+            <div>2. Ensure container oss-floci is running.</div>
           </div>
           {details && <div className="text-rose-400 border-t border-zinc-800 pt-1 mt-1 truncate">Status: {details}</div>}
         </div>
@@ -72,4 +72,3 @@ export function DockerServicesNotRunningScreen() {
     </div>
   );
 }
-

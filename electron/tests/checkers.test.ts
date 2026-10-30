@@ -1,15 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import { checkDockerInstalled, checkDockerRunning, checkBunInstalled, checkInternetConnection } from '@/main/checks/systemChecker';
+import { checkDockerInstalled, checkDockerRunning, checkInternetConnection } from '@/main/checks/systemChecker';
 import { checkNodeModulesExist } from '@/main/checks/nodeModulesChecker';
 import { pingUrl, checkFrontendHealth } from '@/main/checks/healthChecker';
 
 describe('Electron System Checkers', () => {
-  it('detects bun runtime successfully', async () => {
-    const res = await checkBunInstalled();
-    expect(res.ok).toBe(true);
-    expect(res.version).toBeDefined();
-  });
-
   it('detects docker cli installation', async () => {
     const res = await checkDockerInstalled();
     expect(res.ok).toBe(true);
@@ -45,5 +39,3 @@ describe('Electron System Checkers', () => {
     expect(result).toBe(false);
   });
 });
-
-

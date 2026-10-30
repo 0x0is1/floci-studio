@@ -18,7 +18,7 @@ export function BackendUnresponsiveScreen() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-zinc-950/95 backdrop-blur-md select-none">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-zinc-950/95 backdrop-blur-md select-none">
       <div
         className="w-full max-w-lg rounded-2xl border p-6 md:p-8 shadow-2xl flex flex-col items-center text-center space-y-5"
         style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border }}
@@ -67,4 +67,3 @@ export function BackendUnresponsiveScreen() {
     </div>
   );
 }
-

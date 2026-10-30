@@ -35,10 +35,10 @@ test.describe('Electron Desktop Application', () => {
     const heading = await window.textContent('h1');
     expect(heading).toContain('Floci Studio');
 
-    await window.waitForSelector('text=Bun Runtime');
+    await window.waitForSelector('text=Docker CLI');
     const appText = await window.textContent('body');
-    expect(appText).toContain('Bun Runtime');
     expect(appText).toContain('Docker CLI');
+    expect(appText).toContain('Docker Engine');
 
     await electronApp.close();
   });

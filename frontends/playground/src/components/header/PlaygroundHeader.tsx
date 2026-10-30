@@ -5,7 +5,7 @@ import { usePlaygroundStore } from '@/store/playgroundStore';
 import { useBottomTrayStore } from '@/store/bottomTrayStore';
 import { useCanvasTabStore } from '@/store/canvasTabStore';
 import { useTheme } from '@/theme/ThemeProvider';
-import { useFlociHealth } from '@/hooks/useSwrApi';
+import { useServiceHealth } from '@/context/ServiceHealthContext';
 import { PlaygroundHeaderNav } from './PlaygroundHeaderNav';
 import { PlaygroundHeaderControls } from './PlaygroundHeaderControls';
 import { toast } from 'sonner';
@@ -15,8 +15,7 @@ import { mutate } from 'swr';
 export function PlaygroundHeader() {
   const { activeProjectId, isDirty, saveCurrentProject, isExecuting, setExecuting, isDeployed, setDeployed, updateNodeStatus, nodes, edges } = usePlaygroundStore();
   const { setActiveTab, addLogs } = useBottomTrayStore();
-  const { data: health } = useFlociHealth();
-  const flociOnline = health?.floci?.status === 'connected';
+  const { healthState } = useServiceHealth();
   const { tokens } = useTheme();
   const [isSaving, setIsSaving] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
@@ -27,15 +26,17 @@ export function PlaygroundHeader() {
       const ok = await saveCurrentProject();
       if (ok) toast.success('Project Saved', { description: 'All configurations saved.' });
       else toast.error('Save Failed', { description: 'Backend service or Docker is offline.' });
-    } finally {
-      setIsSaving(false);
-    }
+    } finally { setIsSaving(false); }
   };
 
   const handleDeploy = async () => {
     if (!activeProjectId) return;
+    if (healthState !== 'healthy') {
+      toast.error('Deployment Blocked', { description: healthState === 'docker_not_running' ? 'Docker services paused.' : 'Backend is unreachable.' });
+      return;
+    }
     setExecuting(true); setActiveTab('terminal');
-    toast.info('Starting Deployment', { description: 'Executing dependency DAG against Floci emulator...' });
+    toast.info('Starting Deployment', { description: 'Executing DAG against Floci emulator...' });
     nodes.forEach((n) => updateNodeStatus(n.id, 'deploying'));
     try {
       const res = await deployInfrastructure(nodes, edges, activeProjectId);
@@ -75,18 +76,15 @@ export function PlaygroundHeader() {
       mutate(`/api/projects/${activeProjectId}`);
       await saveCurrentProject().catch(() => {});
       toast.info('Playground Reset', { description: 'Infrastructure stopped and canvas unfrozen.' });
-    } finally {
-      setIsStopping(false);
-    }
+    } finally { setIsStopping(false); }
   };
 
   return (
     <header className="h-12 border-b px-4 flex items-center justify-between shrink-0 transition-colors sticky top-0 z-30" style={{ backgroundColor: tokens.headerBg, borderColor: tokens.border }}>
       <PlaygroundHeaderNav />
       <PlaygroundHeaderControls
-        flociOnline={flociOnline} isExecuting={isExecuting} isDeployed={isDeployed} isDirty={isDirty}
-        isSaving={isSaving} isStopping={isStopping}
-        hasProject={Boolean(activeProjectId)} nodeCount={nodes.length}
+        healthState={healthState} isExecuting={isExecuting} isDeployed={isDeployed} isDirty={isDirty}
+        isSaving={isSaving} isStopping={isStopping} hasProject={Boolean(activeProjectId)} nodeCount={nodes.length}
         onSave={handleSave} onDeploy={handleDeploy} onStop={handleStop}
       />
     </header>

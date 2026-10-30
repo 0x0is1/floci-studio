@@ -3,9 +3,10 @@
 import React from 'react';
 import { LuPlay, LuSquare, LuSave, LuSunMedium, LuMoon, LuLoaderCircle } from 'react-icons/lu';
 import { useTheme } from '@/theme/ThemeProvider';
+import { HealthState } from '@/context/ServiceHealthContext';
 
 interface Props {
-  flociOnline: boolean | null;
+  healthState: HealthState;
   isExecuting: boolean;
   isDeployed: boolean;
   isSaving?: boolean;
@@ -19,18 +20,23 @@ interface Props {
 }
 
 export function PlaygroundHeaderControls({
-  flociOnline, isExecuting, isDeployed, isSaving = false, isStopping = false,
+  healthState, isExecuting, isDeployed, isSaving = false, isStopping = false,
   isDirty = false, hasProject, nodeCount, onSave, onDeploy, onStop,
 }: Props) {
   const { theme, tokens, toggleTheme } = useTheme();
-  const canDeploy = !isExecuting && !isDeployed && hasProject && nodeCount > 0;
+  const isHealthy = healthState === 'healthy';
+  const canDeploy = !isExecuting && !isDeployed && hasProject && nodeCount > 0 && isHealthy;
+
+  const badgeColor = isHealthy ? 'text-emerald-400' : healthState === 'docker_not_running' ? 'text-amber-400' : 'text-rose-400';
+  const dotColor = isHealthy ? 'bg-emerald-400' : healthState === 'docker_not_running' ? 'bg-amber-400' : 'bg-rose-400';
+  const badgeLabel = isHealthy ? 'ONLINE' : healthState === 'docker_not_running' ? 'PAUSED' : 'OFFLINE';
 
   return (
     <div className="flex items-center gap-2">
       <div className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-[10px] font-mono mr-2" style={{ borderColor: tokens.border }}>
-        <span className={`w-1.5 h-1.5 rounded-full ${flociOnline ? 'bg-emerald-400' : 'bg-red-400'}`} />
+        <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
         <span style={{ color: tokens.textMuted }}>Floci 4566:</span>
-        <span className={flociOnline ? 'text-emerald-400' : 'text-red-400'}>{flociOnline ? 'ONLINE' : 'OFFLINE'}</span>
+        <span className={badgeColor}>{badgeLabel}</span>
       </div>
 
       <button
@@ -48,7 +54,7 @@ export function PlaygroundHeaderControls({
 
       <button
         onClick={onSave}
-        disabled={!hasProject || isExecuting || isSaving}
+        disabled={!hasProject || isExecuting || isSaving || !isHealthy}
         style={{ backgroundColor: tokens.btnBg, borderColor: tokens.border, color: tokens.textPrimary }}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-85 cursor-pointer"
       >
@@ -60,7 +66,7 @@ export function PlaygroundHeaderControls({
       <button
         onClick={onDeploy}
         disabled={!canDeploy || isExecuting}
-        title={!hasProject ? 'Select or create a project first' : nodeCount === 0 ? 'Add components to canvas before deploying' : 'Deploy to Floci'}
+        title={!hasProject ? 'Select or create a project first' : !isHealthy ? 'Docker or backend is offline' : nodeCount === 0 ? 'Add components to canvas' : 'Deploy to Floci'}
         className="flex items-center gap-1 px-3 py-1.5 rounded bg-sky-500 hover:bg-sky-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 text-xs font-semibold cursor-pointer"
       >
         {isExecuting ? <LuLoaderCircle className="w-3.5 h-3.5 animate-spin" /> : <LuPlay className="w-3.5 h-3.5 fill-current" />}

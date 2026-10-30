@@ -2,14 +2,12 @@ import { API_BASE, safeFetch } from './flociFetch';
 
 export async function fetchHealth() {
   const res = await safeFetch('/api/health', { cache: 'no-store' }, 2000);
-  return res.ok && res.data ? res.data : { status: 'unreachable', error: res.error };
+  return res.ok && res.data ? res.data : { status: 'unreachable', error: res.error, statusHttp: res.status };
 }
 
 export async function fetchRuntimeState(projectId?: string) {
-  const endpoint = projectId
-    ? `/api/orchestrator/runtime-state?projectId=${encodeURIComponent(projectId)}`
-    : '/api/orchestrator/runtime-state';
-  const res = await safeFetch(endpoint, { cache: 'no-store' }, 3000);
+  const ep = projectId ? `/api/orchestrator/runtime-state?projectId=${encodeURIComponent(projectId)}` : '/api/orchestrator/runtime-state';
+  const res = await safeFetch(ep, { cache: 'no-store' }, 3000);
   return res.ok && res.data ? res.data : { success: false, error: res.error };
 }
 
@@ -20,7 +18,7 @@ export async function listProjects() {
 
 export async function getProject(id: string) {
   const res = await safeFetch(`/api/projects/${id}`, { cache: 'no-store' }, 3000);
-  return res.ok && res.data ? res.data : { success: false, error: res.error };
+  return res.ok && res.data ? res.data : { success: false, error: res.error, status: res.status };
 }
 
 export async function createProject(name: string, description?: string) {

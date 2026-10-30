@@ -3,11 +3,14 @@ import { reconcileNodeStates } from '@/lib/state/stateRecovery';
 import { useBottomTrayStore } from '@/store/bottomTrayStore';
 import { mutate } from 'swr';
 
+export type ProjectLoadStatus = 'idle' | 'loading' | 'loaded' | 'not_found' | 'error';
+
 export interface ProjectStateSlice {
   projects: Array<{ id: string; name: string; updatedAt: string; status: string }>;
   activeProjectId: string | null;
   projectName: string;
   isDirty: boolean;
+  projectLoadStatus: ProjectLoadStatus;
   loadProjects: () => Promise<void>;
   switchProject: (id: string) => Promise<boolean>;
   closeProject: (skipConfirm?: boolean) => void;
@@ -17,10 +20,7 @@ export interface ProjectStateSlice {
 }
 
 export const createProjectSlice = (set: any, get: any) => ({
-  projects: [],
-  activeProjectId: null,
-  projectName: '',
-  isDirty: false,
+  projects: [], activeProjectId: null, projectName: '', isDirty: false, projectLoadStatus: 'idle' as ProjectLoadStatus,
 
   loadProjects: async () => {
     const res = await listProjects();
@@ -28,32 +28,30 @@ export const createProjectSlice = (set: any, get: any) => ({
   },
 
   switchProject: async (id: string): Promise<boolean> => {
+    set({ projectLoadStatus: 'loading' });
     const res = await getProject(id);
     if (res?.success && res.data) {
       const runtime = await fetchRuntimeState(id).catch(() => null);
       const { nodes: updatedNodes, isDeployed } = reconcileNodeStates(res.data.nodes || [], runtime, res.data.edges || [], res.data.status);
       useBottomTrayStore.getState().setLogs(res.data.logs || []);
       set({
-        activeProjectId: id, projectName: res.data.name,
-        nodes: updatedNodes, edges: res.data.edges || [],
-        isDeployed, isDirty: false, selectedNodeId: null, selectedEdgeId: null,
+        activeProjectId: id, projectName: res.data.name, nodes: updatedNodes, edges: res.data.edges || [],
+        isDeployed, isDirty: false, selectedNodeId: null, selectedEdgeId: null, projectLoadStatus: 'loaded',
       });
       return true;
     }
+    const isNotFound = res?.status === 404 || res?.error?.includes('404') || res?.error?.toLowerCase().includes('not found');
+    set({ projectLoadStatus: isNotFound ? 'not_found' : 'error' });
     return false;
   },
 
   closeProject: (skipConfirm?: boolean) => {
     const { isDirty, isDeployed } = get();
     if (!skipConfirm && (isDirty || isDeployed)) {
-      const ok = typeof window !== 'undefined' ? window.confirm('You have unsaved changes or active infrastructure. Do you want to leave this project?') : true;
-      if (!ok) return;
+      if (typeof window !== 'undefined' && !window.confirm('Leave project with unsaved changes or active infrastructure?')) return;
     }
     useBottomTrayStore.getState().clearLogs();
-    set({
-      activeProjectId: null, projectName: '',
-      nodes: [], edges: [], isDeployed: false, isDirty: false, selectedNodeId: null, selectedEdgeId: null,
-    });
+    set({ activeProjectId: null, projectName: '', nodes: [], edges: [], isDeployed: false, isDirty: false, selectedNodeId: null, selectedEdgeId: null, projectLoadStatus: 'idle' });
   },
 
   createNewProject: async (name: string): Promise<boolean> => {
@@ -80,11 +78,7 @@ export const createProjectSlice = (set: any, get: any) => ({
     if (!activeProjectId) return false;
     const now = new Date().toISOString();
     const currentLogs = useBottomTrayStore.getState().logs || [];
-    const res = await saveProject({
-      id: activeProjectId, name: projectName, nodes, edges,
-      createdAt: now, updatedAt: now, status: isDeployed ? 'running' : 'draft',
-      logs: currentLogs,
-    });
+    const res = await saveProject({ id: activeProjectId, name: projectName, nodes, edges, createdAt: now, updatedAt: now, status: isDeployed ? 'running' : 'draft', logs: currentLogs });
     if (res?.success) {
       set({ isDirty: false });
       mutate('/api/projects');

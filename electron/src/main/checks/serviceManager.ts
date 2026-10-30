@@ -1,4 +1,4 @@
-import { spawn, exec, type ChildProcess } from 'child_process';
+import { exec, type ChildProcess } from 'child_process';
 import path from 'path';
 import { existsSync, cpSync, rmSync } from 'fs';
 import { promisify } from 'util';
@@ -17,11 +17,10 @@ export async function startBackendServices(): Promise<CheckResult> {
   const composePath = path.join(root, 'services', 'docker-compose.yml');
   try {
     await execAsync(`docker compose -f "${composePath}" up -d`);
-  } catch {
-    const apiDir = path.join(root, 'services', 'api');
-    backendProcess = spawn('bun', ['src/index.ts'], { cwd: apiDir, shell: true });
+  } catch (err: any) {
+    return { ok: false, detail: 'Failed to start Docker Compose services', error: err.message };
   }
-  return waitForHealthy(checkBackendHealth, 15, 600);
+  return waitForHealthy(checkBackendHealth, 20, 600);
 }
 
 export async function startFrontendProduction(): Promise<CheckResult> {

@@ -23,15 +23,6 @@ export async function checkDockerRunning(): Promise<CheckResult> {
   }
 }
 
-export async function checkBunInstalled(): Promise<CheckResult> {
-  try {
-    const { stdout } = await execAsync('bun --version');
-    return { ok: true, version: stdout.trim(), detail: `Bun v${stdout.trim()} detected` };
-  } catch {
-    return { ok: false, detail: 'Bun runtime not found on system PATH', error: 'Bun is not installed' };
-  }
-}
-
 export async function checkInternetConnection(): Promise<CheckResult> {
   return new Promise((resolve) => {
     dns.lookup('github.com', (err) => {
@@ -43,4 +34,3 @@ export async function checkInternetConnection(): Promise<CheckResult> {
     });
   });
 }
-
