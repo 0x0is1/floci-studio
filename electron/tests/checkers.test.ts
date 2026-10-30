@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { checkDockerInstalled, checkDockerRunning, checkBunInstalled, checkInternetConnection } from '@/main/checks/systemChecker';
 import { checkNodeModulesExist } from '@/main/checks/nodeModulesChecker';
-import { pingUrl } from '@/main/checks/healthChecker';
+import { pingUrl, checkFrontendHealth } from '@/main/checks/healthChecker';
 
 describe('Electron System Checkers', () => {
   it('detects bun runtime successfully', async () => {
@@ -34,9 +34,16 @@ describe('Electron System Checkers', () => {
     expect(typeof allExist).toBe('boolean');
   });
 
+  it('validates compiled static studio frontend bundle', async () => {
+    const res = await checkFrontendHealth();
+    expect(res.ok).toBe(true);
+    expect(res.detail).toContain('Studio bundle verified');
+  });
+
   it('handles unreachable urls gracefully without crashing', async () => {
     const result = await pingUrl('http://127.0.0.1:59999/unreachable', 200);
     expect(result).toBe(false);
   });
 });
+
 

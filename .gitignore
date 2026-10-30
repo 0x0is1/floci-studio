@@ -7,15 +7,23 @@ node_modules/
 # Next.js build output
 .next/
 */.next/
+**/.next/
 out/
 */out/
+**/out/
 dist/
 */dist/
+**/dist/
 dist-package/
 */dist-package/
+**/dist-package/
 build/
 .turbo/
 *.tsbuildinfo
+*.exe
+*.asar
+*.7z
+*.zip
 
 # Testing & Coverage
 test-results/

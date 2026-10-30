@@ -16,12 +16,12 @@ export function createSplashWindow(): BrowserWindow {
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
-  const winWidth = Math.round(width * 0.8);
-  const winHeight = Math.round(height * 0.8);
 
   mainWindow = new BrowserWindow({
-    width: winWidth,
-    height: winHeight,
+    width,
+    height,
+    x: 0,
+    y: 0,
     minWidth: 800,
     minHeight: 600,
     center: true,
@@ -42,6 +42,8 @@ export function createSplashWindow(): BrowserWindow {
   mainWindow.removeMenu();
   mainWindow.setMenu(null);
   mainWindow.setMenuBarVisibility(false);
+  mainWindow.maximize();
+
   mainWindow.once('ready-to-show', () => mainWindow?.show());
 
   mainWindow.webContents.on('before-input-event', (event, input) => {
@@ -62,5 +64,5 @@ export function createSplashWindow(): BrowserWindow {
 
 export function launchMainStudio(): void {
   if (!mainWindow) return;
-  mainWindow.loadURL('http://localhost:3000');
+  mainWindow.loadURL('app://studio/index.html');
 }

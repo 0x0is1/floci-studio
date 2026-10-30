@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/theme/ThemeProvider';
+import { ServiceHealthProvider } from '@/context/ServiceHealthContext';
+import { GlobalServiceWatcher } from '@/components/status/GlobalServiceWatcher';
 
 export const metadata: Metadata = {
   title: {
@@ -20,7 +22,10 @@ export default function RootLayout({
     <html lang="en" className="h-full w-full">
       <body className="antialiased h-full w-full overflow-hidden">
         <ThemeProvider>
-          {children}
+          <ServiceHealthProvider>
+            <GlobalServiceWatcher />
+            {children}
+          </ServiceHealthProvider>
         </ThemeProvider>
         <Toaster position="bottom-right" richColors />
       </body>

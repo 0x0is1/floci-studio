@@ -2,14 +2,17 @@
 
 import React from 'react';
 import { useTheme } from '@/theme/ThemeProvider';
-import { useFlociHealth } from '@/hooks/useSwrApi';
-import { FaAws } from 'react-icons/fa6';
+import { useServiceHealth } from '@/context/ServiceHealthContext';
 import { LuSunMedium, LuMoon } from 'react-icons/lu';
 
 export function HomeNavbar() {
   const { theme, tokens, toggleTheme } = useTheme();
-  const { data: health } = useFlociHealth();
-  const flociOnline = health?.floci?.status === 'connected';
+  const { healthState } = useServiceHealth();
+
+  const isHealthy = healthState === 'healthy';
+  const badgeColor = isHealthy ? 'bg-emerald-400' : healthState === 'docker_not_running' ? 'bg-amber-400' : 'bg-red-400';
+  const badgeText = isHealthy ? 'ONLINE' : healthState === 'docker_not_running' ? 'DOCKER INACTIVE' : 'OFFLINE';
+  const textColor = isHealthy ? 'text-emerald-400' : healthState === 'docker_not_running' ? 'text-amber-400' : 'text-red-400';
 
   return (
     <header className="h-14 border-b px-6 flex items-center justify-between shrink-0 sticky top-0 z-30 transition-colors" style={{ backgroundColor: tokens.headerBg, borderColor: tokens.border }}>
@@ -20,10 +23,10 @@ export function HomeNavbar() {
 
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-mono" style={{ borderColor: tokens.border, backgroundColor: tokens.cardBgAlt }}>
-          <span className={`w-2 h-2 rounded-full ${flociOnline ? 'bg-emerald-400' : 'bg-red-400'}`} />
-          <span style={{ color: tokens.textMuted }}>Floci 4566:</span>
-          <span className={flociOnline ? 'text-emerald-400 font-semibold' : 'text-red-400 font-semibold'}>
-            {flociOnline ? 'ONLINE' : 'OFFLINE'}
+          <span className={`w-2 h-2 rounded-full ${badgeColor}`} />
+          <span style={{ color: tokens.textMuted }}>Services:</span>
+          <span className={`${textColor} font-semibold`}>
+            {badgeText}
           </span>
         </div>
 

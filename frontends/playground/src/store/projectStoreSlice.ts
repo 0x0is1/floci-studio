@@ -9,11 +9,11 @@ export interface ProjectStateSlice {
   projectName: string;
   isDirty: boolean;
   loadProjects: () => Promise<void>;
-  switchProject: (id: string) => Promise<void>;
+  switchProject: (id: string) => Promise<boolean>;
   closeProject: (skipConfirm?: boolean) => void;
-  createNewProject: (name: string) => Promise<void>;
-  deleteProjectById: (id: string) => Promise<void>;
-  saveCurrentProject: () => Promise<void>;
+  createNewProject: (name: string) => Promise<boolean>;
+  deleteProjectById: (id: string) => Promise<boolean>;
+  saveCurrentProject: () => Promise<boolean>;
 }
 
 export const createProjectSlice = (set: any, get: any) => ({
@@ -24,14 +24,12 @@ export const createProjectSlice = (set: any, get: any) => ({
 
   loadProjects: async () => {
     const res = await listProjects();
-    if (res.success && Array.isArray(res.data)) {
-      set({ projects: res.data });
-    }
+    if (res?.success && Array.isArray(res.data)) set({ projects: res.data });
   },
 
-  switchProject: async (id: string) => {
+  switchProject: async (id: string): Promise<boolean> => {
     const res = await getProject(id);
-    if (res.success) {
+    if (res?.success && res.data) {
       const runtime = await fetchRuntimeState(id).catch(() => null);
       const { nodes: updatedNodes, isDeployed } = reconcileNodeStates(res.data.nodes || [], runtime, res.data.edges || [], res.data.status);
       useBottomTrayStore.getState().setLogs(res.data.logs || []);
@@ -40,7 +38,9 @@ export const createProjectSlice = (set: any, get: any) => ({
         nodes: updatedNodes, edges: res.data.edges || [],
         isDeployed, isDirty: false, selectedNodeId: null, selectedEdgeId: null,
       });
+      return true;
     }
+    return false;
   },
 
   closeProject: (skipConfirm?: boolean) => {
@@ -56,25 +56,28 @@ export const createProjectSlice = (set: any, get: any) => ({
     });
   },
 
-  createNewProject: async (name: string) => {
+  createNewProject: async (name: string): Promise<boolean> => {
     const res = await createProject(name);
-    if (res.success) {
+    if (res?.success && res.data?.id) {
       mutate('/api/projects');
       await get().loadProjects();
       await get().switchProject(res.data.id);
+      return true;
     }
+    return false;
   },
 
-  deleteProjectById: async (id: string) => {
-    await deleteProject(id);
+  deleteProjectById: async (id: string): Promise<boolean> => {
+    const res = await deleteProject(id);
     mutate('/api/projects');
     if (get().activeProjectId === id) get().closeProject(true);
     await get().loadProjects();
+    return Boolean(res?.success);
   },
 
-  saveCurrentProject: async () => {
+  saveCurrentProject: async (): Promise<boolean> => {
     const { activeProjectId, projectName, nodes, edges, isDeployed } = get();
-    if (!activeProjectId) return;
+    if (!activeProjectId) return false;
     const now = new Date().toISOString();
     const currentLogs = useBottomTrayStore.getState().logs || [];
     const res = await saveProject({
@@ -87,6 +90,8 @@ export const createProjectSlice = (set: any, get: any) => ({
       mutate('/api/projects');
       mutate(`/api/projects/${activeProjectId}`);
       await get().loadProjects();
+      return true;
     }
+    return false;
   },
 });

@@ -1,20 +1,19 @@
-import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { ClientHomePage } from '@/components/home/ClientHomePage';
+import { SearchParamsWatcher } from './SearchParamsWatcher';
 
 export const metadata: Metadata = {
-  title: 'Home',
+  title: 'Floci Studio | Home',
 };
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ project?: string }>;
-}) {
-  const params = await searchParams;
-  if (params?.project) {
-    redirect(`/projects/${params.project}/editor`);
-  }
-
-  return <ClientHomePage />;
+export default function HomePage() {
+  return (
+    <>
+      <Suspense fallback={null}>
+        <SearchParamsWatcher />
+      </Suspense>
+      <ClientHomePage />
+    </>
+  );
 }

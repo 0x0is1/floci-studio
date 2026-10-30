@@ -40,7 +40,7 @@ export async function runFullPreflight(onUpdate: StepUpdateFn): Promise<boolean>
   onUpdate({ id: 'backend', label: 'Backend Services', status: backRes.ok ? 'ready' : 'error', detail: backRes.detail, error: backRes.error });
   if (!backRes.ok) return false;
 
-  onUpdate({ id: 'frontend', label: 'Studio Frontend', status: 'checking', detail: 'Starting production server...' });
+  onUpdate({ id: 'frontend', label: 'Studio Frontend', status: 'checking', detail: 'Verifying compiled Studio UI...' });
   const frontRes = await startFrontendProduction();
   onUpdate({ id: 'frontend', label: 'Studio Frontend', status: frontRes.ok ? 'ready' : 'error', detail: frontRes.detail, error: frontRes.error });
   return frontRes.ok;

@@ -7,9 +7,10 @@
   "main": "dist/main/index.js",
   "scripts": {
     "build:splash": "bun run --cwd splash build",
+    "sync:studio": "bun -e \"const fs = require('fs'); const src = '../frontends/playground/out'; const dest = 'studio/out'; if (fs.existsSync(src)) { if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true, force: true }); fs.cpSync(src, dest, { recursive: true }); }\"",
     "build:electron": "bun build src/main/index.ts --target=node --format=cjs --outfile=dist/main/index.js --external=electron && bun build src/preload/index.ts --target=node --format=cjs --outfile=dist/preload/index.js --external=electron",
     "typecheck": "tsc --noEmit",
-    "build": "bun run build:splash && bun run build:electron",
+    "build": "bun run sync:studio && bun run build:splash && bun run build:electron",
     "start": "electron .",
     "test": "bun test tests/checkers.test.ts",
     "dist": "electron-builder --win --dir",
@@ -25,6 +26,7 @@
       "dist/**/*",
       "assets/**/*",
       "splash/out/**/*",
+      "studio/out/**/*",
       "package.json"
     ],
     "win": {

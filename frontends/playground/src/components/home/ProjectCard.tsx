@@ -8,14 +8,7 @@ import { LuFolder, LuArrowRight, LuTrash2, LuClock } from 'react-icons/lu';
 import { toast } from 'sonner';
 
 interface Props {
-  project: {
-    id: string;
-    name: string;
-    updatedAt: string;
-    status: string;
-    nodeCount?: number;
-    edgeCount?: number;
-  };
+  project: { id: string; name: string; updatedAt: string; status: string; nodeCount?: number; edgeCount?: number };
 }
 
 export function ProjectCard({ project }: Props) {
@@ -23,23 +16,19 @@ export function ProjectCard({ project }: Props) {
   const { deleteProjectById } = usePlaygroundStore();
   const { tokens } = useTheme();
 
-  const handleOpen = () => {
-    router.push(`/projects/${project.id}/editor`);
-  };
+  const handleOpen = () => router.push(`/projects/${project.id}/editor`);
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm(`Delete project "${project.name}"?`)) {
-      deleteProjectById(project.id);
-      toast.info('Project deleted');
+      const ok = await deleteProjectById(project.id);
+      if (ok) toast.info('Project deleted');
+      else toast.error('Failed to delete project', { description: 'Backend service offline.' });
     }
   };
 
   const dateStr = project.updatedAt ? new Date(project.updatedAt).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }) : 'Just now';
 
   return (
@@ -62,8 +51,7 @@ export function ProjectCard({ project }: Props) {
             </div>
           </div>
           <button
-            type="button"
-            onClick={handleDelete}
+            type="button" onClick={handleDelete}
             className="p-1.5 rounded text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
             title="Delete project"
           >
@@ -81,13 +69,9 @@ export function ProjectCard({ project }: Props) {
         <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
           {project.status || 'DRAFT'}
         </span>
-
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleOpen();
-          }}
+          onClick={(e) => { e.stopPropagation(); handleOpen(); }}
           className="flex items-center gap-1.5 text-xs font-semibold text-sky-400 group-hover:translate-x-1 transition-transform cursor-pointer"
         >
           <span>Open Canvas</span>

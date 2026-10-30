@@ -1,10 +1,10 @@
-import { app, protocol, net } from 'electron';
+import { app, protocol } from 'electron';
 import path from 'path';
-import { pathToFileURL } from 'url';
 import { existsSync } from 'fs';
 import { createSplashWindow } from '@/main/windowManager';
 import { registerIpcHandlers } from '@/main/ipcRegistry';
 import { cleanupProcesses } from '@/main/checks/serviceManager';
+import { setupAppProtocol, getSplashDir } from '@/main/protocolHandler';
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -25,23 +25,13 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.whenReady().then(() => {
-    const splashOut = path.join(app.getAppPath(), 'splash/out');
-
-    protocol.handle('app', (request) => {
-      const parsed = new URL(request.url);
-      let pathname = decodeURIComponent(parsed.pathname);
-      if (!pathname || pathname === '/') {
-        pathname = '/index.html';
-      }
-      const targetFile = path.join(splashOut, pathname);
-      return net.fetch(pathToFileURL(targetFile).toString());
-    });
-
+    setupAppProtocol();
     registerIpcHandlers();
     const win = createSplashWindow();
 
-    if (existsSync(path.join(splashOut, 'index.html'))) {
-      win.loadURL('app://studio/index.html');
+    const splashIndex = path.join(getSplashDir(), 'index.html');
+    if (existsSync(splashIndex)) {
+      win.loadURL('app://splash/index.html');
     } else {
       win.loadURL('http://localhost:3002');
     }

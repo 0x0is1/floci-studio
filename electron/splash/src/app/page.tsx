@@ -6,22 +6,14 @@ import { CheckStepItem } from '@/components/CheckStepItem';
 import { ProgressBar } from '@/components/ProgressBar';
 import { ActionControls } from '@/components/ActionControls';
 import type { CheckStep } from '@/types/splash';
-
-const INITIAL_STEPS: Record<string, CheckStep> = {
-  bun: { id: 'bun', label: 'Bun Runtime', status: 'pending', detail: 'Waiting' },
-  docker_cli: { id: 'docker_cli', label: 'Docker CLI', status: 'pending', detail: 'Waiting' },
-  docker_run: { id: 'docker_run', label: 'Docker Engine', status: 'pending', detail: 'Waiting' },
-  modules: { id: 'modules', label: 'Dependencies', status: 'pending', detail: 'Waiting' },
-  network: { id: 'network', label: 'Network Mode', status: 'pending', detail: 'Checking' },
-  backend: { id: 'backend', label: 'Backend Services', status: 'pending', detail: 'Waiting' },
-  frontend: { id: 'frontend', label: 'Studio Frontend', status: 'pending', detail: 'Waiting' },
-};
+import { INITIAL_STEPS } from '@/types/splash';
 
 export default function SplashPage() {
   const [steps, setSteps] = useState<Record<string, CheckStep>>(INITIAL_STEPS);
   const [isComplete, setIsComplete] = useState(false);
   const [hasErrors, setHasErrors] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const completedCount = useMemo(
     () => Object.values(steps).filter((s) => s.status === 'ready').length,
@@ -32,6 +24,7 @@ export default function SplashPage() {
     setSteps(INITIAL_STEPS);
     setHasErrors(false);
     setIsComplete(false);
+    setCountdown(null);
     if (typeof window === 'undefined') return;
 
     if (window.electronAPI) {
@@ -43,7 +36,16 @@ export default function SplashPage() {
       const ok = await window.electronAPI.startChecks();
       if (ok) {
         setIsComplete(true);
-        setTimeout(() => window.electronAPI?.launchStudio(), 800);
+        setCountdown(3);
+        let count = 3;
+        const timer = setInterval(() => {
+          count -= 1;
+          setCountdown(count);
+          if (count <= 0) {
+            clearInterval(timer);
+            window.electronAPI?.launchStudio();
+          }
+        }, 1000);
       } else {
         setHasErrors(true);
       }
@@ -78,6 +80,7 @@ export default function SplashPage() {
         <ActionControls
           isComplete={isComplete}
           hasErrors={hasErrors}
+          countdown={countdown}
           onLaunch={() => window.electronAPI?.launchStudio()}
           onRetry={startPreflight}
         />

@@ -1,4 +1,7 @@
 import http from 'http';
+import path from 'path';
+import { existsSync } from 'fs';
+import { getRepoRoot } from '@/main/checks/nodeModulesChecker';
 import type { CheckResult } from '@/main/types';
 
 export function pingUrl(url: string, timeoutMs = 1500): Promise<boolean> {
@@ -36,9 +39,13 @@ export async function checkBackendHealth(): Promise<CheckResult> {
 }
 
 export async function checkFrontendHealth(): Promise<CheckResult> {
-  const healthy = await pingUrl('http://127.0.0.1:3000');
-  if (healthy) return { ok: true, detail: 'Studio frontend healthy on port 3000' };
-  return { ok: false, detail: 'Frontend unreachable', error: 'Port 3000 not responding' };
+  const root = getRepoRoot();
+  const repoOut = path.join(root, 'frontends/playground/out/index.html');
+  const studioOut = path.join(root, 'electron/studio/out/index.html');
+  if (existsSync(repoOut) || existsSync(studioOut)) {
+    return { ok: true, detail: 'Compiled Studio bundle verified' };
+  }
+  return { ok: false, detail: 'Studio bundle missing', error: 'Static HTML build not found' };
 }
 
 export async function waitForHealthy(

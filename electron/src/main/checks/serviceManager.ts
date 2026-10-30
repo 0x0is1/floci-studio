@@ -1,6 +1,6 @@
 import { spawn, exec, type ChildProcess } from 'child_process';
 import path from 'path';
-import { existsSync } from 'fs';
+import { existsSync, cpSync, rmSync } from 'fs';
 import { promisify } from 'util';
 import { getRepoRoot } from '@/main/checks/nodeModulesChecker';
 import { checkBackendHealth, checkFrontendHealth, waitForHealthy } from '@/main/checks/healthChecker';
@@ -8,7 +8,6 @@ import type { CheckResult } from '@/main/types';
 
 const execAsync = promisify(exec);
 let backendProcess: ChildProcess | null = null;
-let frontendProcess: ChildProcess | null = null;
 
 export async function startBackendServices(): Promise<CheckResult> {
   const currentHealth = await checkBackendHealth();
@@ -31,26 +30,25 @@ export async function startFrontendProduction(): Promise<CheckResult> {
 
   const root = getRepoRoot();
   const playgroundDir = path.join(root, 'frontends', 'playground');
-  const buildId = path.join(playgroundDir, '.next', 'BUILD_ID');
-  if (!existsSync(buildId)) {
-    try {
-      await execAsync('bun run build', { cwd: playgroundDir });
-    } catch {
-      await execAsync('npm run build', { cwd: playgroundDir });
-    }
+  try {
+    await execAsync('bun run build', { cwd: playgroundDir });
+  } catch {
+    await execAsync('npm run build', { cwd: playgroundDir });
   }
 
-  frontendProcess = spawn('bun', ['run', 'start', '-p', '3000'], { cwd: playgroundDir, shell: true });
-  return waitForHealthy(checkFrontendHealth, 15, 600);
+  const outSrc = path.join(playgroundDir, 'out');
+  const outDest = path.join(root, 'electron', 'studio', 'out');
+  if (existsSync(outSrc)) {
+    if (existsSync(outDest)) rmSync(outDest, { recursive: true, force: true });
+    cpSync(outSrc, outDest, { recursive: true });
+  }
+
+  return checkFrontendHealth();
 }
 
 export function cleanupProcesses(): void {
   if (backendProcess) {
     backendProcess.kill();
     backendProcess = null;
-  }
-  if (frontendProcess) {
-    frontendProcess.kill();
-    frontendProcess = null;
   }
 }

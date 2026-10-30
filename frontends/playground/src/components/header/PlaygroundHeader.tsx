@@ -24,8 +24,9 @@ export function PlaygroundHeader() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await saveCurrentProject();
-      toast.success('Project Saved', { description: 'All configurations saved.' });
+      const ok = await saveCurrentProject();
+      if (ok) toast.success('Project Saved', { description: 'All configurations saved.' });
+      else toast.error('Save Failed', { description: 'Backend service or Docker is offline.' });
     } finally {
       setIsSaving(false);
     }
@@ -47,9 +48,14 @@ export function PlaygroundHeader() {
         mutate(`/api/projects/${activeProjectId}`);
         await saveCurrentProject().catch(() => {});
         toast.success('Deployment Complete', { description: 'AWS infrastructure is live on localhost!' });
+      } else {
+        nodes.forEach((n) => updateNodeStatus(n.id, 'error'));
+        toast.error('Deployment Failed', { description: res?.error || 'Docker services paused or inactive.' });
       }
-    } catch (err: any) { toast.error('Deployment Failed', { description: err.message }); }
-    finally { setExecuting(false); }
+    } catch (err: any) {
+      nodes.forEach((n) => updateNodeStatus(n.id, 'error'));
+      toast.error('Deployment Failed', { description: err.message });
+    } finally { setExecuting(false); }
   };
 
   const handleStop = async () => {
