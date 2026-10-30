@@ -1,10 +1,10 @@
 import http from 'node:http';
-import { generateWebHtml, getOsReleaseContent, WebTemplateParams } from './webTemplates';
+import { generateWebHtml, getOsReleaseContent } from './webTemplates';
 
 export function dockerReq(method: string, path: string, data?: any): Promise<{ status: number; body: any }> {
   return new Promise((resolve) => {
     const req = http.request(
-      { socketPath: '/var/run/docker.sock', path, method, headers: { 'Content-Type': 'application/json' } },
+      { socketPath: '/var/run/docker.sock', path, method, headers: { 'Content-Type': 'application/json' }, timeout: 2000 },
       (res) => {
         let text = '';
         res.on('data', (c) => (text += c));
@@ -17,6 +17,10 @@ export function dockerReq(method: string, path: string, data?: any): Promise<{ s
         });
       }
     );
+    req.on('timeout', () => {
+      req.destroy();
+      resolve({ status: 500, body: 'Socket request timed out' });
+    });
     req.on('error', (err) => resolve({ status: 500, body: err.message }));
     if (data) req.write(JSON.stringify(data));
     req.end();
@@ -36,9 +40,7 @@ export class DockerService {
       for (const c of list.body) {
         const matchesPort = c.Ports?.some((p: any) => p.PublicPort === port);
         const isEc2 = c.Names?.some((n: string) => n.includes('floci-ec2'));
-        if (matchesPort && isEc2) {
-          await dockerReq('DELETE', `/containers/${c.Id}?force=true`);
-        }
+        if (matchesPort && isEc2) await dockerReq('DELETE', `/containers/${c.Id}?force=true`);
       }
     }
 
@@ -71,9 +73,7 @@ export class DockerService {
         const matchesPort = Boolean(port && (c.Ports?.some((p: any) => p.PublicPort === port) || c.Labels?.['floci.port'] === String(port)));
         const matchesProject = Boolean(projectId && (c.Labels?.['floci.project'] === projectId || c.Names?.some((n: string) => n.includes(projectId))));
         const isEc2 = c.Names?.some((n: string) => n.includes('floci-ec2'));
-        if (isEc2 && (matchesPort || matchesProject)) {
-          await dockerReq('DELETE', `/containers/${c.Id}?force=true`);
-        }
+        if (isEc2 && (matchesPort || matchesProject)) await dockerReq('DELETE', `/containers/${c.Id}?force=true`);
       }
     }
   }
