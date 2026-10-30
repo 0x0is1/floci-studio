@@ -64,12 +64,14 @@ export async function checkFrontendHealth(): Promise<CheckResult> {
 
 export async function waitForHealthy(
   checkFn: () => Promise<CheckResult>,
-  maxAttempts = 25,
-  delayMs = 600
+  maxAttempts = 35,
+  delayMs = 800,
+  onProgress?: (detail: string) => void
 ): Promise<CheckResult> {
   for (let i = 0; i < maxAttempts; i++) {
     const res = await checkFn();
     if (res.ok) return res;
+    onProgress?.(`Waiting for Floci API (${i + 1}/${maxAttempts})...`);
     await new Promise((r) => setTimeout(r, delayMs));
   }
   return checkFn();
