@@ -13,13 +13,14 @@
       "data": {
         "serviceType": "cloudfront",
         "label": "CloudFront CDN",
-        "status": "draft",
+        "status": "running",
         "config": {
           "priceClass": "PriceClass_100",
           "defaultRootObject": "index.html",
           "viewerProtocolPolicy": "redirect-to-https",
           "networkAccess": "public_external"
-        }
+        },
+        "liveUrl": "http://localhost:8080"
       }
     },
     {
@@ -32,7 +33,7 @@
       "data": {
         "serviceType": "ec2",
         "label": "Production Web Server",
-        "status": "draft",
+        "status": "running",
         "config": {
           "ami": "ami-0abcdef1234567891",
           "instanceType": "t3.large",
@@ -48,7 +49,8 @@
             "s3:PutObject",
             "sqs:SendMessage"
           ]
-        }
+        },
+        "liveUrl": "http://localhost:8081"
       }
     },
     {
@@ -61,7 +63,7 @@
       "data": {
         "serviceType": "s3",
         "label": "Static Media Bucket",
-        "status": "draft",
+        "status": "running",
         "config": {
           "bucketName": "app-static-assets-prod",
           "accessControl": "private",
@@ -81,7 +83,7 @@
       "data": {
         "serviceType": "sqs",
         "label": "Background Job Queue",
-        "status": "draft",
+        "status": "running",
         "config": {
           "queueName": "app-jobs-prod",
           "queueType": "standard",
@@ -127,9 +129,9 @@
       }
     }
   ],
-  "createdAt": "2026-10-29T18:31:45.980Z",
-  "updatedAt": "2026-10-29T18:31:45.986Z",
-  "status": "draft",
+  "createdAt": "2026-10-30T09:09:55.923Z",
+  "updatedAt": "2026-10-30T09:09:55.943Z",
+  "status": "running",
   "logs": [
     {
       "id": "log_1793298560644_0onq",
@@ -1168,6 +1170,190 @@
     {
       "id": "log_1793298689103_79b7",
       "timestamp": "18:31:29.103",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 18."
+    },
+    {
+      "id": "log_1793351395178_8b8i",
+      "timestamp": "09:09:55.161",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 4 nodes execution order."
+    },
+    {
+      "id": "log_1793351395180_kfw7",
+      "timestamp": "09:09:55.180",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-1",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name ec2-production-role",
+      "message": "$ aws iam create-role --role-name ec2-production-role"
+    },
+    {
+      "id": "log_1793351395193_hsfm",
+      "timestamp": "09:09:55.193",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-1",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name ec2-production-role --policy-name ec2-production-role-policy",
+      "message": "$ aws iam put-role-policy --role-name ec2-production-role --policy-name ec2-production-role-policy"
+    },
+    {
+      "id": "log_1793351395205_6ltl",
+      "timestamp": "09:09:55.205",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-1",
+      "serviceType": "iam",
+      "message": "Attached policy 'ec2-production-role-policy' with [s3:GetObject, s3:PutObject, sqs:SendMessage].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"5a545855-f7f1-4a12-a2cf-32c2a9c9dacb\",\n    \"extendedRequestId\": \"5a545855-f7f1-4a12-a2cf-32c2a9c9dacb\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793351395205_my9i",
+      "timestamp": "09:09:55.205",
+      "source": "system",
+      "type": "info",
+      "nodeId": "cf-1",
+      "serviceType": "cloudfront",
+      "message": "Provisioning CloudFront CDN..."
+    },
+    {
+      "id": "log_1793351395207_8it0",
+      "timestamp": "09:09:55.207",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "cf-1",
+      "serviceType": "cloudfront",
+      "command": "aws cloudfront create-distribution --origin-domain localhost:8080",
+      "message": "$ aws cloudfront create-distribution --origin-domain localhost:8080"
+    },
+    {
+      "id": "log_1793351395207_qxd8",
+      "timestamp": "09:09:55.207",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "cf-1",
+      "serviceType": "cloudfront",
+      "message": "CloudFront CDN 'EDIST395206' connected -> http://localhost:8080",
+      "rawOutput": "{\n  \"Id\": \"EDIST395206\",\n  \"LocalEdge\": \"http://localhost:8080\",\n  \"Status\": \"Deployed\"\n}"
+    },
+    {
+      "id": "log_1793351395207_e33h",
+      "timestamp": "09:09:55.207",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "message": "Provisioning Production Web Server..."
+    },
+    {
+      "id": "log_1793351395265_s1tl",
+      "timestamp": "09:09:55.265",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "command": "aws ec2 run-instances --image-id ami-0abcdef1234567891 --instance-type t3.large --count 1",
+      "message": "$ aws ec2 run-instances --image-id ami-0abcdef1234567891 --instance-type t3.large --count 1"
+    },
+    {
+      "id": "log_1793351395324_xvgc",
+      "timestamp": "09:09:55.323",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "message": "EC2 Instance i-f67c208daa2c34616 state: RUNNING",
+      "rawOutput": "{\n  \"ReservationId\": \"r-13abc90ac6bd60a5d\",\n  \"OwnerId\": \"000000000000\",\n  \"Groups\": [],\n  \"Instances\": [\n    {\n      \"Architecture\": \"x86_64\",\n      \"BlockDeviceMappings\": [\n        {\n          \"DeviceName\": \"/dev/xvda\",\n          \"Ebs\": {\n            \"AttachTime\": \"2026-10-30T09:09:55.279Z\",\n            \"DeleteOnTermination\": true,\n            \"Status\": \"attached\",\n            \"VolumeId\": \"vol-d451b38c180d9771e\"\n          }\n        }\n      ],\n      \"ClientToken\": \"67c69121-fd7e-439d-8c4e-ec52adc31ae1\",\n      \"EbsOptimized\": false,\n      \"EnaSupport\": true,\n      \"Hypervisor\": \"xen\",\n      \"NetworkInterfaces\": [\n        {\n          \"Attachment\": {\n            \"AttachTime\": \"2026-10-30T09:09:55.279Z\",\n            \"AttachmentId\": \"eni-attach-e2c9e78536a79b521\",\n            \"DeleteOnTermination\": true,\n            \"DeviceIndex\": 0,\n            \"Status\": \"attached\"\n          },\n          \"Groups\": [\n            {\n              \"GroupId\": \"sg-default-us-east-1\",\n              \"GroupName\": \"default\"\n            }\n          ],\n          \"NetworkInterfaceId\": \"eni-e05e323c4f3c08253\",\n          \"OwnerId\": \"000000000000\",\n          \"PrivateDnsName\": \"ip-172-31-32-169.ec2.internal\",\n          \"PrivateIpAddress\": \"172.31.32.169\",\n          \"PrivateIpAddresses\": [\n            {\n              \"Primary\": true,\n              \"PrivateDnsName\": \"ip-172-31-32-169.ec2.internal\",\n              \"PrivateIpAddress\": \"172.31.32.169\"\n            }\n          ],\n          \"SourceDestCheck\": true,\n          \"Status\": \"in-use\",\n          \"SubnetId\": \"subnet-default-us-east-1-c\",\n          \"VpcId\": \"vpc-default-us-east-1\"\n        }\n      ],\n      \"RootDeviceName\": \"/dev/xvda\",\n      \"RootDeviceType\": \"ebs\",\n      \"SecurityGroups\": [\n        {\n          \"GroupId\": \"sg-default-us-east-1\",\n          \"GroupName\": \"default\"\n        }\n      ],\n      \"SourceDestCheck\": true,\n      \"Tags\": [\n        {\n          \"Key\": \"Name\",\n          \"Value\": \"Production Web Server\"\n        }\n      ],\n      \"VirtualizationType\": \"hvm\",\n      \"CpuOptions\": {\n        \"CoreCount\": 1,\n        \"ThreadsPerCore\": 1\n      },\n      \"CapacityReservationSpecification\": {\n        \"CapacityReservationPreference\": \"open\"\n      },\n      \"HibernationOptions\": {\n        \"Configured\": false\n      },\n      \"MetadataOptions\": {\n        \"State\": \"applied\",\n        \"HttpTokens\": \"optional\",\n        \"HttpPutResponseHopLimit\": 1,\n        \"HttpEndpoint\": \"enabled\",\n        \"HttpProtocolIpv6\": \"disabled\",\n        \"InstanceMetadataTags\": \"disabled\"\n      },\n      \"EnclaveOptions\": {\n        \"Enabled\": false\n      },\n      \"PlatformDetails\": \"Linux/UNIX\",\n      \"PrivateDnsNameOptions\": {\n        \"HostnameType\": \"ip-name\",\n        \"EnableResourceNameDnsARecord\": false,\n        \"EnableResourceNameDnsAAAARecord\": false\n      },\n      \"MaintenanceOptions\": {\n        \"AutoRecovery\": \"default\"\n      },\n      \"InstanceId\": \"i-f67c208daa2c34616\",\n      \"ImageId\": \"ami-0abcdef1234567891\",\n      \"State\": {\n        \"Code\": 0,\n        \"Name\": \"pending\"\n      },\n      \"PrivateDnsName\": \"ip-172-31-32-169.ec2.internal\",\n      \"AmiLaunchIndex\": 0,\n      \"InstanceType\": \"t3.large\",\n      \"LaunchTime\": \"2026-10-30T09:09:55.279Z\",\n      \"Placement\": {\n        \"Tenancy\": \"default\",\n        \"AvailabilityZone\": \"us-east-1c\"\n      },\n      \"Monitoring\": {\n        \"State\": \"disabled\"\n      },\n      \"SubnetId\": \"subnet-default-us-east-1-c\",\n      \"VpcId\": \"vpc-default-us-east-1\",\n      \"PrivateIpAddress\": \"172.31.32.169\"\n    }\n  ],\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"28170d64-356c-4081-b696-9e6b4820c2d9\",\n    \"extendedRequestId\": \"28170d64-356c-4081-b696-9e6b4820c2d9\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793351395324_292o",
+      "timestamp": "09:09:55.324",
+      "source": "docker",
+      "type": "stdin",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "command": "docker run -d --name floci-ec2-web-8081 -p 8081:80 nginx:alpine",
+      "message": "$ docker run -d --name floci-ec2-web-8081 -p 8081:80 nginx:alpine"
+    },
+    {
+      "id": "log_1793351395875_63bo",
+      "timestamp": "09:09:55.875",
+      "source": "docker",
+      "type": "stdout",
+      "nodeId": "ec2-1",
+      "serviceType": "ec2",
+      "message": "Container running on host port 8081 -> http://localhost:8081",
+      "rawOutput": "{\n  \"port\": 8081,\n  \"liveUrl\": \"http://localhost:8081\",\n  \"instanceId\": \"i-f67c208daa2c34616\"\n}"
+    },
+    {
+      "id": "log_1793351395876_fqld",
+      "timestamp": "09:09:55.876",
+      "source": "system",
+      "type": "info",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Provisioning Static Media Bucket..."
+    },
+    {
+      "id": "log_1793351395876_6e1r",
+      "timestamp": "09:09:55.876",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "command": "aws s3api create-bucket --bucket app-static-assets-prod --network-access public_external",
+      "message": "$ aws s3api create-bucket --bucket app-static-assets-prod --network-access public_external"
+    },
+    {
+      "id": "log_1793351395891_6uyy",
+      "timestamp": "09:09:55.891",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Bucket 'app-static-assets-prod' ready (public_external).",
+      "rawOutput": "{\n  \"Location\": \"/app-static-assets-prod\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"a36490ff-85c8-480c-bc2f-6f2c2466cf85\",\n    \"extendedRequestId\": \"a36490ff-85c8-480c-bc2f-6f2c2466cf85\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793351395891_sala",
+      "timestamp": "09:09:55.891",
+      "source": "system",
+      "type": "info",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Provisioning Background Job Queue..."
+    },
+    {
+      "id": "log_1793351395891_6a6n",
+      "timestamp": "09:09:55.891",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "command": "aws sqs create-queue --queue-name app-jobs-prod --network-access vpc_only",
+      "message": "$ aws sqs create-queue --queue-name app-jobs-prod --network-access vpc_only"
+    },
+    {
+      "id": "log_1793351395907_0jul",
+      "timestamp": "09:09:55.907",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Queue 'app-jobs-prod' active at http://localhost:4566/000000000000/app-jobs-prod (vpc_only)",
+      "rawOutput": "{\n  \"QueueUrl\": \"http://localhost:4566/000000000000/app-jobs-prod\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"e8bf5714-ba26-425d-a279-c382d572752e\",\n    \"extendedRequestId\": \"e8bf5714-ba26-425d-a279-c382d572752e\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793351395907_1ys5",
+      "timestamp": "09:09:55.907",
       "source": "system",
       "type": "info",
       "nodeId": "system",

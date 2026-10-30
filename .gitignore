@@ -56,6 +56,7 @@ Thumbs.db
 floci.svg
 floci.png
 services/api/scratch_*
+electron/runtime-services/
 
 # Floci runtime database
 services/data/floci/

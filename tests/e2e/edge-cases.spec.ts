@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Edge Cases & Resiliency', () => {
   test('displays Backend Unresponsive Screen when backend is down and dismisses to read-only', async ({ page }) => {
+    await page.route('**/api/health', route => route.abort());
     await page.goto('/');
     await expect(page.locator('text=Backend Service Unresponsive')).toBeVisible();
     await expect(page.locator('text=Retry Connection')).toBeVisible();

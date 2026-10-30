@@ -39,18 +39,32 @@ export async function checkBackendHealth(): Promise<CheckResult> {
 }
 
 export async function checkFrontendHealth(): Promise<CheckResult> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { app } = require('electron');
+    if (app && typeof app.getAppPath === 'function') {
+      const packaged = path.join(app.getAppPath(), 'studio', 'out', 'index.html');
+      if (existsSync(packaged)) return { ok: true, detail: 'Compiled Studio bundle verified' };
+    }
+  } catch {}
+
   const root = getRepoRoot();
-  const repoOut = path.join(root, 'frontends/playground/out/index.html');
-  const studioOut = path.join(root, 'electron/studio/out/index.html');
-  if (existsSync(repoOut) || existsSync(studioOut)) {
-    return { ok: true, detail: 'Compiled Studio bundle verified' };
+  if (root) {
+    const repoOut = path.join(root, 'frontends/playground/out/index.html');
+    if (existsSync(repoOut)) return { ok: true, detail: 'Compiled Studio bundle verified' };
+    const studioOut = path.join(root, 'electron/studio/out/index.html');
+    if (existsSync(studioOut)) return { ok: true, detail: 'Compiled Studio bundle verified' };
   }
+
+  const direct = path.resolve('studio/out/index.html');
+  if (existsSync(direct)) return { ok: true, detail: 'Compiled Studio bundle verified' };
+
   return { ok: false, detail: 'Studio bundle missing', error: 'Static HTML build not found' };
 }
 
 export async function waitForHealthy(
   checkFn: () => Promise<CheckResult>,
-  maxAttempts = 15,
+  maxAttempts = 25,
   delayMs = 600
 ): Promise<CheckResult> {
   for (let i = 0; i < maxAttempts; i++) {
@@ -58,5 +72,5 @@ export async function waitForHealthy(
     if (res.ok) return res;
     await new Promise((r) => setTimeout(r, delayMs));
   }
-  return { ok: false, detail: 'Service check timed out', error: 'Service did not respond in time' };
+  return checkFn();
 }

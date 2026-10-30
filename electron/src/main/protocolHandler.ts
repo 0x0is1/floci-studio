@@ -7,8 +7,11 @@ import { getRepoRoot } from '@/main/checks/nodeModulesChecker';
 export function getStudioDir(): string {
   const packagedStudio = path.join(app.getAppPath(), 'studio/out');
   if (existsSync(path.join(packagedStudio, 'index.html'))) return packagedStudio;
-  const repoStudio = path.join(getRepoRoot(), 'frontends/playground/out');
-  if (existsSync(path.join(repoStudio, 'index.html'))) return repoStudio;
+  const repo = getRepoRoot();
+  if (repo) {
+    const repoStudio = path.join(repo, 'frontends/playground/out');
+    if (existsSync(path.join(repoStudio, 'index.html'))) return repoStudio;
+  }
   return packagedStudio;
 }
 
