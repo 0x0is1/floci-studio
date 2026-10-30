@@ -29,3 +29,4 @@ export interface CheckResult {
   detail: string;
   error?: string;
 }
+

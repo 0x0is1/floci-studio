@@ -43,3 +43,4 @@ export async function checkInternetConnection(): Promise<CheckResult> {
     });
   });
 }
+

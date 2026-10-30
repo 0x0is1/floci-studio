@@ -39,3 +39,4 @@ describe('Electron System Checkers', () => {
     expect(result).toBe(false);
   });
 });
+

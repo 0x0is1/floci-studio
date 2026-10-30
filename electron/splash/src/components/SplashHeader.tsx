@@ -13,7 +13,7 @@ export function SplashHeader({ isOffline }: SplashHeaderProps) {
     <div className="flex flex-col items-center text-center mb-6">
       <div className="relative w-16 h-16 mb-3">
         <Image
-          src="./floci-logo.png"
+          src="/floci-logo.png"
           alt="Floci Logo"
           width={64}
           height={64}
@@ -37,3 +37,4 @@ export function SplashHeader({ isOffline }: SplashHeaderProps) {
     </div>
   );
 }
+

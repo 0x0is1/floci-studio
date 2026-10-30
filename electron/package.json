@@ -7,7 +7,8 @@
   "main": "dist/main/index.js",
   "scripts": {
     "build:splash": "bun run --cwd splash build",
-    "build:electron": "bun tsc && bun tsc-alias",
+    "build:electron": "bun build src/main/index.ts --target=node --format=cjs --outfile=dist/main/index.js --external=electron && bun build src/preload/index.ts --target=node --format=cjs --outfile=dist/preload/index.js --external=electron",
+    "typecheck": "tsc --noEmit",
     "build": "bun run build:splash && bun run build:electron",
     "start": "electron .",
     "test": "bun test tests/checkers.test.ts",
@@ -39,7 +40,6 @@
     "@types/node": "^22.13.1",
     "electron": "^34.0.0",
     "electron-builder": "^26.18.0",
-    "tsc-alias": "^1.9.9",
     "typescript": "^5.7.3"
   }
 }

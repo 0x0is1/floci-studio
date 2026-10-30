@@ -7,12 +7,25 @@ import type { CheckResult } from '@/main/types';
 const execAsync = promisify(exec);
 
 export function getRepoRoot(): string {
-  let cur = path.resolve(__dirname);
-  for (let i = 0; i < 5; i++) {
-    if (existsSync(path.join(cur, 'frontends', 'playground')) && existsSync(path.join(cur, 'services', 'api'))) {
-      return cur;
+  const bases: string[] = [process.cwd(), path.resolve(__dirname)];
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const electron = require('electron');
+    if (electron && typeof electron === 'object' && electron.app) {
+      bases.unshift(electron.app.getAppPath());
     }
-    cur = path.dirname(cur);
+  } catch {
+    // running in unit test without electron
+  }
+
+  for (const base of bases) {
+    let cur = path.resolve(base);
+    for (let i = 0; i < 6; i++) {
+      if (existsSync(path.join(cur, 'frontends', 'playground')) && existsSync(path.join(cur, 'services', 'api'))) {
+        return cur;
+      }
+      cur = path.dirname(cur);
+    }
   }
   return path.resolve(process.cwd());
 }
@@ -30,13 +43,11 @@ export async function installDependencies(onProgress?: (msg: string) => void): P
   try {
     if (!backend) {
       onProgress?.('Installing backend dependencies via npm...');
-      const backendDir = path.join(root, 'services', 'api');
-      await execAsync('npm install', { cwd: backendDir });
+      await execAsync('npm install', { cwd: path.join(root, 'services', 'api') });
     }
     if (!frontend) {
       onProgress?.('Installing frontend dependencies via npm...');
-      const frontendDir = path.join(root, 'frontends', 'playground');
-      await execAsync('npm install', { cwd: frontendDir });
+      await execAsync('npm install', { cwd: path.join(root, 'frontends', 'playground') });
     }
     return { ok: true, detail: 'Dependencies verified and installed' };
   } catch (err: unknown) {

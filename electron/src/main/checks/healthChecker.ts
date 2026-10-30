@@ -1,7 +1,7 @@
 import http from 'http';
 import type { CheckResult } from '@/main/types';
 
-export function pingUrl(url: string, timeoutMs = 2500): Promise<boolean> {
+export function pingUrl(url: string, timeoutMs = 1500): Promise<boolean> {
   return new Promise((resolve) => {
     try {
       const parsed = new URL(url);
@@ -28,28 +28,28 @@ export function pingUrl(url: string, timeoutMs = 2500): Promise<boolean> {
 }
 
 export async function checkBackendHealth(): Promise<CheckResult> {
-  const healthy = await pingUrl('http://localhost:4501/health');
+  const healthy = await pingUrl('http://127.0.0.1:4501/api/health');
   if (healthy) return { ok: true, detail: 'Backend API healthy on port 4501' };
-  const fallback = await pingUrl('http://localhost:4501/api/projects');
+  const fallback = await pingUrl('http://127.0.0.1:4501/api/projects');
   if (fallback) return { ok: true, detail: 'Backend API ready on port 4501' };
-  return { ok: false, detail: 'Backend service unreachable', error: 'Port 4501 not responding' };
+  return { ok: false, detail: 'Backend unreachable', error: 'Port 4501 not responding' };
 }
 
 export async function checkFrontendHealth(): Promise<CheckResult> {
-  const healthy = await pingUrl('http://localhost:3000');
+  const healthy = await pingUrl('http://127.0.0.1:3000');
   if (healthy) return { ok: true, detail: 'Studio frontend healthy on port 3000' };
-  return { ok: false, detail: 'Frontend service unreachable', error: 'Port 3000 not responding' };
+  return { ok: false, detail: 'Frontend unreachable', error: 'Port 3000 not responding' };
 }
 
 export async function waitForHealthy(
   checkFn: () => Promise<CheckResult>,
-  maxAttempts = 30,
-  delayMs = 1000
+  maxAttempts = 15,
+  delayMs = 600
 ): Promise<CheckResult> {
   for (let i = 0; i < maxAttempts; i++) {
     const res = await checkFn();
     if (res.ok) return res;
     await new Promise((r) => setTimeout(r, delayMs));
   }
-  return { ok: false, detail: 'Service health check timed out', error: 'Timeout after 30 attempts' };
+  return { ok: false, detail: 'Service check timed out', error: 'Service did not respond in time' };
 }

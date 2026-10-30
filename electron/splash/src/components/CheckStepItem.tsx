@@ -33,3 +33,4 @@ export function CheckStepItem({ step }: CheckStepItemProps) {
     </div>
   );
 }
+

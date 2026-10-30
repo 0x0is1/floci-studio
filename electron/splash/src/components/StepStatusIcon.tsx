@@ -25,3 +25,4 @@ export function StepStatusIcon({ status }: StepStatusIconProps) {
       return <Circle className="w-4 h-4 text-zinc-600 shrink-0" />;
   }
 }
+

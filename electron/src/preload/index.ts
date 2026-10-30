@@ -12,3 +12,4 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.removeAllListeners('check:progress');
   },
 });
+
