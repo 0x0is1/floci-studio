@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   startChecks: (): Promise<boolean> => ipcRenderer.invoke('checks:start'),
   launchStudio: (): Promise<boolean> => ipcRenderer.invoke('checks:launch'),
   restartChecks: (): Promise<boolean> => ipcRenderer.invoke('app:restart-checks'),
+  openExternal: (url: string): Promise<boolean> => ipcRenderer.invoke('app:open-external', url),
   onCheckProgress: (callback: (step: CheckStep) => void): void => {
     ipcRenderer.on('check:progress', (_event, step) => callback(step));
   },

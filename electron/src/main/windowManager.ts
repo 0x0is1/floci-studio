@@ -1,4 +1,4 @@
-import { BrowserWindow, screen, Menu, app } from 'electron';
+import { BrowserWindow, screen, Menu, app, shell } from 'electron';
 import path from 'path';
 
 let mainWindow: BrowserWindow | null = null;
@@ -51,6 +51,29 @@ export function createSplashWindow(): BrowserWindow {
       mainWindow?.setFullScreen(!mainWindow.isFullScreen());
       event.preventDefault();
     }
+  });
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^(https?|mailto):/i.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (/^(https?|mailto):/i.test(url)) {
+      event.preventDefault();
+      shell.openExternal(url);
+    }
+  });
+
+  mainWindow.webContents.on('will-redirect', (event, url) => {
+    if (/^(https?|mailto):/i.test(url)) {
+      event.preventDefault();
+      shell.openExternal(url);
+    }
+  });
+
+  mainWindow.webContents.on('will-attach-webview', (event) => {
+    event.preventDefault();
   });
 
   mainWindow.webContents.on('did-fail-load', (_event, errorCode, _errorDescription, validatedURL) => {

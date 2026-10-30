@@ -1,7 +1,7 @@
 import { app, protocol } from 'electron';
 import path from 'path';
 import { existsSync } from 'fs';
-import { createSplashWindow } from '@/main/windowManager';
+import { createSplashWindow, getMainWindow } from '@/main/windowManager';
 import { registerIpcHandlers } from '@/main/ipcRegistry';
 import { cleanupProcesses } from '@/main/checks/serviceManager';
 import { setupAppProtocol, getSplashDir } from '@/main/protocolHandler';
@@ -34,6 +34,14 @@ if (!gotTheLock) {
       win.loadURL('app://splash/index.html');
     } else {
       win.loadURL('http://localhost:3002');
+    }
+  });
+
+  app.on('second-instance', () => {
+    const current = getMainWindow();
+    if (current) {
+      if (current.isMinimized()) current.restore();
+      current.focus();
     }
   });
 
