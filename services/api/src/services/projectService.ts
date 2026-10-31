@@ -36,15 +36,15 @@ export class ProjectService {
     if (!existsSync(filePath)) return null;
     try {
       const proj = ProjectSchema.parse(JSON.parse(readFileSync(filePath, 'utf-8')));
-      if (!proj.nodes.some((n) => n.data.serviceType === 'vpc')) {
-        const vpcNode: CanvasNode = {
-          id: 'vpc-default', type: 'custom', position: { x: 40, y: 40 },
-          data: {
-            serviceType: 'vpc', label: 'Default VPC', status: 'draft',
-            config: { uuid: 'vpc-default', vpcId: 'vpc-default', cidrBlock: '172.31.0.0/16', isDefault: true },
-          },
-        };
-        proj.nodes = [vpcNode, ...proj.nodes];
+      const hasVpc = proj.nodes.some((n) => n.data.serviceType === 'vpc');
+      const hasSubnet = proj.nodes.some((n) => n.data.serviceType === 'subnet');
+      if (!hasVpc || !hasSubnet) {
+        const bp = getBoilerplate();
+        if (!hasVpc) proj.nodes.unshift(bp.nodes[0]);
+        if (!hasSubnet) proj.nodes.push(bp.nodes[1]);
+        if (!proj.edges.some((e) => (e.source === 'vpc-default' && e.target === 'subnet-default') || (e.source === 'subnet-default' && e.target === 'vpc-default'))) {
+          proj.edges.push(bp.edges[0]);
+        }
         this.saveProject(proj);
       }
       return proj;

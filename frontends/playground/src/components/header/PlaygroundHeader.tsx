@@ -9,6 +9,7 @@ import { useServiceHealth } from '@/context/ServiceHealthContext';
 import { PlaygroundHeaderNav } from './PlaygroundHeaderNav';
 import { PlaygroundHeaderControls } from './PlaygroundHeaderControls';
 import { toast } from 'sonner';
+import { validateVpcDeployment } from '@/lib/rules/vpcDeploymentValidator';
 import { deployInfrastructure, teardownInfrastructure } from '@/lib/api/flociClient';
 import { mutate } from 'swr';
 
@@ -33,6 +34,11 @@ export function PlaygroundHeader() {
     if (!activeProjectId) return;
     if (healthState !== 'healthy') {
       toast.error('Deployment Blocked', { description: healthState === 'docker_not_running' ? 'Docker services paused.' : 'Backend is unreachable.' });
+      return;
+    }
+    const vpcCheck = validateVpcDeployment(nodes as any, edges as any);
+    if (!vpcCheck.valid) {
+      toast.error(vpcCheck.title || 'VPC Connection Required', { description: vpcCheck.description });
       return;
     }
     setExecuting(true); setActiveTab('terminal');

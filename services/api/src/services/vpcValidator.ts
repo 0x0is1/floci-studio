@@ -1,30 +1,36 @@
 import { CanvasNode, CanvasEdge } from '@/models/project';
 
-const NETWORK_SERVICES = new Set(['ec2', 'rds', 'ecs', 'alb', 'elasticache', 'efs', 'subnet']);
+export function getVpcConnectedNodeIds(nodes: CanvasNode[], edges: CanvasEdge[]): Set<string> {
+  const vpcIds = nodes.filter((n) => n.data.serviceType === 'vpc').map((n) => n.id);
+  const subnetIds = nodes.filter((n) => n.data.serviceType === 'subnet').map((n) => n.id);
 
-export function requiresVpc(serviceType: string): boolean {
-  return NETWORK_SERVICES.has(serviceType);
-}
+  if (vpcIds.length === 0 || subnetIds.length === 0) return new Set<string>();
 
-export function isAttachedToVpc(nodeId: string, nodes: CanvasNode[], edges: CanvasEdge[]): boolean {
-  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
-  const targetNode = nodeMap.get(nodeId);
-  if (!targetNode) return false;
-  if (targetNode.data.serviceType === 'vpc') return true;
+  const adj = new Map<string, string[]>();
+  for (const n of nodes) adj.set(n.id, []);
+  for (const e of edges) {
+    adj.get(e.source)?.push(e.target);
+    adj.get(e.target)?.push(e.source);
+  }
 
-  const connectedEdges = edges.filter((e) => e.source === nodeId || e.target === nodeId);
-  for (const edge of connectedEdges) {
-    const peerId = edge.source === nodeId ? edge.target : edge.source;
-    const peer = nodeMap.get(peerId);
-    if (peer?.data.serviceType === 'vpc') return true;
-    if (peer?.data.serviceType === 'subnet') {
-      const subnetEdges = edges.filter((e) => e.source === peerId || e.target === peerId);
-      for (const se of subnetEdges) {
-        const vpcPeerId = se.source === peerId ? se.target : se.source;
-        if (nodeMap.get(vpcPeerId)?.data.serviceType === 'vpc') return true;
+  const connected = new Set<string>(vpcIds);
+  const queue = [...vpcIds];
+  while (queue.length > 0) {
+    const curr = queue.shift()!;
+    for (const neighbor of adj.get(curr) || []) {
+      if (!connected.has(neighbor)) {
+        connected.add(neighbor);
+        queue.push(neighbor);
       }
     }
   }
-  return false;
+
+  const hasSubnetInVpc = subnetIds.some((sId) => connected.has(sId));
+  if (!hasSubnetInVpc) return new Set<string>();
+
+  return connected;
 }
 
+export function isAttachedToVpc(nodeId: string, nodes: CanvasNode[], edges: CanvasEdge[]): boolean {
+  return getVpcConnectedNodeIds(nodes, edges).has(nodeId);
+}

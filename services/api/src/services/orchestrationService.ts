@@ -3,7 +3,7 @@ import { sortNodesTopologically } from './dagSorter';
 import { createLog, TerminalLog } from './loggerService';
 import { provisionResource } from './resourceProvisioner';
 import { iamProvisioner } from './iamProvisioner';
-import { requiresVpc, isAttachedToVpc } from './vpcValidator';
+import { getVpcConnectedNodeIds } from './vpcValidator';
 
 export interface ProvisionResult {
   nodeId: string;
@@ -21,6 +21,22 @@ export class OrchestrationService {
     const stateMap: Record<string, 'running' | 'error'> = {};
     const resourceMap: Record<string, string> = {};
 
+    const vpcConnected = getVpcConnectedNodeIds(nodes, edges);
+    const unconnected = nodes.filter((n) => !vpcConnected.has(n.id));
+    if (unconnected.length > 0) {
+      const names = unconnected.map((n) => n.data?.label || n.id).join(', ');
+      const errMsg = `AWS Network Isolation Violation: [${names}] not connected to VPC & Subnet network. Deployment aborted. 0 resources provisioned.`;
+      logs.push(createLog('system', 'vpc', 'error', `[VPC & SUBNET REQUIRED] ${errMsg}`));
+      return {
+        results: nodes.map((n) => ({
+          nodeId: n.id,
+          status: 'error',
+          error: unconnected.some((u) => u.id === n.id) ? errMsg : 'Aborted due to network isolation violation',
+        })),
+        logs,
+      };
+    }
+
     const ordered = sortNodesTopologically(nodes, edges);
     logs.push(createLog('system', 'orchestrator', 'info', `DAG planned: ${ordered.length} nodes execution order.`));
 
@@ -32,27 +48,10 @@ export class OrchestrationService {
       const config = node.data.config || {};
       const label = node.data.label || type;
 
-      const isConnected = edges.some((e) => e.source === node.id || e.target === node.id);
-      const isNetworkRouting = ['cloudfront', 'alb', 'subnet'].includes(type);
-
-      if ((nodes.length > 1 && !isConnected) || (isNetworkRouting && !isConnected)) {
-        logs.push(createLog(node.id, type, 'warn', `Skipping '${label}': node is unconnected to architecture.`));
-        results.push({ nodeId: node.id, status: 'draft' });
-        continue;
-      }
-
       const failedDep = dependencies.find((d) => stateMap[d] === 'error');
       if (failedDep) {
         const errMsg = `Dependency '${failedDep}' failed. Blocking execution of '${label}'.`;
         logs.push(createLog(node.id, type, 'error', `[SEMAPHORE BLOCKED] ${errMsg}`));
-        stateMap[node.id] = 'error';
-        results.push({ nodeId: node.id, status: 'error', error: errMsg });
-        continue;
-      }
-
-      if (requiresVpc(type) && !isAttachedToVpc(node.id, nodes, edges)) {
-        const errMsg = `AWS Network Isolation Violation: '${label}' (${type.toUpperCase()}) is not connected to any VPC. Connect to Default VPC or Subnet before deploying.`;
-        logs.push(createLog(node.id, type, 'error', `[VPC REQUIRED] ${errMsg}`));
         stateMap[node.id] = 'error';
         results.push({ nodeId: node.id, status: 'error', error: errMsg });
         continue;
@@ -65,13 +64,7 @@ export class OrchestrationService {
         const res = await provisionResource({ nodeId: node.id, type, label, config, resourceMap, edges: edgeList, projectId, nodes }, logs);
         if (res.resourceId) resourceMap[node.id] = res.resourceId;
         stateMap[node.id] = 'running';
-        results.push({
-          nodeId: node.id,
-          status: 'running',
-          resourceId: res.resourceId,
-          liveUrl: res.liveUrl,
-          port: (res as any).port,
-        });
+        results.push({ nodeId: node.id, status: 'running', resourceId: res.resourceId, liveUrl: res.liveUrl, port: (res as any).port });
       } catch (err: any) {
         logs.push(createLog(node.id, type, 'error', `Provision failed for ${label}: ${err.message}`));
         stateMap[node.id] = 'error';
