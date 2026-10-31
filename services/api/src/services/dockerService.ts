@@ -62,12 +62,12 @@ export class DockerService {
     const envLines = envEntries.map(([k, v]) => `export ${k}='${v}'\n${k}='${v}'`).join('\n');
     const envB64 = Buffer.from(envLines).toString('base64');
 
-    const cmd = ['sh', '-c', `echo '${osB64}' | base64 -d > /etc/os-release && echo '${envB64}' | base64 -d > /etc/environment && mkdir -p /etc/profile.d && echo '${envB64}' | base64 -d > /etc/profile.d/floci_env.sh && echo '${b64}' | base64 -d > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'`];
+    const cmd = ['sh', '-c', `echo '${osB64}' | base64 -d > /etc/os-release && echo '${envB64}' | base64 -d > /etc/environment && mkdir -p /etc/profile.d && echo '${envB64}' | base64 -d > /etc/profile.d/floci_env.sh && echo '${envB64}' | base64 -d >> /etc/profile && echo '${envB64}' | base64 -d >> /root/.profile && echo '${envB64}' | base64 -d >> /root/.bashrc && echo '${b64}' | base64 -d > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'`];
 
     const createRes = await dockerReq('POST', `/containers/create?name=${containerName}`, {
       Image: 'nginx:alpine',
       Cmd: cmd,
-      Env: envEntries.map(([k, v]) => `${k}=${v}`),
+      Env: ['ENV=/etc/profile', 'SHELL=/bin/sh', ...envEntries.map(([k, v]) => `${k}=${v}`)],
       ExposedPorts: { '80/tcp': {} },
       Labels: { 'floci.project': pid, 'floci.node': info.id, 'floci.port': String(port), 'floci.ami': info.ami || 'ami-ubuntu2404-amd64' },
       HostConfig: {

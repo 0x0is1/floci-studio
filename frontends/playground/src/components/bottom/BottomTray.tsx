@@ -41,7 +41,7 @@ export function BottomTray() {
   }
 
   return (
-    <div className="border-t flex flex-col shrink-0 z-20 relative select-none" style={{ height: `${height}px`, backgroundColor: tokens.trayBg, borderColor: tokens.border }}>
+    <div className="border-t flex flex-col shrink-0 z-20 relative select-text" style={{ height: `${height}px`, backgroundColor: tokens.trayBg, borderColor: tokens.border }}>
       <div
         onMouseDown={handleMouseDown}
         className="h-1.5 w-full cursor-row-resize hover:bg-sky-500/40 active:bg-sky-500 transition-colors shrink-0"

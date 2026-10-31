@@ -25,35 +25,37 @@ export function reconcileNodeStates(
   const updatedNodes = nodes.map((node) => {
     const type = node.data.serviceType;
     const cfg = node.data.config || {};
-    let isRunning = false;
+    let isRunning = node.data.status === 'running';
     let liveUrl = node.data.liveUrl;
     let resourceId = node.data.resourceId;
 
-    if (type === 'ec2') {
+    if (type === 'vpc' || type === 'subnet') {
+      isRunning = true;
+    } else if (type === 'ec2') {
       const port = Number(cfg.port) || 8080;
-      isRunning = runningPorts.includes(port);
-      if (isRunning) liveUrl = `http://localhost:${port}`;
+      isRunning = isRunning || runningPorts.includes(port) || Boolean(runtime?.isDeployed);
+      if (isRunning) liveUrl = liveUrl || `http://localhost:${port}`;
     } else if (type === 's3') {
       const name = cfg.bucketName;
-      isRunning = Boolean(name && buckets.includes(name));
-      if (isRunning) resourceId = name;
+      isRunning = isRunning || Boolean(name && buckets.includes(name));
+      if (isRunning) resourceId = resourceId || name;
     } else if (type === 'sqs') {
       const name = cfg.queueName;
       const found = queues.find((q) => name && q.includes(name));
-      isRunning = Boolean(found);
-      if (isRunning) resourceId = found;
+      isRunning = isRunning || Boolean(found);
+      if (isRunning) resourceId = resourceId || found;
     } else if (type === 'dynamodb') {
       const name = cfg.tableName;
-      isRunning = Boolean(name && tables.includes(name));
-      if (isRunning) resourceId = name;
+      isRunning = isRunning || Boolean(name && tables.includes(name));
+      if (isRunning) resourceId = resourceId || name;
     } else if (type === 'rds') {
       const name = (cfg.dbName || '').toLowerCase();
-      isRunning = Boolean(name && instances.includes(name));
-      if (isRunning) resourceId = name;
+      isRunning = isRunning || Boolean(name && instances.includes(name));
+      if (isRunning) resourceId = resourceId || name;
     } else if (type === 'lambda') {
       const name = cfg.functionName;
-      isRunning = Boolean(name && functions.includes(name));
-    } else if (type === 'bedrock') {
+      isRunning = isRunning || Boolean(name && functions.includes(name));
+    } else if (type === 'bedrock' || type === 'secrets' || type === 'sns' || type === 'kms' || type === 'ecs') {
       isRunning = true;
     }
 
@@ -78,6 +80,6 @@ export function reconcileNodeStates(
     return node;
   });
 
-  const isDeployed = finalNodes.some((n) => n.data.status === 'running');
+  const isDeployed = projectStatus === 'running' || finalNodes.some((n) => n.data.status === 'running');
   return { nodes: finalNodes, isDeployed };
 }

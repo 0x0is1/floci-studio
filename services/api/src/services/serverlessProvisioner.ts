@@ -10,12 +10,13 @@ export async function provisionServerless(
   config: Record<string, any>,
   logs: TerminalLog[],
   edges: Array<{ source: string; target: string; data?: { envVarName?: string } }> = [],
-  resourceMap: Record<string, string> = {}
+  resourceMap: Record<string, string> = {},
+  nodes?: any[]
 ): Promise<{ resourceId: string; liveUrl?: string }> {
   const fnName = config.functionName || `lambda-${Date.now().toString().slice(-4)}`;
   const runtime = config.runtime || 'nodejs20.x';
   const access = config.networkAccess || 'public_external';
-  const envVars = resolveInjectedEnvVars(nodeId, edges, resourceMap);
+  const envVars = resolveInjectedEnvVars(nodeId, edges, resourceMap, nodes);
   const envCount = Object.keys(envVars).length;
 
   const cmd = `aws lambda create-function --function-name ${fnName} --runtime ${runtime} --network-access ${access}`;

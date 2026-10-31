@@ -39,6 +39,8 @@ export function FlociCloudDialog({ isOpen, onClose }: Props) {
     else { toast.error('Purge failed'); }
   };
 
+  const dedupe = (list?: any[]) => Array.from(new Set(list || []));
+
   return (
     <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
       <div onClick={(e) => e.stopPropagation()} className="w-full max-w-5xl rounded-xl border p-5 shadow-2xl space-y-4 max-h-[85vh] flex flex-col" style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border, color: tokens.textPrimary }}>
@@ -62,17 +64,17 @@ export function FlociCloudDialog({ isOpen, onClose }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 font-mono text-xs pr-1">
-          <FlociResourceCategoryCard title="S3 Buckets" items={data?.s3?.buckets || []} service="s3" onDelete={handleDelete} tokens={tokens} />
-          <FlociResourceCategoryCard title="SQS Queues" items={data?.sqs?.queues || []} service="sqs" onDelete={handleDelete} tokens={tokens} isUrl />
-          <FlociResourceCategoryCard title="DynamoDB Tables" items={data?.dynamodb?.tables || []} service="dynamodb" onDelete={handleDelete} tokens={tokens} />
-          <FlociResourceCategoryCard title="EC2 Web Servers" items={(data?.runningPorts || []).map((p: any) => `localhost:${p}`)} service="ec2" onDelete={(s, p) => handleDelete(s, p.replace('localhost:', ''))} tokens={tokens} isPort />
-          <FlociResourceCategoryCard title="RDS Databases" items={data?.rds?.instances || []} service="rds" onDelete={handleDelete} tokens={tokens} />
-          <FlociResourceCategoryCard title="Lambda Functions" items={data?.lambda?.functions || []} service="lambda" onDelete={handleDelete} tokens={tokens} />
-          <FlociResourceCategoryCard title="SNS Topics" items={data?.sns?.topics || []} service="sns" onDelete={handleDelete} tokens={tokens} isUrl />
-          <FlociResourceCategoryCard title="Secrets Manager" items={data?.secrets?.secrets || []} service="secrets" onDelete={handleDelete} tokens={tokens} />
-          <FlociResourceCategoryCard title="KMS Encryption Keys" items={data?.kms?.keys || []} service="kms" onDelete={handleDelete} tokens={tokens} />
-          <FlociResourceCategoryCard title="CloudWatch Log Groups" items={data?.logs?.logGroups || []} service="logs" onDelete={handleDelete} tokens={tokens} />
-          <FlociResourceCategoryCard title="EventBridge Buses" items={data?.eventbridge?.buses || []} service="eventbridge" onDelete={handleDelete} tokens={tokens} />
+          <FlociResourceCategoryCard title="S3 Buckets" items={dedupe(data?.s3?.buckets)} service="s3" onDelete={handleDelete} tokens={tokens} />
+          <FlociResourceCategoryCard title="SQS Queues" items={dedupe(data?.sqs?.queues)} service="sqs" onDelete={handleDelete} tokens={tokens} isUrl />
+          <FlociResourceCategoryCard title="DynamoDB Tables" items={dedupe(data?.dynamodb?.tables)} service="dynamodb" onDelete={handleDelete} tokens={tokens} />
+          <FlociResourceCategoryCard title="EC2 Web Servers" items={dedupe(data?.runningPorts).map((p: any) => `localhost:${p}`)} service="ec2" onDelete={(s, p) => handleDelete(s, p.replace('localhost:', ''))} tokens={tokens} isPort />
+          <FlociResourceCategoryCard title="RDS Databases" items={dedupe(data?.rds?.instances)} service="rds" onDelete={handleDelete} tokens={tokens} />
+          <FlociResourceCategoryCard title="Lambda Functions" items={dedupe(data?.lambda?.functions)} service="lambda" onDelete={handleDelete} tokens={tokens} />
+          <FlociResourceCategoryCard title="SNS Topics" items={dedupe(data?.sns?.topics)} service="sns" onDelete={handleDelete} tokens={tokens} isUrl />
+          <FlociResourceCategoryCard title="Secrets Manager" items={dedupe(data?.secrets?.secrets)} service="secrets" onDelete={handleDelete} tokens={tokens} />
+          <FlociResourceCategoryCard title="KMS Encryption Keys" items={dedupe(data?.kms?.keys)} service="kms" onDelete={handleDelete} tokens={tokens} />
+          <FlociResourceCategoryCard title="CloudWatch Log Groups" items={dedupe(data?.logs?.logGroups)} service="logs" onDelete={handleDelete} tokens={tokens} />
+          <FlociResourceCategoryCard title="EventBridge Buses" items={dedupe(data?.eventbridge?.buses)} service="eventbridge" onDelete={handleDelete} tokens={tokens} />
         </div>
       </div>
     </div>

@@ -29,11 +29,13 @@ export function ProjectDialog({ isOpen, onClose }: Props) {
 
   if (!isOpen) return null;
 
-  const baseList = swrProjects?.length ? swrProjects : storeProjects;
-  const currentInList = activeProjectId ? baseList.some((p: { id: string }) => p.id === activeProjectId) : true;
-  const allProjects = !currentInList && activeProjectId
-    ? [{ id: activeProjectId, name: projectName || 'Current Project', updatedAt: new Date().toISOString() }, ...baseList]
-    : baseList;
+  const map = new Map<string, any>();
+  (storeProjects || []).forEach((p: any) => map.set(p.id, p));
+  (swrProjects || []).forEach((p: any) => map.set(p.id, p));
+  if (activeProjectId && !map.has(activeProjectId)) {
+    map.set(activeProjectId, { id: activeProjectId, name: projectName || 'Current Project', updatedAt: new Date().toISOString() });
+  }
+  const allProjects = Array.from(map.values()).sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();

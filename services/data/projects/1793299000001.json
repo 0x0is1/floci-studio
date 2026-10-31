@@ -4,6 +4,45 @@
   "description": "",
   "nodes": [
     {
+      "id": "vpc-default",
+      "type": "custom",
+      "position": {
+        "x": 60,
+        "y": 40
+      },
+      "data": {
+        "serviceType": "vpc",
+        "label": "Default VPC",
+        "status": "draft",
+        "config": {
+          "uuid": "vpc-default",
+          "vpcId": "vpc-default",
+          "cidrBlock": "172.31.0.0/16",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "subnet-default",
+      "type": "custom",
+      "position": {
+        "x": 340,
+        "y": 40
+      },
+      "data": {
+        "serviceType": "subnet",
+        "label": "Default Subnet (172.31.1.0/24)",
+        "status": "draft",
+        "config": {
+          "uuid": "subnet-default",
+          "subnetId": "subnet-default-1a",
+          "cidrBlock": "172.31.1.0/24",
+          "vpcId": "vpc-default",
+          "isDefault": true
+        }
+      }
+    },
+    {
       "id": "ec2-1",
       "type": "custom",
       "position": {
@@ -68,6 +107,16 @@
   ],
   "edges": [
     {
+      "id": "e-vpc-subnet",
+      "source": "vpc-default",
+      "target": "subnet-default",
+      "type": "custom",
+      "data": {
+        "protocol": "VPC CIDR Association",
+        "isConfigured": true
+      }
+    },
+    {
       "id": "e-ec2-bedrock",
       "source": "ec2-1",
       "target": "bedrock-1",
@@ -86,6 +135,16 @@
       "data": {
         "iamPolicy": "s3:PutObject,s3:GetObject",
         "envVarName": "S3_BUCKET_NAME",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-ec2-1",
+      "source": "subnet-default",
+      "target": "ec2-1",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
         "isConfigured": true
       }
     }

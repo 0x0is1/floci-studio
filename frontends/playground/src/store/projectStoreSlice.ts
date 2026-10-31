@@ -32,13 +32,13 @@ export const createProjectSlice = (set: any, get: any) => ({
     const res = await getProject(id);
     if (res?.success && res.data) {
       const runtime = await fetchRuntimeState(id).catch(() => null);
-      const rawDeployed = res.data.deployedNodes || [];
-      const { nodes: recDeployed } = reconcileNodeStates(rawDeployed, runtime, res.data.deployedEdges || [], res.data.status);
-      const isDeployed = recDeployed.some((n) => n.data.status === 'running');
+      const rawDeployed = res.data.deployedNodes?.length ? res.data.deployedNodes : (res.data.status === 'running' ? res.data.nodes : []);
+      const rawEdges = res.data.deployedEdges?.length ? res.data.deployedEdges : (res.data.edges || []);
+      const { nodes: recDeployed, isDeployed } = reconcileNodeStates(rawDeployed, runtime, rawEdges, res.data.status);
       useBottomTrayStore.getState().setLogs(res.data.logs || []);
       set({
         activeProjectId: id, projectName: res.data.name, nodes: res.data.nodes || [], edges: res.data.edges || [],
-        deployedNodes: recDeployed, deployedEdges: res.data.deployedEdges || [],
+        deployedNodes: recDeployed, deployedEdges: rawEdges,
         isDeployed, isDirty: false, selectedNodeId: null, selectedEdgeId: null, projectLoadStatus: 'loaded',
       });
       return true;

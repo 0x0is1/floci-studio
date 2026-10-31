@@ -43,8 +43,8 @@ export function FlociResourceCategoryCard({ title, items = [], service, onDelete
         <p className="text-[10px]" style={{ color: tokens.textMuted }}>No active resources.</p>
       ) : (
         <div className="space-y-1 max-h-36 overflow-y-auto pr-1">
-          {items.map((item) => (
-            <div key={item} className="flex items-center justify-between p-1.5 rounded border text-[11px] gap-1" style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border }}>
+          {items.map((item, idx) => (
+            <div key={`${item}-${idx}`} className="flex items-center justify-between p-1.5 rounded border text-[11px] gap-1" style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border }}>
               <span className={`truncate mr-1 select-all ${isPort ? 'text-emerald-400 font-mono' : ''}`} title={item}>
                 {formatDisplay(item)}
               </span>

@@ -6,13 +6,15 @@ import { AwsIcon } from '@/components/icons/AwsIcons';
 import { useTheme } from '@/theme/ThemeProvider';
 import { LuLock, LuCheck, LuCircleSlash } from 'react-icons/lu';
 import { LiveServiceSpecs } from './LiveServiceSpecs';
+import { NodeIamSection } from './NodeIamSection';
 
 interface Props {
   nodeData: AwsNodeData;
   nodeId?: string;
+  node?: any;
 }
 
-export function LiveComponentTelemetry({ nodeData, nodeId }: Props) {
+export function LiveComponentTelemetry({ nodeData, nodeId, node }: Props) {
   const isRunning = nodeData.status === 'running';
   const { tokens } = useTheme();
 
@@ -55,6 +57,10 @@ export function LiveComponentTelemetry({ nodeData, nodeId }: Props) {
       )}
 
       <LiveServiceSpecs nodeData={nodeData} nodeId={nodeId} />
+
+      {node && (
+        <NodeIamSection node={node} config={nodeData.config || {}} isReadOnly={true} />
+      )}
 
       <div
         className="p-3 rounded-lg border flex items-start gap-2.5 text-xs"

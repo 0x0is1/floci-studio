@@ -1,0 +1,524 @@
+{
+  "id": "1793469668626",
+  "name": "a",
+  "description": "",
+  "nodes": [
+    {
+      "id": "vpc-default",
+      "type": "custom",
+      "position": {
+        "x": 100,
+        "y": 140
+      },
+      "data": {
+        "serviceType": "vpc",
+        "label": "Default VPC",
+        "status": "draft",
+        "config": {
+          "uuid": "vpc-default",
+          "vpcId": "vpc-default",
+          "cidrBlock": "172.31.0.0/16",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "subnet-default",
+      "type": "custom",
+      "position": {
+        "x": 380,
+        "y": 140
+      },
+      "data": {
+        "serviceType": "subnet",
+        "label": "Default Subnet (172.31.1.0/24)",
+        "status": "draft",
+        "config": {
+          "uuid": "subnet-default",
+          "subnetId": "subnet-default-1a",
+          "cidrBlock": "172.31.1.0/24",
+          "vpcId": "vpc-default",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "sqs-bfad9aa9",
+      "type": "custom",
+      "position": {
+        "x": 711.8333333333333,
+        "y": 464.99999999999994
+      },
+      "data": {
+        "serviceType": "sqs",
+        "label": "SQS Queue",
+        "status": "draft",
+        "config": {
+          "queueName": "app-queue",
+          "queueType": "standard",
+          "visibilityTimeout": 30,
+          "messageRetentionDays": 4,
+          "uuid": "bfad9aa9-7ff2-4fc8-ae83-e1b654ca406f"
+        }
+      }
+    },
+    {
+      "id": "ec2-eb0ab861",
+      "type": "custom",
+      "position": {
+        "x": 922.5,
+        "y": 266.3333333333333
+      },
+      "data": {
+        "serviceType": "ec2",
+        "label": "EC2 Instance",
+        "status": "draft",
+        "config": {
+          "ami": "ami-al2023",
+          "instanceType": "t3.micro",
+          "template": "nginx",
+          "port": 8080,
+          "publicIp": true,
+          "rootVolumeSize": 20,
+          "uuid": "eb0ab861-fa4a-45aa-a5f7-6f3c5e429a1f"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-vpc-subnet",
+      "source": "vpc-default",
+      "target": "subnet-default",
+      "type": "custom",
+      "data": {
+        "protocol": "VPC CIDR Association",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-default-ec2-eb0ab861",
+      "source": "subnet-default",
+      "target": "ec2-eb0ab861",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-eb0ab861-sqs-bfad9aa9",
+      "source": "ec2-eb0ab861",
+      "target": "sqs-bfad9aa9",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "sqs:SendMessage,sqs:ReceiveMessage",
+        "envVarName": "QUEUE_URL",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-sqs-bfad9aa9",
+      "source": "subnet-default",
+      "target": "sqs-bfad9aa9",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
+        "isConfigured": true
+      }
+    }
+  ],
+  "deployedNodes": [
+    {
+      "id": "vpc-default",
+      "type": "custom",
+      "position": {
+        "x": 100,
+        "y": 140
+      },
+      "data": {
+        "serviceType": "vpc",
+        "label": "Default VPC",
+        "status": "running",
+        "config": {
+          "uuid": "vpc-default",
+          "vpcId": "vpc-default",
+          "cidrBlock": "172.31.0.0/16",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "subnet-default",
+      "type": "custom",
+      "position": {
+        "x": 380,
+        "y": 140
+      },
+      "data": {
+        "serviceType": "subnet",
+        "label": "Default Subnet (172.31.1.0/24)",
+        "status": "running",
+        "config": {
+          "uuid": "subnet-default",
+          "subnetId": "subnet-default-1a",
+          "cidrBlock": "172.31.1.0/24",
+          "vpcId": "vpc-default",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "sqs-bfad9aa9",
+      "type": "custom",
+      "position": {
+        "x": 711.8333333333333,
+        "y": 464.99999999999994
+      },
+      "data": {
+        "serviceType": "sqs",
+        "label": "SQS Queue",
+        "status": "running",
+        "config": {
+          "queueName": "app-queue",
+          "queueType": "standard",
+          "visibilityTimeout": 30,
+          "messageRetentionDays": 4,
+          "uuid": "bfad9aa9-7ff2-4fc8-ae83-e1b654ca406f"
+        },
+        "resourceId": "http://localhost:4566/000000000000/app-queue"
+      }
+    },
+    {
+      "id": "ec2-eb0ab861",
+      "type": "custom",
+      "position": {
+        "x": 922.5,
+        "y": 266.3333333333333
+      },
+      "data": {
+        "serviceType": "ec2",
+        "label": "EC2 Instance",
+        "status": "running",
+        "config": {
+          "ami": "ami-al2023",
+          "instanceType": "t3.micro",
+          "template": "nginx",
+          "port": 8080,
+          "publicIp": true,
+          "rootVolumeSize": 20,
+          "uuid": "eb0ab861-fa4a-45aa-a5f7-6f3c5e429a1f"
+        },
+        "liveUrl": "http://localhost:8080"
+      }
+    }
+  ],
+  "deployedEdges": [
+    {
+      "id": "e-vpc-subnet",
+      "source": "vpc-default",
+      "target": "subnet-default",
+      "type": "custom",
+      "data": {
+        "protocol": "VPC CIDR Association",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-default-ec2-eb0ab861",
+      "source": "subnet-default",
+      "target": "ec2-eb0ab861",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-eb0ab861-sqs-bfad9aa9",
+      "source": "ec2-eb0ab861",
+      "target": "sqs-bfad9aa9",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "sqs:SendMessage,sqs:ReceiveMessage",
+        "envVarName": "QUEUE_URL",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-sqs-bfad9aa9",
+      "source": "subnet-default",
+      "target": "sqs-bfad9aa9",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
+        "isConfigured": true
+      }
+    }
+  ],
+  "createdAt": "2026-10-31T18:02:32.267Z",
+  "updatedAt": "2026-10-31T18:02:32.336Z",
+  "status": "running",
+  "logs": [
+    {
+      "id": "log_1793469673238_qf52",
+      "timestamp": "18:01:13.238",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 2 nodes execution order."
+    },
+    {
+      "id": "log_1793469673238_7r60",
+      "timestamp": "18:01:13.238",
+      "source": "system",
+      "type": "info",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Provisioning Default VPC..."
+    },
+    {
+      "id": "log_1793469673238_1l9x",
+      "timestamp": "18:01:13.238",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "command": "aws ec2 create-vpc --cidr-block 172.31.0.0/16",
+      "message": "$ aws ec2 create-vpc --cidr-block 172.31.0.0/16"
+    },
+    {
+      "id": "log_1793469673277_cist",
+      "timestamp": "18:01:13.277",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "VPC 'vpc-c679a9bc' available (172.31.0.0/16).",
+      "rawOutput": "{\n  \"Vpc\": {\n    \"OwnerId\": \"000000000000\",\n    \"InstanceTenancy\": \"default\",\n    \"Ipv6CidrBlockAssociationSet\": [],\n    \"CidrBlockAssociationSet\": [\n      {\n        \"AssociationId\": \"vpc-cidr-assoc-4621c48e\",\n        \"CidrBlock\": \"172.31.0.0/16\",\n        \"CidrBlockState\": {\n          \"State\": \"associated\"\n        }\n      }\n    ],\n    \"IsDefault\": false,\n    \"Tags\": [],\n    \"VpcId\": \"vpc-c679a9bc\",\n    \"State\": \"available\",\n    \"CidrBlock\": \"172.31.0.0/16\",\n    \"DhcpOptionsId\": \"dopt-default\"\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"190b1646-8bc3-4802-82ee-b66892304256\",\n    \"extendedRequestId\": \"190b1646-8bc3-4802-82ee-b66892304256\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469673277_65lg",
+      "timestamp": "18:01:13.277",
+      "source": "system",
+      "type": "info",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Provisioning Default Subnet (172.31.1.0/24)..."
+    },
+    {
+      "id": "log_1793469673277_025d",
+      "timestamp": "18:01:13.277",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "command": "aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24",
+      "message": "$ aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24"
+    },
+    {
+      "id": "log_1793469673283_3mr6",
+      "timestamp": "18:01:13.283",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Subnet 'subnet-673283' bound to vpc-default.",
+      "rawOutput": "{\n  \"subnetId\": \"subnet-673283\",\n  \"vpcId\": \"vpc-default\"\n}"
+    },
+    {
+      "id": "log_1793469673283_m5s5",
+      "timestamp": "18:01:13.283",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 7."
+    },
+    {
+      "id": "log_1793469751336_zavj",
+      "timestamp": "18:02:31.336",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 4 nodes execution order."
+    },
+    {
+      "id": "log_1793469751337_rzcu",
+      "timestamp": "18:02:31.337",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-eb0ab861",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name ec2-instance-role",
+      "message": "$ aws iam create-role --role-name ec2-instance-role"
+    },
+    {
+      "id": "log_1793469751342_9lzq",
+      "timestamp": "18:02:31.342",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-eb0ab861",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name ec2-instance-role --policy-name ec2-instance-role-policy",
+      "message": "$ aws iam put-role-policy --role-name ec2-instance-role --policy-name ec2-instance-role-policy"
+    },
+    {
+      "id": "log_1793469751370_u43l",
+      "timestamp": "18:02:31.370",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-eb0ab861",
+      "serviceType": "iam",
+      "message": "Attached policy 'ec2-instance-role-policy' with [sqs:SendMessage, sqs:ReceiveMessage].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"8b6d10b7-5f44-44fd-a0e7-d3e31c9252ae\",\n    \"extendedRequestId\": \"8b6d10b7-5f44-44fd-a0e7-d3e31c9252ae\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469751370_9rsk",
+      "timestamp": "18:02:31.370",
+      "source": "system",
+      "type": "info",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Provisioning Default VPC..."
+    },
+    {
+      "id": "log_1793469751370_r4k2",
+      "timestamp": "18:02:31.370",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "command": "aws ec2 create-vpc --cidr-block 172.31.0.0/16",
+      "message": "$ aws ec2 create-vpc --cidr-block 172.31.0.0/16"
+    },
+    {
+      "id": "log_1793469751449_u283",
+      "timestamp": "18:02:31.449",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "VPC 'vpc-2cedc3d0' available (172.31.0.0/16).",
+      "rawOutput": "{\n  \"Vpc\": {\n    \"OwnerId\": \"000000000000\",\n    \"InstanceTenancy\": \"default\",\n    \"Ipv6CidrBlockAssociationSet\": [],\n    \"CidrBlockAssociationSet\": [\n      {\n        \"AssociationId\": \"vpc-cidr-assoc-2bf70ac8\",\n        \"CidrBlock\": \"172.31.0.0/16\",\n        \"CidrBlockState\": {\n          \"State\": \"associated\"\n        }\n      }\n    ],\n    \"IsDefault\": false,\n    \"Tags\": [],\n    \"VpcId\": \"vpc-2cedc3d0\",\n    \"State\": \"available\",\n    \"CidrBlock\": \"172.31.0.0/16\",\n    \"DhcpOptionsId\": \"dopt-default\"\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"b44f97c2-3c82-4bcc-9273-e61c2145ad03\",\n    \"extendedRequestId\": \"b44f97c2-3c82-4bcc-9273-e61c2145ad03\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469751449_p4us",
+      "timestamp": "18:02:31.449",
+      "source": "system",
+      "type": "info",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Provisioning Default Subnet (172.31.1.0/24)..."
+    },
+    {
+      "id": "log_1793469751449_gn08",
+      "timestamp": "18:02:31.449",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "command": "aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24",
+      "message": "$ aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24"
+    },
+    {
+      "id": "log_1793469751452_yr1u",
+      "timestamp": "18:02:31.452",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Subnet 'subnet-751452' bound to vpc-default.",
+      "rawOutput": "{\n  \"subnetId\": \"subnet-751452\",\n  \"vpcId\": \"vpc-default\"\n}"
+    },
+    {
+      "id": "log_1793469751453_rx0p",
+      "timestamp": "18:02:31.453",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ec2-eb0ab861",
+      "serviceType": "ec2",
+      "message": "Provisioning EC2 Instance..."
+    },
+    {
+      "id": "log_1793469751515_8ujd",
+      "timestamp": "18:02:31.515",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-eb0ab861",
+      "serviceType": "ec2",
+      "command": "aws ec2 run-instances --image-id ami-al2023 --instance-type t3.micro --count 1",
+      "message": "$ aws ec2 run-instances --image-id ami-al2023 --instance-type t3.micro --count 1"
+    },
+    {
+      "id": "log_1793469751570_9yal",
+      "timestamp": "18:02:31.570",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-eb0ab861",
+      "serviceType": "ec2",
+      "message": "EC2 Instance i-462b1cafbe65117fc state: RUNNING",
+      "rawOutput": "{\n  \"ReservationId\": \"r-d58c38c0f40722b52\",\n  \"OwnerId\": \"000000000000\",\n  \"Groups\": [],\n  \"Instances\": [\n    {\n      \"Architecture\": \"x86_64\",\n      \"BlockDeviceMappings\": [\n        {\n          \"DeviceName\": \"/dev/xvda\",\n          \"Ebs\": {\n            \"AttachTime\": \"2026-10-31T18:02:31.517Z\",\n            \"DeleteOnTermination\": true,\n            \"Status\": \"attached\",\n            \"VolumeId\": \"vol-a305d58eba9452591\"\n          }\n        }\n      ],\n      \"ClientToken\": \"986cb7a2-a561-4fec-9eff-514945bef208\",\n      \"EbsOptimized\": false,\n      \"EnaSupport\": true,\n      \"Hypervisor\": \"xen\",\n      \"NetworkInterfaces\": [\n        {\n          \"Attachment\": {\n            \"AttachTime\": \"2026-10-31T18:02:31.517Z\",\n            \"AttachmentId\": \"eni-attach-7e748111880fdbb3e\",\n            \"DeleteOnTermination\": true,\n            \"DeviceIndex\": 0,\n            \"Status\": \"attached\"\n          },\n          \"Groups\": [\n            {\n              \"GroupId\": \"sg-default-us-east-1\",\n              \"GroupName\": \"default\"\n            }\n          ],\n          \"NetworkInterfaceId\": \"eni-a02098a3da9198e83\",\n          \"OwnerId\": \"000000000000\",\n          \"PrivateDnsName\": \"ip-172-31-32-13.ec2.internal\",\n          \"PrivateIpAddress\": \"172.31.32.13\",\n          \"PrivateIpAddresses\": [\n            {\n              \"Primary\": true,\n              \"PrivateDnsName\": \"ip-172-31-32-13.ec2.internal\",\n              \"PrivateIpAddress\": \"172.31.32.13\"\n            }\n          ],\n          \"SourceDestCheck\": true,\n          \"Status\": \"in-use\",\n          \"SubnetId\": \"subnet-default-us-east-1-c\",\n          \"VpcId\": \"vpc-default-us-east-1\"\n        }\n      ],\n      \"RootDeviceName\": \"/dev/xvda\",\n      \"RootDeviceType\": \"ebs\",\n      \"SecurityGroups\": [\n        {\n          \"GroupId\": \"sg-default-us-east-1\",\n          \"GroupName\": \"default\"\n        }\n      ],\n      \"SourceDestCheck\": true,\n      \"Tags\": [\n        {\n          \"Key\": \"Name\",\n          \"Value\": \"EC2 Instance\"\n        }\n      ],\n      \"VirtualizationType\": \"hvm\",\n      \"CpuOptions\": {\n        \"CoreCount\": 1,\n        \"ThreadsPerCore\": 1\n      },\n      \"CapacityReservationSpecification\": {\n        \"CapacityReservationPreference\": \"open\"\n      },\n      \"HibernationOptions\": {\n        \"Configured\": false\n      },\n      \"MetadataOptions\": {\n        \"State\": \"applied\",\n        \"HttpTokens\": \"optional\",\n        \"HttpPutResponseHopLimit\": 1,\n        \"HttpEndpoint\": \"enabled\",\n        \"HttpProtocolIpv6\": \"disabled\",\n        \"InstanceMetadataTags\": \"disabled\"\n      },\n      \"EnclaveOptions\": {\n        \"Enabled\": false\n      },\n      \"PlatformDetails\": \"Linux/UNIX\",\n      \"PrivateDnsNameOptions\": {\n        \"HostnameType\": \"ip-name\",\n        \"EnableResourceNameDnsARecord\": false,\n        \"EnableResourceNameDnsAAAARecord\": false\n      },\n      \"MaintenanceOptions\": {\n        \"AutoRecovery\": \"default\"\n      },\n      \"InstanceId\": \"i-462b1cafbe65117fc\",\n      \"ImageId\": \"ami-al2023\",\n      \"State\": {\n        \"Code\": 0,\n        \"Name\": \"pending\"\n      },\n      \"PrivateDnsName\": \"ip-172-31-32-13.ec2.internal\",\n      \"AmiLaunchIndex\": 0,\n      \"InstanceType\": \"t3.micro\",\n      \"LaunchTime\": \"2026-10-31T18:02:31.517Z\",\n      \"Placement\": {\n        \"Tenancy\": \"default\",\n        \"AvailabilityZone\": \"us-east-1c\"\n      },\n      \"Monitoring\": {\n        \"State\": \"disabled\"\n      },\n      \"SubnetId\": \"subnet-default-us-east-1-c\",\n      \"VpcId\": \"vpc-default-us-east-1\",\n      \"PrivateIpAddress\": \"172.31.32.13\"\n    }\n  ],\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"b270c269-2370-4a4c-a76e-6a1f11714b58\",\n    \"extendedRequestId\": \"b270c269-2370-4a4c-a76e-6a1f11714b58\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469751571_qsn8",
+      "timestamp": "18:02:31.571",
+      "source": "docker",
+      "type": "stdin",
+      "nodeId": "ec2-eb0ab861",
+      "serviceType": "ec2",
+      "command": "docker run -d --name floci-ec2-web-8080 -p 8080:80 nginx:alpine",
+      "message": "$ docker run -d --name floci-ec2-web-8080 -p 8080:80 nginx:alpine"
+    },
+    {
+      "id": "log_1793469752240_gpke",
+      "timestamp": "18:02:32.240",
+      "source": "docker",
+      "type": "stdout",
+      "nodeId": "ec2-eb0ab861",
+      "serviceType": "ec2",
+      "message": "Container running on host port 8080 -> http://localhost:8080",
+      "rawOutput": "{\n  \"port\": 8080,\n  \"liveUrl\": \"http://localhost:8080\",\n  \"instanceId\": \"i-462b1cafbe65117fc\"\n}"
+    },
+    {
+      "id": "log_1793469752240_f5bl",
+      "timestamp": "18:02:32.240",
+      "source": "system",
+      "type": "info",
+      "nodeId": "sqs-bfad9aa9",
+      "serviceType": "sqs",
+      "message": "Provisioning SQS Queue..."
+    },
+    {
+      "id": "log_1793469752240_fb78",
+      "timestamp": "18:02:32.240",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "sqs-bfad9aa9",
+      "serviceType": "sqs",
+      "command": "aws sqs create-queue --queue-name app-queue --network-access vpc_only",
+      "message": "$ aws sqs create-queue --queue-name app-queue --network-access vpc_only"
+    },
+    {
+      "id": "log_1793469752251_1dtt",
+      "timestamp": "18:02:32.251",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "sqs-bfad9aa9",
+      "serviceType": "sqs",
+      "message": "Queue 'app-queue' active at http://localhost:4566/000000000000/app-queue (vpc_only)",
+      "rawOutput": "{\n  \"QueueUrl\": \"http://localhost:4566/000000000000/app-queue\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"0fc3244c-2df6-439a-a02d-f146a60edd53\",\n    \"extendedRequestId\": \"0fc3244c-2df6-439a-a02d-f146a60edd53\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469752251_lrvu",
+      "timestamp": "18:02:32.251",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 18."
+    }
+  ]
+}

@@ -10,21 +10,30 @@ export function NodeCardBody({ nodeData, nodeId }: { nodeData: AwsNodeData; node
   const isRunning = nodeData.status === 'running', isDeploying = nodeData.status === 'deploying', isError = nodeData.status === 'error';
   const isDeployedTab = useCanvasTabStore((s) => s.activeTab === 'deployed');
   const { tokens } = useTheme();
-  const { edges, nodes } = usePlaygroundStore();
+  const { edges, nodes, deployedEdges, deployedNodes } = usePlaygroundStore();
+  const activeNodes = isDeployedTab && deployedNodes.length > 0 ? deployedNodes : nodes;
+  const activeEdges = isDeployedTab && deployedEdges.length > 0 ? deployedEdges : edges;
 
-  const incoming = edges.filter((e) => e.target === nodeId).map((e) => nodes.find((n) => n.id === e.source)).filter(Boolean);
-  const outgoing = edges.filter((e) => e.source === nodeId).map((e) => nodes.find((n) => n.id === e.target)).filter(Boolean);
+  const incoming = activeEdges.filter((e) => e.target === nodeId).map((e) => activeNodes.find((n) => n.id === e.source)).filter(Boolean);
+  const outgoing = activeEdges.filter((e) => e.source === nodeId).map((e) => activeNodes.find((n) => n.id === e.target)).filter(Boolean);
 
   const iamRole = nodeData.config?.iamRole || (['ec2', 'lambda'].includes(nodeData.serviceType) ? `${nodeData.label.toLowerCase().replace(/[^a-z0-9-]/g, '-')}-role` : null);
   const roleDisplay = iamRole ? iamRole.replace(/-role$/, '') : null;
 
   let connLabel = '';
-  if (['cloudfront', 'alb'].includes(nodeData.serviceType)) {
-    connLabel = outgoing.length > 0 ? `-> ${outgoing[0]?.data.serviceType.toUpperCase()}${outgoing[0]?.data.config?.port ? `:${outgoing[0]?.data.config.port}` : ''}` : 'Unconnected';
-  } else if (['s3', 'sqs', 'rds', 'dynamodb'].includes(nodeData.serviceType)) {
-    connLabel = incoming.length > 0 ? `<- ${incoming.map((n) => n?.data.serviceType.toUpperCase()).join(',')}` : (nodeData.config?.queueType || '');
-  } else if (nodeData.serviceType === 'ec2') {
-    connLabel = outgoing.length > 0 ? `-> ${outgoing.map((n) => n?.data.serviceType.toUpperCase()).join(',')}` : (nodeData.config?.port ? `:${nodeData.config.port}` : 'standalone');
+  if (outgoing.length > 0) {
+    const targets = outgoing.map((n) => n!.data.serviceType.toUpperCase()).join(',');
+    const portSuffix = outgoing[0]?.data.config?.port ? `:${outgoing[0]?.data.config?.port}` : '';
+    connLabel = `-> ${targets}${outgoing.length === 1 ? portSuffix : ''}`;
+  } else if (incoming.length > 0) {
+    const sources = incoming.map((n) => n!.data.serviceType.toUpperCase()).join(',');
+    connLabel = `<- ${sources}`;
+  } else {
+    if (nodeData.serviceType === 'vpc') connLabel = nodeData.config?.cidrBlock || '172.31.0.0/16';
+    else if (nodeData.serviceType === 'subnet') connLabel = nodeData.config?.cidrBlock || '172.31.1.0/24';
+    else if (nodeData.serviceType === 'ec2') connLabel = nodeData.config?.port ? `:${nodeData.config.port}` : 'standalone';
+    else if (['cloudfront', 'alb'].includes(nodeData.serviceType)) connLabel = 'Unconnected';
+    else connLabel = nodeData.config?.queueType || nodeData.config?.ami || '';
   }
 
   const isUnconnectedAlert = ['cloudfront', 'alb'].includes(nodeData.serviceType) && connLabel === 'Unconnected';

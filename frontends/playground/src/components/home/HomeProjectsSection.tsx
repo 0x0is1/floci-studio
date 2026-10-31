@@ -1,22 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePlaygroundStore } from '@/store/playgroundStore';
+import { useProjects } from '@/hooks/useSwrApi';
 import { useTheme } from '@/theme/ThemeProvider';
 import { ProjectCard } from './ProjectCard';
-import { FaAws } from 'react-icons/fa6';
-import { LuPlus, LuLayoutGrid } from 'react-icons/lu';
+import { LuPlus, LuLayoutGrid, LuLoaderCircle } from 'react-icons/lu';
 
 interface Props {
   onCreateClick: () => void;
 }
 
 export function HomeProjectsSection({ onCreateClick }: Props) {
-  const { projects } = usePlaygroundStore();
+  const { projects: swrProjects, isLoading } = useProjects();
+  const { projects: storeProjects, loadProjects } = usePlaygroundStore();
   const { tokens } = useTheme();
 
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
+
+  const projects = swrProjects?.length ? swrProjects : storeProjects;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 select-text" style={{ userSelect: 'text' }}>
       <div className="rounded-2xl border p-6 shadow-sm space-y-4" style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border }}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -47,11 +54,16 @@ export function HomeProjectsSection({ onCreateClick }: Props) {
           </div>
         </div>
 
-        {projects.length === 0 ? (
+        {isLoading && projects.length === 0 ? (
+          <div className="flex items-center justify-center gap-2 py-12 rounded-xl border border-dashed p-8 text-xs" style={{ borderColor: tokens.border, color: tokens.textMuted }}>
+            <LuLoaderCircle className="w-4 h-4 animate-spin text-sky-400" />
+            <span>Loading projects from Floci orchestrator...</span>
+          </div>
+        ) : projects.length === 0 ? (
           <div className="text-center py-12 rounded-xl border border-dashed p-8 space-y-3" style={{ borderColor: tokens.border, backgroundColor: tokens.cardBgAlt }}>
             <p className="text-sm font-medium" style={{ color: tokens.textPrimary }}>No projects available</p>
             <p className="text-xs max-w-md mx-auto" style={{ color: tokens.textMuted }}>
-              Get started by creating your first architecture project. It will be pre-configured with client, server, and storage starter boilerplate.
+              Get started by creating your first architecture project.
             </p>
             <button
               type="button"
@@ -64,8 +76,8 @@ export function HomeProjectsSection({ onCreateClick }: Props) {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {projects.map((p) => (
-              <ProjectCard key={p.id} project={p} />
+            {projects.map((p: any) => (
+              <ProjectCard key={p.id} project={p as any} />
             ))}
           </div>
         )}

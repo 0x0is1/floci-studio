@@ -48,7 +48,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   onEdgesChange: (c) => !get().isExecuting && set({ edges: applyEdgeChanges(c, get().edges) }),
   setNodes: (nodes) => set({ nodes, isDirty: true }),
   setEdges: (edges) => set({ edges, isDirty: true }),
-  setDeployedState: (deployedNodes, deployedEdges) => set({ deployedNodes, deployedEdges }),
+  setDeployedState: (deployedNodes, deployedEdges) => set({ deployedNodes, deployedEdges, isDeployed: deployedNodes.some((n) => n.data.status === 'running') }),
   clearDeployedState: () => set({ deployedNodes: [], deployedEdges: [], isDeployed: false }),
   selectNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null }),
   selectEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null }),

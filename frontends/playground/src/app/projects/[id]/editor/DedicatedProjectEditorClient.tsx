@@ -25,7 +25,9 @@ export function DedicatedProjectEditorClient() {
   }, [activeTab]);
 
   useEffect(() => {
-    setActiveTab('editor');
+    if (!usePlaygroundStore.getState().isDeployed) {
+      setActiveTab('editor');
+    }
     if (id && activeProjectId !== id) {
       switchProject(id).then((ok) => {
         if (!ok && projectLoadStatus !== 'not_found') {

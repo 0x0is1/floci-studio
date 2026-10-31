@@ -1,0 +1,197 @@
+{
+  "id": "proj_1793297628775_2pjky",
+  "name": "Production Cloud 1793297628602",
+  "description": "",
+  "nodes": [
+    {
+      "id": "vpc-default",
+      "type": "custom",
+      "position": {
+        "x": 60,
+        "y": 40
+      },
+      "data": {
+        "serviceType": "vpc",
+        "label": "Default VPC",
+        "status": "draft",
+        "config": {
+          "uuid": "vpc-default",
+          "vpcId": "vpc-default",
+          "cidrBlock": "172.31.0.0/16",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "subnet-default",
+      "type": "custom",
+      "position": {
+        "x": 340,
+        "y": 40
+      },
+      "data": {
+        "serviceType": "subnet",
+        "label": "Default Subnet (172.31.1.0/24)",
+        "status": "draft",
+        "config": {
+          "uuid": "subnet-default",
+          "subnetId": "subnet-default-1a",
+          "cidrBlock": "172.31.1.0/24",
+          "vpcId": "vpc-default",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "cf-1",
+      "type": "custom",
+      "position": {
+        "x": 60,
+        "y": 160
+      },
+      "data": {
+        "serviceType": "cloudfront",
+        "label": "CloudFront CDN",
+        "status": "draft",
+        "config": {
+          "uuid": "e2bb22d9-343c-4ff0-915c-ad66100aff0f",
+          "priceClass": "PriceClass_100",
+          "defaultRootObject": "index.html",
+          "viewerProtocolPolicy": "redirect-to-https",
+          "networkAccess": "public_external"
+        }
+      }
+    },
+    {
+      "id": "ec2-1",
+      "type": "custom",
+      "position": {
+        "x": 380,
+        "y": 160
+      },
+      "data": {
+        "serviceType": "ec2",
+        "label": "Production Web Server",
+        "status": "draft",
+        "config": {
+          "uuid": "2dd591b7-1dce-4190-b814-e265fc0dcb33",
+          "ami": "ami-al2023",
+          "instanceType": "t3.micro",
+          "template": "nginx",
+          "port": 8080,
+          "publicIp": true,
+          "rootVolumeSize": 20,
+          "name": "web-server-8775",
+          "keyName": "default-key",
+          "iamRole": "ec2-production-role",
+          "iamPolicies": [
+            "s3:GetObject",
+            "s3:PutObject",
+            "sqs:SendMessage"
+          ]
+        }
+      }
+    },
+    {
+      "id": "s3-1",
+      "type": "custom",
+      "position": {
+        "x": 720,
+        "y": 70
+      },
+      "data": {
+        "serviceType": "s3",
+        "label": "Static Media Bucket",
+        "status": "draft",
+        "config": {
+          "uuid": "0b053741-4214-4d5f-92ff-9cd4569efcee",
+          "bucketName": "assets-8775",
+          "accessControl": "private",
+          "versioning": false,
+          "encryption": "AES256",
+          "networkAccess": "public_external"
+        }
+      }
+    },
+    {
+      "id": "sqs-1",
+      "type": "custom",
+      "position": {
+        "x": 720,
+        "y": 250
+      },
+      "data": {
+        "serviceType": "sqs",
+        "label": "Background Job Queue",
+        "status": "draft",
+        "config": {
+          "uuid": "882e6ff4-7e8f-4107-a19f-999a696f42ae",
+          "queueName": "jobs-8775",
+          "queueType": "standard",
+          "visibilityTimeout": 30,
+          "messageRetentionDays": 4,
+          "networkAccess": "vpc_only"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-vpc-subnet",
+      "source": "vpc-default",
+      "target": "subnet-default",
+      "type": "custom",
+      "data": {
+        "protocol": "VPC CIDR Association",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-cf-ec2",
+      "source": "cf-1",
+      "target": "ec2-1",
+      "type": "custom",
+      "data": {
+        "protocol": "HTTP",
+        "port": 8080,
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-s3",
+      "source": "ec2-1",
+      "target": "s3-1",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "s3:PutObject,s3:GetObject",
+        "envVarName": "S3_BUCKET_NAME",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-sqs",
+      "source": "ec2-1",
+      "target": "sqs-1",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "sqs:SendMessage",
+        "envVarName": "QUEUE_URL",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-ec2-1",
+      "source": "subnet-default",
+      "target": "ec2-1",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
+        "isConfigured": true
+      }
+    }
+  ],
+  "createdAt": "2026-10-29T18:22:30.466Z",
+  "updatedAt": "2026-10-29T18:28:49.420Z",
+  "status": "draft",
+  "logs": []
+}

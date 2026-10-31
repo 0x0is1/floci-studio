@@ -4,55 +4,76 @@
   "description": "",
   "nodes": [
     {
+      "id": "vpc-default",
+      "type": "custom",
+      "position": {
+        "x": -406.6014331856659,
+        "y": -361.1906314261405
+      },
+      "data": {
+        "serviceType": "vpc",
+        "label": "Default VPC",
+        "status": "draft",
+        "config": {
+          "uuid": "vpc-default",
+          "vpcId": "vpc-default",
+          "cidrBlock": "172.31.0.0/16",
+          "isDefault": true
+        }
+      }
+    },
+    {
       "id": "sqs-1",
       "type": "custom",
       "position": {
-        "x": -47.35599079429447,
-        "y": -13.02445370684898
+        "x": -67.10305701114605,
+        "y": 135.4400274616346
       },
       "data": {
         "serviceType": "sqs",
         "label": "Ingestion Queue",
-        "status": "draft",
+        "status": "running",
         "config": {
           "queueName": "event-ingestion-queue",
           "queueType": "standard",
           "visibilityTimeout": 30,
           "networkAccess": "public_external"
-        }
+        },
+        "resourceId": "http://localhost:4566/000000000000/event-ingestion-queue"
       }
     },
     {
       "id": "lambda-1",
       "type": "custom",
       "position": {
-        "x": 420,
-        "y": 160
+        "x": 439.4914267772069,
+        "y": 302.0089665196503
       },
       "data": {
         "serviceType": "lambda",
         "label": "Event Processor",
-        "status": "draft",
+        "status": "running",
         "config": {
           "functionName": "event-processor-fn",
           "runtime": "nodejs20.x",
           "memorySize": 256,
           "timeout": 15,
           "networkAccess": "public_external"
-        }
+        },
+        "liveUrl": "http://localhost:4566/2015-03-31/functions/event-processor-fn/invocations"
       }
     },
     {
       "id": "ddb-1",
       "type": "custom",
       "position": {
-        "x": 880,
-        "y": -166.66666666666669
+        "x": 890.7411228844019,
+        "y": 240.1533625800517
       },
       "data": {
         "serviceType": "dynamodb",
         "label": "Events Document Store",
-        "status": "draft",
+        "status": "running",
         "config": {
           "tableName": "EventsStore",
           "partitionKey": "eventId",
@@ -61,9 +82,79 @@
         },
         "resourceId": "EventsStore"
       }
+    },
+    {
+      "id": "ec2-8d9ef8fe",
+      "type": "custom",
+      "position": {
+        "x": 478.3688418098195,
+        "y": -76.18516366526084
+      },
+      "data": {
+        "serviceType": "ec2",
+        "label": "EC2 Instance",
+        "status": "draft",
+        "config": {
+          "ami": "ami-al2023",
+          "instanceType": "t3.micro",
+          "template": "nginx",
+          "port": 8080,
+          "publicIp": true,
+          "rootVolumeSize": 20,
+          "uuid": "8d9ef8fe-6afe-4849-8278-fea3c51055da"
+        }
+      }
+    },
+    {
+      "id": "subnet-4d0b55d7",
+      "type": "custom",
+      "position": {
+        "x": 66.24855348242778,
+        "y": -334.44483511449204
+      },
+      "data": {
+        "serviceType": "subnet",
+        "label": "VPC Subnet",
+        "status": "draft",
+        "config": {
+          "cidrBlock": "10.0.1.0/24",
+          "availabilityZone": "us-east-1a",
+          "uuid": "4d0b55d7-5307-42ed-b718-cb2cb90e0983"
+        }
+      }
+    },
+    {
+      "id": "alb-849554a3",
+      "type": "custom",
+      "position": {
+        "x": 390.4882809866368,
+        "y": -384.4130686927314
+      },
+      "data": {
+        "serviceType": "alb",
+        "label": "App Load Balancer",
+        "status": "draft",
+        "config": {
+          "scheme": "internet-facing",
+          "port": 80,
+          "protocol": "HTTP",
+          "algorithm": "round_robin",
+          "uuid": "849554a3-41a6-45da-8c3e-aa5d15ac81af"
+        }
+      }
     }
   ],
   "edges": [
+    {
+      "id": "e-vpc-subnet",
+      "source": "vpc-default",
+      "target": "subnet-default",
+      "type": "custom",
+      "data": {
+        "protocol": "VPC CIDR Association",
+        "isConfigured": true
+      }
+    },
     {
       "id": "e-sqs-lambda",
       "source": "sqs-1",
@@ -85,10 +176,64 @@
         "envVarName": "DATABASE_TABLE",
         "isConfigured": true
       }
+    },
+    {
+      "id": "e-vpc-default-subnet-4d0b55d7",
+      "source": "vpc-default",
+      "target": "subnet-4d0b55d7",
+      "type": "custom",
+      "data": {
+        "protocol": "VPC Network Association",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-4d0b55d7-alb-849554a3",
+      "source": "subnet-4d0b55d7",
+      "target": "alb-849554a3",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-alb-849554a3-ec2-8d9ef8fe",
+      "source": "alb-849554a3",
+      "target": "ec2-8d9ef8fe",
+      "type": "custom",
+      "data": {
+        "protocol": "HTTP Target Group",
+        "port": 80,
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-8d9ef8fe-sqs-1",
+      "source": "ec2-8d9ef8fe",
+      "target": "sqs-1",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "sqs:SendMessage,sqs:ReceiveMessage",
+        "envVarName": "QUEUE_URL",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-sqs-1",
+      "source": "subnet-default",
+      "target": "sqs-1",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
+        "isConfigured": true
+      }
     }
   ],
-  "createdAt": "2026-10-29T19:10:00.874Z",
-  "updatedAt": "2026-10-29T19:10:00.940Z",
+  "deployedNodes": [],
+  "deployedEdges": [],
+  "createdAt": "2026-10-31T18:00:44.348Z",
+  "updatedAt": "2026-10-31T18:00:44.384Z",
   "status": "draft",
   "logs": [
     {
@@ -225,6 +370,924 @@
       "nodeId": "system",
       "serviceType": "orchestrator",
       "message": "Execution complete. Total events logged: 13."
+    },
+    {
+      "id": "log_1793462599036_55tq",
+      "timestamp": "16:03:19.036",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 3 nodes execution order."
+    },
+    {
+      "id": "log_1793462599037_8jsr",
+      "timestamp": "16:03:19.037",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name event-processor-role",
+      "message": "$ aws iam create-role --role-name event-processor-role"
+    },
+    {
+      "id": "log_1793462599072_l6lg",
+      "timestamp": "16:03:19.071",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "message": "IAM Role 'event-processor-role' created (arn:aws:iam::000000000000:role/event-processor-role).",
+      "rawOutput": "{\n  \"Role\": {\n    \"Path\": \"/\",\n    \"RoleName\": \"event-processor-role\",\n    \"RoleId\": \"AROA6LN4FGSG4ZAEAW7C\",\n    \"Arn\": \"arn:aws:iam::000000000000:role/event-processor-role\",\n    \"CreateDate\": \"2026-10-31T16:03:19.046Z\",\n    \"AssumeRolePolicyDocument\": \"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"lambda.amazonaws.com\\\"},\\\"Action\\\":\\\"sts:AssumeRole\\\"}]}\",\n    \"MaxSessionDuration\": 3600\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"8e055dc1-6a15-464b-8cd1-81910c83a2b4\",\n    \"extendedRequestId\": \"8e055dc1-6a15-464b-8cd1-81910c83a2b4\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793462599073_y7qh",
+      "timestamp": "16:03:19.073",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy",
+      "message": "$ aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy"
+    },
+    {
+      "id": "log_1793462599107_k1b4",
+      "timestamp": "16:03:19.107",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "message": "Attached policy 'event-processor-role-policy' with [dynamodb:GetItem, dynamodb:PutItem].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"75c991af-7ed5-4a13-8230-d3b7860df5aa\",\n    \"extendedRequestId\": \"75c991af-7ed5-4a13-8230-d3b7860df5aa\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793462599107_gule",
+      "timestamp": "16:03:19.107",
+      "source": "system",
+      "type": "info",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Provisioning Ingestion Queue..."
+    },
+    {
+      "id": "log_1793462599107_7n3o",
+      "timestamp": "16:03:19.107",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "command": "aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external",
+      "message": "$ aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external"
+    },
+    {
+      "id": "log_1793462599137_fawt",
+      "timestamp": "16:03:19.137",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Queue 'event-ingestion-queue' active at http://localhost:4566/000000000000/event-ingestion-queue (public_external)",
+      "rawOutput": "{\n  \"QueueUrl\": \"http://localhost:4566/000000000000/event-ingestion-queue\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"29f311f6-e3b6-4af8-96bb-4b64c3d0e272\",\n    \"extendedRequestId\": \"29f311f6-e3b6-4af8-96bb-4b64c3d0e272\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793462599137_fhl7",
+      "timestamp": "16:03:19.137",
+      "source": "system",
+      "type": "info",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Provisioning Event Processor..."
+    },
+    {
+      "id": "log_1793462599138_syq3",
+      "timestamp": "16:03:19.138",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "command": "aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external",
+      "message": "$ aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external"
+    },
+    {
+      "id": "log_1793462599309_dwwv",
+      "timestamp": "16:03:19.309",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Lambda 'event-processor-fn' ready (public_external).",
+      "rawOutput": "{\n  \"FunctionArn\": \"arn:aws:lambda:us-east-1:000000000000:function:event-processor-fn\",\n  \"runtime\": \"nodejs20.x\",\n  \"envVars\": {}\n}"
+    },
+    {
+      "id": "log_1793462599309_p2kn",
+      "timestamp": "16:03:19.309",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "Provisioning Events Document Store..."
+    },
+    {
+      "id": "log_1793462599310_ka3i",
+      "timestamp": "16:03:19.310",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "command": "aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external",
+      "message": "$ aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external"
+    },
+    {
+      "id": "log_1793462599365_uruw",
+      "timestamp": "16:03:19.365",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "DynamoDB Table 'EventsStore' ready (public_external).",
+      "rawOutput": "{\n  \"TableDescription\": {\n    \"AttributeDefinitions\": [\n      {\n        \"AttributeName\": \"id\",\n        \"AttributeType\": \"S\"\n      }\n    ],\n    \"TableName\": \"EventsStore\",\n    \"KeySchema\": [\n      {\n        \"AttributeName\": \"id\",\n        \"KeyType\": \"HASH\"\n      }\n    ],\n    \"TableStatus\": \"ACTIVE\",\n    \"CreationDateTime\": \"2026-10-31T16:03:19.000Z\",\n    \"ProvisionedThroughput\": {\n      \"NumberOfDecreasesToday\": 0,\n      \"ReadCapacityUnits\": 0,\n      \"WriteCapacityUnits\": 0\n    },\n    \"TableSizeBytes\": 0,\n    \"ItemCount\": 0,\n    \"TableArn\": \"arn:aws:dynamodb:us-east-1:000000000000:table/EventsStore\",\n    \"TableId\": \"cb1ed600-cb2e-47d6-b4a3-d8ac7d316fed\",\n    \"BillingModeSummary\": {\n      \"BillingMode\": \"PAY_PER_REQUEST\",\n      \"LastUpdateToPayPerRequestDateTime\": \"2026-10-31T16:03:19.000Z\"\n    },\n    \"TableClassSummary\": {\n      \"TableClass\": \"STANDARD\"\n    },\n    \"DeletionProtectionEnabled\": false,\n    \"WarmThroughput\": {\n      \"ReadUnitsPerSecond\": 0,\n      \"WriteUnitsPerSecond\": 0,\n      \"Status\": \"ACTIVE\"\n    }\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"c4db9b4c-a9b1-4009-8fd7-a633287b1fc5\",\n    \"extendedRequestId\": \"c4db9b4c-a9b1-4009-8fd7-a633287b1fc5\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793462599365_ibh3",
+      "timestamp": "16:03:19.365",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 14."
+    },
+    {
+      "id": "log_1793463577407_sken",
+      "timestamp": "16:19:37.407",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 4 nodes execution order."
+    },
+    {
+      "id": "log_1793463577408_8ypq",
+      "timestamp": "16:19:37.408",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name event-processor-role",
+      "message": "$ aws iam create-role --role-name event-processor-role"
+    },
+    {
+      "id": "log_1793463577424_9sdw",
+      "timestamp": "16:19:37.424",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy",
+      "message": "$ aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy"
+    },
+    {
+      "id": "log_1793463577511_rbqi",
+      "timestamp": "16:19:37.511",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "message": "Attached policy 'event-processor-role-policy' with [dynamodb:GetItem, dynamodb:PutItem].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"f45fff9a-6e6a-4581-8666-7a43e4a2f5e8\",\n    \"extendedRequestId\": \"f45fff9a-6e6a-4581-8666-7a43e4a2f5e8\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793463577511_2cdn",
+      "timestamp": "16:19:37.511",
+      "source": "system",
+      "type": "info",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Provisioning Ingestion Queue..."
+    },
+    {
+      "id": "log_1793463577511_ccxf",
+      "timestamp": "16:19:37.511",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "command": "aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external",
+      "message": "$ aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external"
+    },
+    {
+      "id": "log_1793463577536_ri6z",
+      "timestamp": "16:19:37.536",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Queue 'event-ingestion-queue' active at http://localhost:4566/000000000000/event-ingestion-queue (public_external)",
+      "rawOutput": "{\n  \"QueueUrl\": \"http://localhost:4566/000000000000/event-ingestion-queue\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"e70a1dad-27fa-43e2-ab09-731c4d5ef811\",\n    \"extendedRequestId\": \"e70a1dad-27fa-43e2-ab09-731c4d5ef811\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793463577536_gpom",
+      "timestamp": "16:19:37.536",
+      "source": "system",
+      "type": "warn",
+      "nodeId": "ecs-02004dc0",
+      "serviceType": "ecs",
+      "message": "Skipping 'ECS Container': node is unconnected to architecture."
+    },
+    {
+      "id": "log_1793463577536_exqu",
+      "timestamp": "16:19:37.536",
+      "source": "system",
+      "type": "info",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Provisioning Event Processor..."
+    },
+    {
+      "id": "log_1793463577536_olwb",
+      "timestamp": "16:19:37.536",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "command": "aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external",
+      "message": "$ aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external"
+    },
+    {
+      "id": "log_1793463577685_9ml2",
+      "timestamp": "16:19:37.685",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Lambda 'event-processor-fn' ready (public_external).",
+      "rawOutput": "{\n  \"FunctionArn\": \"arn:aws:lambda:us-east-1:000000000000:function:event-processor-fn\",\n  \"runtime\": \"nodejs20.x\",\n  \"envVars\": {}\n}"
+    },
+    {
+      "id": "log_1793463577685_v5tf",
+      "timestamp": "16:19:37.685",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "Provisioning Events Document Store..."
+    },
+    {
+      "id": "log_1793463577685_787c",
+      "timestamp": "16:19:37.685",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "command": "aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external",
+      "message": "$ aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external"
+    },
+    {
+      "id": "log_1793463577695_9o6n",
+      "timestamp": "16:19:37.695",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "DynamoDB Table 'EventsStore' ready (public_external).",
+      "rawOutput": "{\n  \"TableName\": \"EventsStore\",\n  \"Status\": \"ACTIVE\"\n}"
+    },
+    {
+      "id": "log_1793463577695_88fz",
+      "timestamp": "16:19:37.695",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 14."
+    },
+    {
+      "id": "log_1793463800413_yomg",
+      "timestamp": "16:23:20.412",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 3 nodes execution order."
+    },
+    {
+      "id": "log_1793463800413_x8z6",
+      "timestamp": "16:23:20.413",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name event-processor-role",
+      "message": "$ aws iam create-role --role-name event-processor-role"
+    },
+    {
+      "id": "log_1793463800431_rvfq",
+      "timestamp": "16:23:20.431",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy",
+      "message": "$ aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy"
+    },
+    {
+      "id": "log_1793463800516_xj7v",
+      "timestamp": "16:23:20.516",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "message": "Attached policy 'event-processor-role-policy' with [dynamodb:GetItem, dynamodb:PutItem].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"6251d277-dc3f-496f-906f-16b9b3cf8835\",\n    \"extendedRequestId\": \"6251d277-dc3f-496f-906f-16b9b3cf8835\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793463800516_8vfu",
+      "timestamp": "16:23:20.516",
+      "source": "system",
+      "type": "info",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Provisioning Ingestion Queue..."
+    },
+    {
+      "id": "log_1793463800517_wns6",
+      "timestamp": "16:23:20.517",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "command": "aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external",
+      "message": "$ aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external"
+    },
+    {
+      "id": "log_1793463800522_bo4d",
+      "timestamp": "16:23:20.522",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Queue 'event-ingestion-queue' active at http://localhost:4566/000000000000/event-ingestion-queue (public_external)",
+      "rawOutput": "{\n  \"QueueUrl\": \"http://localhost:4566/000000000000/event-ingestion-queue\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"46ee25c9-6dba-41b1-9380-f0539f60a514\",\n    \"extendedRequestId\": \"46ee25c9-6dba-41b1-9380-f0539f60a514\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793463800522_co5y",
+      "timestamp": "16:23:20.522",
+      "source": "system",
+      "type": "info",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Provisioning Event Processor..."
+    },
+    {
+      "id": "log_1793463800522_g1un",
+      "timestamp": "16:23:20.522",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "command": "aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external",
+      "message": "$ aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external"
+    },
+    {
+      "id": "log_1793463800660_20c3",
+      "timestamp": "16:23:20.660",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Lambda 'event-processor-fn' ready (public_external).",
+      "rawOutput": "{\n  \"FunctionArn\": \"arn:aws:lambda:us-east-1:000000000000:function:event-processor-fn\",\n  \"runtime\": \"nodejs20.x\",\n  \"envVars\": {}\n}"
+    },
+    {
+      "id": "log_1793463800660_7b3j",
+      "timestamp": "16:23:20.660",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "Provisioning Events Document Store..."
+    },
+    {
+      "id": "log_1793463800660_rnmh",
+      "timestamp": "16:23:20.660",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "command": "aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external",
+      "message": "$ aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external"
+    },
+    {
+      "id": "log_1793463800667_lrp4",
+      "timestamp": "16:23:20.667",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "DynamoDB Table 'EventsStore' ready (public_external).",
+      "rawOutput": "{\n  \"TableName\": \"EventsStore\",\n  \"Status\": \"ACTIVE\"\n}"
+    },
+    {
+      "id": "log_1793463800667_s0tb",
+      "timestamp": "16:23:20.667",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 13."
+    },
+    {
+      "id": "log_1793468384936_yz2z",
+      "timestamp": "17:39:44.936",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 5 nodes execution order."
+    },
+    {
+      "id": "log_1793468384937_0pwq",
+      "timestamp": "17:39:44.937",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name event-processor-role",
+      "message": "$ aws iam create-role --role-name event-processor-role"
+    },
+    {
+      "id": "log_1793468384949_o7z2",
+      "timestamp": "17:39:44.949",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy",
+      "message": "$ aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy"
+    },
+    {
+      "id": "log_1793468384965_yqdj",
+      "timestamp": "17:39:44.965",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "message": "Attached policy 'event-processor-role-policy' with [dynamodb:GetItem, dynamodb:PutItem].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"695c4a2e-5fcf-431e-9581-19a49b5ff242\",\n    \"extendedRequestId\": \"695c4a2e-5fcf-431e-9581-19a49b5ff242\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793468384965_uq9j",
+      "timestamp": "17:39:44.965",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name ec2-instance-role",
+      "message": "$ aws iam create-role --role-name ec2-instance-role"
+    },
+    {
+      "id": "log_1793468384976_al0i",
+      "timestamp": "17:39:44.976",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "iam",
+      "message": "IAM Role 'ec2-instance-role' created (arn:aws:iam::000000000000:role/ec2-instance-role).",
+      "rawOutput": "{\n  \"Role\": {\n    \"Path\": \"/\",\n    \"RoleName\": \"ec2-instance-role\",\n    \"RoleId\": \"AROAYVSXCDFCESZG2FAV\",\n    \"Arn\": \"arn:aws:iam::000000000000:role/ec2-instance-role\",\n    \"CreateDate\": \"2026-10-31T17:39:44.967Z\",\n    \"AssumeRolePolicyDocument\": \"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"ec2.amazonaws.com\\\"},\\\"Action\\\":\\\"sts:AssumeRole\\\"}]}\",\n    \"MaxSessionDuration\": 3600\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"62ff23dc-1839-4657-8b8d-b3ba6e5b9d90\",\n    \"extendedRequestId\": \"62ff23dc-1839-4657-8b8d-b3ba6e5b9d90\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793468384976_7ujj",
+      "timestamp": "17:39:44.976",
+      "source": "system",
+      "type": "warn",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Skipping 'Default VPC': node is unconnected to architecture."
+    },
+    {
+      "id": "log_1793468384976_z595",
+      "timestamp": "17:39:44.976",
+      "source": "system",
+      "type": "info",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Provisioning Ingestion Queue..."
+    },
+    {
+      "id": "log_1793468384976_s1g1",
+      "timestamp": "17:39:44.976",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "command": "aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external",
+      "message": "$ aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external"
+    },
+    {
+      "id": "log_1793468384981_fwa4",
+      "timestamp": "17:39:44.981",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Queue 'event-ingestion-queue' active at http://localhost:4566/000000000000/event-ingestion-queue (public_external)",
+      "rawOutput": "{\n  \"QueueUrl\": \"http://localhost:4566/000000000000/event-ingestion-queue\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"50a611d4-d8ab-418b-bd61-c9445d57e645\",\n    \"extendedRequestId\": \"50a611d4-d8ab-418b-bd61-c9445d57e645\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793468384981_ubia",
+      "timestamp": "17:39:44.981",
+      "source": "system",
+      "type": "warn",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "ec2",
+      "message": "Skipping 'EC2 Instance': node is unconnected to architecture."
+    },
+    {
+      "id": "log_1793468384981_1dd7",
+      "timestamp": "17:39:44.981",
+      "source": "system",
+      "type": "info",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Provisioning Event Processor..."
+    },
+    {
+      "id": "log_1793468384982_o5bh",
+      "timestamp": "17:39:44.982",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "command": "aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external",
+      "message": "$ aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external"
+    },
+    {
+      "id": "log_1793468385039_cymu",
+      "timestamp": "17:39:45.039",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Lambda 'event-processor-fn' ready with env vars [AWS_REGION, AWS_DEFAULT_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT_URL, FLOCI_ENDPOINT].",
+      "rawOutput": "{\n  \"FunctionArn\": \"arn:aws:lambda:us-east-1:000000000000:function:event-processor-fn\",\n  \"runtime\": \"nodejs20.x\",\n  \"envVars\": {\n    \"AWS_REGION\": \"us-east-1\",\n    \"AWS_DEFAULT_REGION\": \"us-east-1\",\n    \"AWS_ACCESS_KEY_ID\": \"test\",\n    \"AWS_SECRET_ACCESS_KEY\": \"test\",\n    \"AWS_ENDPOINT_URL\": \"http://floci:4566\",\n    \"FLOCI_ENDPOINT\": \"http://floci:4566\"\n  }\n}"
+    },
+    {
+      "id": "log_1793468385039_w63o",
+      "timestamp": "17:39:45.039",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "Provisioning Events Document Store..."
+    },
+    {
+      "id": "log_1793468385039_izr2",
+      "timestamp": "17:39:45.039",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "command": "aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external",
+      "message": "$ aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external"
+    },
+    {
+      "id": "log_1793468385045_s9yu",
+      "timestamp": "17:39:45.045",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "DynamoDB Table 'EventsStore' ready (public_external).",
+      "rawOutput": "{\n  \"TableName\": \"EventsStore\",\n  \"Status\": \"ACTIVE\"\n}"
+    },
+    {
+      "id": "log_1793468385045_oi83",
+      "timestamp": "17:39:45.045",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 17."
+    },
+    {
+      "id": "log_1793469586706_vbg9",
+      "timestamp": "17:59:46.706",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 7 nodes execution order."
+    },
+    {
+      "id": "log_1793469586706_l2ug",
+      "timestamp": "17:59:46.706",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name event-processor-role",
+      "message": "$ aws iam create-role --role-name event-processor-role"
+    },
+    {
+      "id": "log_1793469586719_02b1",
+      "timestamp": "17:59:46.719",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "message": "IAM Role 'event-processor-role' created (arn:aws:iam::000000000000:role/event-processor-role).",
+      "rawOutput": "{\n  \"Role\": {\n    \"Path\": \"/\",\n    \"RoleName\": \"event-processor-role\",\n    \"RoleId\": \"AROATGF262Q9Z0FQVKYQ\",\n    \"Arn\": \"arn:aws:iam::000000000000:role/event-processor-role\",\n    \"CreateDate\": \"2026-10-31T17:59:46.709Z\",\n    \"AssumeRolePolicyDocument\": \"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"lambda.amazonaws.com\\\"},\\\"Action\\\":\\\"sts:AssumeRole\\\"}]}\",\n    \"MaxSessionDuration\": 3600\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"9d25c69e-64c2-4608-ad39-d86885e541d3\",\n    \"extendedRequestId\": \"9d25c69e-64c2-4608-ad39-d86885e541d3\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469586719_sa9n",
+      "timestamp": "17:59:46.719",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy",
+      "message": "$ aws iam put-role-policy --role-name event-processor-role --policy-name event-processor-role-policy"
+    },
+    {
+      "id": "log_1793469586730_mmw8",
+      "timestamp": "17:59:46.730",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "iam",
+      "message": "Attached policy 'event-processor-role-policy' with [dynamodb:GetItem, dynamodb:PutItem].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"88d4beda-3935-4aff-8a00-81f67f499219\",\n    \"extendedRequestId\": \"88d4beda-3935-4aff-8a00-81f67f499219\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469586730_7lld",
+      "timestamp": "17:59:46.730",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "iam",
+      "command": "aws iam create-role --role-name ec2-instance-role",
+      "message": "$ aws iam create-role --role-name ec2-instance-role"
+    },
+    {
+      "id": "log_1793469586739_t4fn",
+      "timestamp": "17:59:46.739",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "iam",
+      "message": "IAM Role 'ec2-instance-role' created (arn:aws:iam::000000000000:role/ec2-instance-role).",
+      "rawOutput": "{\n  \"Role\": {\n    \"Path\": \"/\",\n    \"RoleName\": \"ec2-instance-role\",\n    \"RoleId\": \"AROA10PZECH3WFDLE318\",\n    \"Arn\": \"arn:aws:iam::000000000000:role/ec2-instance-role\",\n    \"CreateDate\": \"2026-10-31T17:59:46.731Z\",\n    \"AssumeRolePolicyDocument\": \"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"ec2.amazonaws.com\\\"},\\\"Action\\\":\\\"sts:AssumeRole\\\"}]}\",\n    \"MaxSessionDuration\": 3600\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"fbf1dc9c-ee1a-449e-a49b-b124c94840a1\",\n    \"extendedRequestId\": \"fbf1dc9c-ee1a-449e-a49b-b124c94840a1\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469586739_8j9x",
+      "timestamp": "17:59:46.739",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "iam",
+      "command": "aws iam put-role-policy --role-name ec2-instance-role --policy-name ec2-instance-role-policy",
+      "message": "$ aws iam put-role-policy --role-name ec2-instance-role --policy-name ec2-instance-role-policy"
+    },
+    {
+      "id": "log_1793469586751_lecp",
+      "timestamp": "17:59:46.751",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "iam",
+      "message": "Attached policy 'ec2-instance-role-policy' with [sqs:SendMessage, sqs:ReceiveMessage].",
+      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"a16ee71c-8913-4c13-9c9a-397afc20c9c7\",\n    \"extendedRequestId\": \"a16ee71c-8913-4c13-9c9a-397afc20c9c7\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469586751_denx",
+      "timestamp": "17:59:46.751",
+      "source": "system",
+      "type": "info",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Provisioning Default VPC..."
+    },
+    {
+      "id": "log_1793469586751_98oa",
+      "timestamp": "17:59:46.751",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "command": "aws ec2 create-vpc --cidr-block 172.31.0.0/16",
+      "message": "$ aws ec2 create-vpc --cidr-block 172.31.0.0/16"
+    },
+    {
+      "id": "log_1793469586784_d4ux",
+      "timestamp": "17:59:46.784",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "VPC 'vpc-48dba859' available (172.31.0.0/16).",
+      "rawOutput": "{\n  \"Vpc\": {\n    \"OwnerId\": \"000000000000\",\n    \"InstanceTenancy\": \"default\",\n    \"Ipv6CidrBlockAssociationSet\": [],\n    \"CidrBlockAssociationSet\": [\n      {\n        \"AssociationId\": \"vpc-cidr-assoc-d9f0820e\",\n        \"CidrBlock\": \"172.31.0.0/16\",\n        \"CidrBlockState\": {\n          \"State\": \"associated\"\n        }\n      }\n    ],\n    \"IsDefault\": false,\n    \"Tags\": [],\n    \"VpcId\": \"vpc-48dba859\",\n    \"State\": \"available\",\n    \"CidrBlock\": \"172.31.0.0/16\",\n    \"DhcpOptionsId\": \"dopt-default\"\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"9b987afd-ac6b-40fa-9f1c-638f8c908c24\",\n    \"extendedRequestId\": \"9b987afd-ac6b-40fa-9f1c-638f8c908c24\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469586784_06sc",
+      "timestamp": "17:59:46.784",
+      "source": "system",
+      "type": "info",
+      "nodeId": "subnet-4d0b55d7",
+      "serviceType": "subnet",
+      "message": "Provisioning VPC Subnet..."
+    },
+    {
+      "id": "log_1793469586785_u0zy",
+      "timestamp": "17:59:46.785",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "subnet-4d0b55d7",
+      "serviceType": "subnet",
+      "command": "aws ec2 create-subnet --vpc-id vpc-48dba859 --cidr-block 10.0.1.0/24",
+      "message": "$ aws ec2 create-subnet --vpc-id vpc-48dba859 --cidr-block 10.0.1.0/24"
+    },
+    {
+      "id": "log_1793469586793_o9n0",
+      "timestamp": "17:59:46.793",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "subnet-4d0b55d7",
+      "serviceType": "subnet",
+      "message": "Subnet 'subnet-586793' bound to vpc-48dba859.",
+      "rawOutput": "{\n  \"subnetId\": \"subnet-586793\",\n  \"vpcId\": \"vpc-48dba859\"\n}"
+    },
+    {
+      "id": "log_1793469586794_8jzo",
+      "timestamp": "17:59:46.794",
+      "source": "system",
+      "type": "info",
+      "nodeId": "alb-849554a3",
+      "serviceType": "alb",
+      "message": "Provisioning App Load Balancer..."
+    },
+    {
+      "id": "log_1793469586794_rtx5",
+      "timestamp": "17:59:46.794",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "alb-849554a3",
+      "serviceType": "alb",
+      "command": "aws elbv2 create-load-balancer --name alb-6794 --type application",
+      "message": "$ aws elbv2 create-load-balancer --name alb-6794 --type application"
+    },
+    {
+      "id": "log_1793469586794_b0ca",
+      "timestamp": "17:59:46.794",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "alb-849554a3",
+      "serviceType": "alb",
+      "message": "Application Load Balancer 'alb-6794' active -> http://localhost:8080",
+      "rawOutput": "{\n  \"albArn\": \"arn:aws:alb:alb-6794\",\n  \"dnsName\": \"http://localhost:8080\"\n}"
+    },
+    {
+      "id": "log_1793469586794_18vz",
+      "timestamp": "17:59:46.794",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "ec2",
+      "message": "Provisioning EC2 Instance..."
+    },
+    {
+      "id": "log_1793469586857_qbo9",
+      "timestamp": "17:59:46.857",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "ec2",
+      "command": "aws ec2 run-instances --image-id ami-al2023 --instance-type t3.micro --count 1",
+      "message": "$ aws ec2 run-instances --image-id ami-al2023 --instance-type t3.micro --count 1"
+    },
+    {
+      "id": "log_1793469586890_mogk",
+      "timestamp": "17:59:46.890",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "ec2",
+      "message": "EC2 Instance i-5a6d31ce9930e4fa5 state: RUNNING",
+      "rawOutput": "{\n  \"ReservationId\": \"r-14d47083b24da13d0\",\n  \"OwnerId\": \"000000000000\",\n  \"Groups\": [],\n  \"Instances\": [\n    {\n      \"Architecture\": \"x86_64\",\n      \"BlockDeviceMappings\": [\n        {\n          \"DeviceName\": \"/dev/xvda\",\n          \"Ebs\": {\n            \"AttachTime\": \"2026-10-31T17:59:46.860Z\",\n            \"DeleteOnTermination\": true,\n            \"Status\": \"attached\",\n            \"VolumeId\": \"vol-b31fd215a66645f1a\"\n          }\n        }\n      ],\n      \"ClientToken\": \"646415cd-3e04-469e-aad1-eee0a867cea5\",\n      \"EbsOptimized\": false,\n      \"EnaSupport\": true,\n      \"Hypervisor\": \"xen\",\n      \"NetworkInterfaces\": [\n        {\n          \"Attachment\": {\n            \"AttachTime\": \"2026-10-31T17:59:46.860Z\",\n            \"AttachmentId\": \"eni-attach-0bc5d00b67b5b116c\",\n            \"DeleteOnTermination\": true,\n            \"DeviceIndex\": 0,\n            \"Status\": \"attached\"\n          },\n          \"Groups\": [\n            {\n              \"GroupId\": \"sg-default-us-east-1\",\n              \"GroupName\": \"default\"\n            }\n          ],\n          \"NetworkInterfaceId\": \"eni-bf996ed5fecf6a4f9\",\n          \"OwnerId\": \"000000000000\",\n          \"PrivateDnsName\": \"ip-172-31-32-12.ec2.internal\",\n          \"PrivateIpAddress\": \"172.31.32.12\",\n          \"PrivateIpAddresses\": [\n            {\n              \"Primary\": true,\n              \"PrivateDnsName\": \"ip-172-31-32-12.ec2.internal\",\n              \"PrivateIpAddress\": \"172.31.32.12\"\n            }\n          ],\n          \"SourceDestCheck\": true,\n          \"Status\": \"in-use\",\n          \"SubnetId\": \"subnet-default-us-east-1-c\",\n          \"VpcId\": \"vpc-default-us-east-1\"\n        }\n      ],\n      \"RootDeviceName\": \"/dev/xvda\",\n      \"RootDeviceType\": \"ebs\",\n      \"SecurityGroups\": [\n        {\n          \"GroupId\": \"sg-default-us-east-1\",\n          \"GroupName\": \"default\"\n        }\n      ],\n      \"SourceDestCheck\": true,\n      \"Tags\": [\n        {\n          \"Key\": \"Name\",\n          \"Value\": \"EC2 Instance\"\n        }\n      ],\n      \"VirtualizationType\": \"hvm\",\n      \"CpuOptions\": {\n        \"CoreCount\": 1,\n        \"ThreadsPerCore\": 1\n      },\n      \"CapacityReservationSpecification\": {\n        \"CapacityReservationPreference\": \"open\"\n      },\n      \"HibernationOptions\": {\n        \"Configured\": false\n      },\n      \"MetadataOptions\": {\n        \"State\": \"applied\",\n        \"HttpTokens\": \"optional\",\n        \"HttpPutResponseHopLimit\": 1,\n        \"HttpEndpoint\": \"enabled\",\n        \"HttpProtocolIpv6\": \"disabled\",\n        \"InstanceMetadataTags\": \"disabled\"\n      },\n      \"EnclaveOptions\": {\n        \"Enabled\": false\n      },\n      \"PlatformDetails\": \"Linux/UNIX\",\n      \"PrivateDnsNameOptions\": {\n        \"HostnameType\": \"ip-name\",\n        \"EnableResourceNameDnsARecord\": false,\n        \"EnableResourceNameDnsAAAARecord\": false\n      },\n      \"MaintenanceOptions\": {\n        \"AutoRecovery\": \"default\"\n      },\n      \"InstanceId\": \"i-5a6d31ce9930e4fa5\",\n      \"ImageId\": \"ami-al2023\",\n      \"State\": {\n        \"Code\": 0,\n        \"Name\": \"pending\"\n      },\n      \"PrivateDnsName\": \"ip-172-31-32-12.ec2.internal\",\n      \"AmiLaunchIndex\": 0,\n      \"InstanceType\": \"t3.micro\",\n      \"LaunchTime\": \"2026-10-31T17:59:46.860Z\",\n      \"Placement\": {\n        \"Tenancy\": \"default\",\n        \"AvailabilityZone\": \"us-east-1c\"\n      },\n      \"Monitoring\": {\n        \"State\": \"disabled\"\n      },\n      \"SubnetId\": \"subnet-default-us-east-1-c\",\n      \"VpcId\": \"vpc-default-us-east-1\",\n      \"PrivateIpAddress\": \"172.31.32.12\"\n    }\n  ],\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"77abf601-5b56-4d8d-828c-f87fb7989b4a\",\n    \"extendedRequestId\": \"77abf601-5b56-4d8d-828c-f87fb7989b4a\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469586890_wg7g",
+      "timestamp": "17:59:46.890",
+      "source": "docker",
+      "type": "stdin",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "ec2",
+      "command": "docker run -d --name floci-ec2-web-8080 -p 8080:80 nginx:alpine",
+      "message": "$ docker run -d --name floci-ec2-web-8080 -p 8080:80 nginx:alpine"
+    },
+    {
+      "id": "log_1793469587337_dtmd",
+      "timestamp": "17:59:47.337",
+      "source": "docker",
+      "type": "stdout",
+      "nodeId": "ec2-8d9ef8fe",
+      "serviceType": "ec2",
+      "message": "Container running on host port 8080 -> http://localhost:8080",
+      "rawOutput": "{\n  \"port\": 8080,\n  \"liveUrl\": \"http://localhost:8080\",\n  \"instanceId\": \"i-5a6d31ce9930e4fa5\"\n}"
+    },
+    {
+      "id": "log_1793469587338_x232",
+      "timestamp": "17:59:47.338",
+      "source": "system",
+      "type": "info",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Provisioning Ingestion Queue..."
+    },
+    {
+      "id": "log_1793469587338_x9n4",
+      "timestamp": "17:59:47.338",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "command": "aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external",
+      "message": "$ aws sqs create-queue --queue-name event-ingestion-queue --network-access public_external"
+    },
+    {
+      "id": "log_1793469587361_suyc",
+      "timestamp": "17:59:47.361",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "sqs-1",
+      "serviceType": "sqs",
+      "message": "Queue 'event-ingestion-queue' active at http://localhost:4566/000000000000/event-ingestion-queue (public_external)",
+      "rawOutput": "{\n  \"QueueUrl\": \"http://localhost:4566/000000000000/event-ingestion-queue\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"e1184d23-be70-4191-bfa8-03842a78503a\",\n    \"extendedRequestId\": \"e1184d23-be70-4191-bfa8-03842a78503a\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793469587361_vsh3",
+      "timestamp": "17:59:47.361",
+      "source": "system",
+      "type": "info",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Provisioning Event Processor..."
+    },
+    {
+      "id": "log_1793469587361_ptw7",
+      "timestamp": "17:59:47.361",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "command": "aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external",
+      "message": "$ aws lambda create-function --function-name event-processor-fn --runtime nodejs20.x --network-access public_external"
+    },
+    {
+      "id": "log_1793469587408_piev",
+      "timestamp": "17:59:47.408",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "lambda-1",
+      "serviceType": "lambda",
+      "message": "Lambda 'event-processor-fn' ready with env vars [AWS_REGION, AWS_DEFAULT_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT_URL, FLOCI_ENDPOINT].",
+      "rawOutput": "{\n  \"FunctionArn\": \"arn:aws:lambda:us-east-1:000000000000:function:event-processor-fn\",\n  \"runtime\": \"nodejs20.x\",\n  \"envVars\": {\n    \"AWS_REGION\": \"us-east-1\",\n    \"AWS_DEFAULT_REGION\": \"us-east-1\",\n    \"AWS_ACCESS_KEY_ID\": \"test\",\n    \"AWS_SECRET_ACCESS_KEY\": \"test\",\n    \"AWS_ENDPOINT_URL\": \"http://floci:4566\",\n    \"FLOCI_ENDPOINT\": \"http://floci:4566\"\n  }\n}"
+    },
+    {
+      "id": "log_1793469587408_idh7",
+      "timestamp": "17:59:47.408",
+      "source": "system",
+      "type": "info",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "Provisioning Events Document Store..."
+    },
+    {
+      "id": "log_1793469587408_lems",
+      "timestamp": "17:59:47.408",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "command": "aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external",
+      "message": "$ aws dynamodb create-table --table-name EventsStore --billing-mode PAY_PER_REQUEST --network-access public_external"
+    },
+    {
+      "id": "log_1793469587413_d3ev",
+      "timestamp": "17:59:47.413",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "ddb-1",
+      "serviceType": "dynamodb",
+      "message": "DynamoDB Table 'EventsStore' ready (public_external).",
+      "rawOutput": "{\n  \"TableName\": \"EventsStore\",\n  \"Status\": \"ACTIVE\"\n}"
+    },
+    {
+      "id": "log_1793469587413_62ek",
+      "timestamp": "17:59:47.413",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 32."
     }
   ]
 }

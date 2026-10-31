@@ -13,11 +13,13 @@ export function CustomAwsEdge(props: any) {
   });
   const hoveredNodeId = useCanvasHoverStore((s) => s.hoveredNodeId);
   const isDeployedTab = useCanvasTabStore((s) => s.activeTab === 'deployed');
-  const nodes = usePlaygroundStore((s) => s.nodes);
+  const { nodes, deployedNodes } = usePlaygroundStore();
   const { tokens } = useTheme();
 
-  const sourceNode = nodes.find((n) => n.id === source);
-  const isLiveStreaming = isDeployedTab && sourceNode?.data?.status === 'running';
+  const activeNodes = isDeployedTab && deployedNodes.length > 0 ? deployedNodes : nodes;
+  const sourceNode = activeNodes.find((n) => n.id === source);
+  const targetNode = activeNodes.find((n) => n.id === target);
+  const isLiveStreaming = isDeployedTab && (sourceNode?.data?.status === 'running' || targetNode?.data?.status === 'running' || (Boolean(sourceNode) && Boolean(targetNode)));
 
   const isIncoming = hoveredNodeId ? target === hoveredNodeId : false;
   const isOutgoing = hoveredNodeId ? source === hoveredNodeId : isLiveStreaming;
