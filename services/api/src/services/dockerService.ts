@@ -30,7 +30,17 @@ export function dockerReq(method: string, path: string, data?: any): Promise<{ s
 export class DockerService {
   public async launchEc2Web(
     port: number,
-    info: { id: string; name: string; s3?: string; sqs?: string; template?: string; ami?: string; instanceType?: string; projectId?: string }
+    info: {
+      id: string;
+      name: string;
+      s3?: string;
+      sqs?: string;
+      template?: string;
+      ami?: string;
+      instanceType?: string;
+      projectId?: string;
+      envVars?: Record<string, string>;
+    }
   ): Promise<boolean> {
     const pid = info.projectId || 'default';
     const containerName = `floci-ec2-${pid}-${info.id}-${port}`;
@@ -48,11 +58,16 @@ export class DockerService {
     const b64 = Buffer.from(html).toString('base64');
     const osRelease = getOsReleaseContent(info.ami);
     const osB64 = Buffer.from(osRelease).toString('base64');
-    const cmd = ['sh', '-c', `echo '${osB64}' | base64 -d > /etc/os-release && echo '${b64}' | base64 -d > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'`];
+    const envEntries = Object.entries(info.envVars || {});
+    const envLines = envEntries.map(([k, v]) => `export ${k}='${v}'\n${k}='${v}'`).join('\n');
+    const envB64 = Buffer.from(envLines).toString('base64');
+
+    const cmd = ['sh', '-c', `echo '${osB64}' | base64 -d > /etc/os-release && echo '${envB64}' | base64 -d > /etc/environment && mkdir -p /etc/profile.d && echo '${envB64}' | base64 -d > /etc/profile.d/floci_env.sh && echo '${b64}' | base64 -d > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'`];
 
     const createRes = await dockerReq('POST', `/containers/create?name=${containerName}`, {
       Image: 'nginx:alpine',
       Cmd: cmd,
+      Env: envEntries.map(([k, v]) => `${k}=${v}`),
       ExposedPorts: { '80/tcp': {} },
       Labels: { 'floci.project': pid, 'floci.node': info.id, 'floci.port': String(port), 'floci.ami': info.ami || 'ami-ubuntu2404-amd64' },
       HostConfig: {

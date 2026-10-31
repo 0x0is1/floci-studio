@@ -4,7 +4,7 @@ import React from 'react';
 import { useBottomTrayStore } from '@/store/bottomTrayStore';
 import { usePlaygroundStore } from '@/store/playgroundStore';
 import { useTheme } from '@/theme/ThemeProvider';
-import { LuTerminal, LuActivity, LuChevronDown, LuX, LuSquareTerminal } from 'react-icons/lu';
+import { LuTerminal, LuChevronDown, LuX, LuSquareTerminal } from 'react-icons/lu';
 
 export function BottomTrayHeader() {
   const { activeTab, setActiveTab, setOpen, logs } = useBottomTrayStore();
@@ -34,12 +34,6 @@ export function BottomTrayHeader() {
             <span>EC2 Shell</span>
           </button>
         )}
-
-        <button onClick={() => setActiveTab('live')} aria-label="Live Infrastructure / Live Resources" style={getTabStyle('live')} className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-colors cursor-pointer hover:opacity-85">
-          <LuActivity className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Live Infrastructure</span>
-          {runningCount > 0 && <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 font-mono">{runningCount}</span>}
-        </button>
       </div>
 
       <div className="flex items-center gap-1">

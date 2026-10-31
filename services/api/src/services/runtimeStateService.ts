@@ -8,7 +8,7 @@ import { DescribeDBInstancesCommand } from '@aws-sdk/client-rds';
 import { ListFunctionsCommand } from '@aws-sdk/client-lambda';
 import { ListTopicsCommand } from '@aws-sdk/client-sns';
 import { ListSecretsCommand } from '@aws-sdk/client-secrets-manager';
-import { ListKeysCommand } from '@aws-sdk/client-kms';
+import { ListKeysCommand, DescribeKeyCommand } from '@aws-sdk/client-kms';
 import { DescribeLogGroupsCommand } from '@aws-sdk/client-cloudwatch-logs';
 import { ListEventBusesCommand } from '@aws-sdk/client-eventbridge';
 
@@ -56,7 +56,8 @@ export async function getRuntimeState(projectId?: string) {
   const functions = (lamR.Functions || []).map((f) => f.FunctionName || '');
   const topics = (snsR.Topics || []).map((t) => t.TopicArn || '');
   const secrets = (secR.SecretList || []).map((s) => s.Name || '');
-  const keys = (kmsR.Keys || []).map((k) => k.KeyId || '');
+  const keyDescs = await Promise.all((kmsR.Keys || []).map((k) => k.KeyId ? awsClients.kms.send(new DescribeKeyCommand({ KeyId: k.KeyId })).catch(() => null) : null));
+  const keys = keyDescs.filter((d: any) => d?.KeyMetadata?.KeyManager === 'CUSTOMER').map((d: any) => d?.KeyMetadata?.KeyId || '');
   const logGroups = (logR.logGroups || []).map((l) => l.logGroupName || '');
   const buses = (ebR.EventBuses || []).map((b) => b.Name || '');
 

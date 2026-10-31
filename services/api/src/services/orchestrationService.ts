@@ -3,6 +3,7 @@ import { sortNodesTopologically } from './dagSorter';
 import { createLog, TerminalLog } from './loggerService';
 import { provisionResource } from './resourceProvisioner';
 import { iamProvisioner } from './iamProvisioner';
+import { requiresVpc, isAttachedToVpc } from './vpcValidator';
 
 export interface ProvisionResult {
   nodeId: string;
@@ -49,11 +50,19 @@ export class OrchestrationService {
         continue;
       }
 
+      if (requiresVpc(type) && !isAttachedToVpc(node.id, nodes, edges)) {
+        const errMsg = `AWS Network Isolation Violation: '${label}' (${type.toUpperCase()}) is not connected to any VPC. Connect to Default VPC or Subnet before deploying.`;
+        logs.push(createLog(node.id, type, 'error', `[VPC REQUIRED] ${errMsg}`));
+        stateMap[node.id] = 'error';
+        results.push({ nodeId: node.id, status: 'error', error: errMsg });
+        continue;
+      }
+
       logs.push(createLog(node.id, type, 'info', `Provisioning ${label}...`));
 
       try {
-        const edgeList = edges.map((e) => ({ source: e.source, target: e.target }));
-        const res = await provisionResource({ nodeId: node.id, type, label, config, resourceMap, edges: edgeList, projectId }, logs);
+        const edgeList = edges.map((e) => ({ source: e.source, target: e.target, data: e.data }));
+        const res = await provisionResource({ nodeId: node.id, type, label, config, resourceMap, edges: edgeList, projectId, nodes }, logs);
         if (res.resourceId) resourceMap[node.id] = res.resourceId;
         stateMap[node.id] = 'running';
         results.push({

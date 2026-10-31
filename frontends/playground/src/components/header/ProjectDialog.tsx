@@ -16,7 +16,7 @@ interface Props {
 export function ProjectDialog({ isOpen, onClose }: Props) {
   const router = useRouter();
   const { projects: swrProjects, isLoading, invalidateProjects } = useProjects();
-  const { projects: storeProjects, createNewProject, activeProjectId, projectName, loadProjects, switchProject } = usePlaygroundStore();
+  const { projects: storeProjects, createNewProject, deleteProjectById, activeProjectId, projectName, loadProjects, switchProject } = usePlaygroundStore();
   const { tokens } = useTheme();
   const [newProjectName, setNewProjectName] = useState('');
 
@@ -53,6 +53,12 @@ export function ProjectDialog({ isOpen, onClose }: Props) {
     onClose();
   };
 
+  const handleDelete = async (id: string, name: string) => {
+    if (typeof window !== 'undefined' && !window.confirm(`Delete project "${name}"?`)) return;
+    await deleteProjectById(id);
+    invalidateProjects();
+  };
+
   return (
     <div onClick={onClose} className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div onClick={(e) => e.stopPropagation()} className="rounded-xl w-full max-w-md p-5 shadow-2xl space-y-4 border" style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border, color: tokens.textPrimary }}>
@@ -83,7 +89,7 @@ export function ProjectDialog({ isOpen, onClose }: Props) {
 
         <div className="space-y-2 pt-2 border-t" style={{ borderColor: tokens.border }}>
           <label className="text-[11px] font-medium" style={{ color: tokens.textMuted }}>Existing Projects ({allProjects.length})</label>
-          <ProjectDialogList projects={allProjects} activeProjectId={activeProjectId} isLoading={isLoading} onSelect={handleSelect} />
+          <ProjectDialogList projects={allProjects} activeProjectId={activeProjectId} isLoading={isLoading} onSelect={handleSelect} onDelete={handleDelete} />
         </div>
       </div>
     </div>

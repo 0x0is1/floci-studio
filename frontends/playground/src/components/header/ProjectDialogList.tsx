@@ -2,16 +2,17 @@
 
 import React from 'react';
 import { useTheme } from '@/theme/ThemeProvider';
-import { LuFolder, LuLoaderCircle } from 'react-icons/lu';
+import { LuFolder, LuLoaderCircle, LuTrash2 } from 'react-icons/lu';
 
 interface Props {
   projects: Array<{ id: string; name: string; updatedAt: string }>;
   activeProjectId: string | null;
   isLoading: boolean;
   onSelect: (id: string) => void;
+  onDelete: (id: string, name: string) => void;
 }
 
-export function ProjectDialogList({ projects, activeProjectId, isLoading, onSelect }: Props) {
+export function ProjectDialogList({ projects, activeProjectId, isLoading, onSelect, onDelete }: Props) {
   const { tokens } = useTheme();
 
   if (isLoading && projects.length === 0) {
@@ -36,7 +37,7 @@ export function ProjectDialogList({ projects, activeProjectId, isLoading, onSele
       {projects.map((p) => {
         const isActive = p.id === activeProjectId;
         return (
-          <button
+          <div
             key={p.id}
             onClick={() => onSelect(p.id)}
             style={{
@@ -44,9 +45,9 @@ export function ProjectDialogList({ projects, activeProjectId, isLoading, onSele
               borderColor: isActive ? tokens.accent : tokens.border,
               color: tokens.textPrimary,
             }}
-            className="w-full flex items-center justify-between p-2.5 rounded-lg border text-left text-xs transition-colors cursor-pointer hover:opacity-85"
+            className="w-full flex items-center justify-between p-2.5 rounded-lg border text-left text-xs transition-colors cursor-pointer hover:opacity-90 group"
           >
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
               <LuFolder className="w-3.5 h-3.5 shrink-0" style={{ color: isActive ? tokens.accent : tokens.textMuted }} />
               <span className="font-medium truncate">{p.name}</span>
               {isActive && (
@@ -55,10 +56,23 @@ export function ProjectDialogList({ projects, activeProjectId, isLoading, onSele
                 </span>
               )}
             </div>
-            <span className="text-[10px] font-mono shrink-0 ml-2" style={{ color: tokens.textMuted }}>
-              {new Date(p.updatedAt).toLocaleDateString()}
-            </span>
-          </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[10px] font-mono" style={{ color: tokens.textMuted }}>
+                {new Date(p.updatedAt).toLocaleDateString()}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(p.id, p.name);
+                }}
+                className="p-1 rounded hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
+                title={`Delete ${p.name}`}
+              >
+                <LuTrash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
         );
       })}
     </div>

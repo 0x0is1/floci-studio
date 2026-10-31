@@ -25,11 +25,13 @@ export function checkNetworkRules(sourceType: AwsServiceType, targetType: AwsSer
     }
   }
 
-  if (sourceType === 'vpc' && targetType === 'subnet') {
-    return { match: true, data: { protocol: 'VPC CIDR Association', isConfigured: true } };
+  if (sourceType === 'vpc') {
+    if (['subnet', 'ec2', 'rds', 'ecs', 'alb', 'elasticache', 'lambda', 'efs'].includes(targetType)) {
+      return { match: true, data: { protocol: 'VPC Network Association', isConfigured: true } };
+    }
   }
 
-  if (sourceType === 'subnet' && ['ec2', 'rds', 'ecs', 'elasticache', 'lambda', 'efs'].includes(targetType)) {
+  if (sourceType === 'subnet' && ['ec2', 'rds', 'ecs', 'elasticache', 'lambda', 'efs', 'alb'].includes(targetType)) {
     return { match: true, data: { protocol: 'Subnet Placement', isConfigured: true } };
   }
 

@@ -19,8 +19,10 @@ const edgeTypes = { custom: CustomAwsEdge, default: CustomAwsEdge };
 export function PlaygroundCanvas() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition, getViewport, setViewport } = useReactFlow();
-  const { nodes, edges, onNodesChange, onEdgesChange, setNodes, setEdges, selectNode, selectEdge, isExecuting } = usePlaygroundStore();
+  const { nodes, edges, deployedNodes, deployedEdges, onNodesChange, onEdgesChange, setNodes, setEdges, selectNode, selectEdge, isExecuting } = usePlaygroundStore();
   const isReadOnly = useCanvasTabStore((s) => s.activeTab === 'deployed');
+  const activeNodes = isReadOnly ? deployedNodes : nodes;
+  const activeEdges = isReadOnly ? deployedEdges : edges;
   const { tokens } = useTheme();
 
   useCanvasKeyboardShortcuts();
@@ -76,7 +78,7 @@ export function PlaygroundCanvas() {
     <div ref={reactFlowWrapper} className="h-full w-full relative" onWheel={onWheel} onDragOver={onDragOver} onDrop={onDrop} style={{ backgroundColor: tokens.canvasBg }}>
       <CanvasSearchBar />
       <ReactFlow
-        nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
+        nodes={activeNodes} edges={activeEdges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
         onNodeDragStop={() => usePlaygroundStore.setState({ isDirty: true })}
         onConnect={onConnect} onReconnect={onReconnect} edgesReconnectable={!isReadOnly} reconnectRadius={30} isValidConnection={isValidConnection}
         onNodeClick={(_, node) => selectNode(node.id)} onEdgeClick={(_, edge) => selectEdge(edge.id)}

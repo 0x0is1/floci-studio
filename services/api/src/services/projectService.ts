@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 import { config } from '@/config/env';
-import { Project, ProjectSchema, CreateProjectInput } from '@/models/project';
+import { Project, ProjectSchema, CreateProjectInput, CanvasNode } from '@/models/project';
 import { getBoilerplate } from '@/services/boilerplateService';
 
 export class ProjectService {
@@ -35,7 +35,19 @@ export class ProjectService {
     const filePath = join(this.projectsDir, `${id}.json`);
     if (!existsSync(filePath)) return null;
     try {
-      return ProjectSchema.parse(JSON.parse(readFileSync(filePath, 'utf-8')));
+      const proj = ProjectSchema.parse(JSON.parse(readFileSync(filePath, 'utf-8')));
+      if (!proj.nodes.some((n) => n.data.serviceType === 'vpc')) {
+        const vpcNode: CanvasNode = {
+          id: 'vpc-default', type: 'custom', position: { x: 40, y: 40 },
+          data: {
+            serviceType: 'vpc', label: 'Default VPC', status: 'draft',
+            config: { uuid: 'vpc-default', vpcId: 'vpc-default', cidrBlock: '172.31.0.0/16', isDefault: true },
+          },
+        };
+        proj.nodes = [vpcNode, ...proj.nodes];
+        this.saveProject(proj);
+      }
+      return proj;
     } catch {
       return null;
     }
@@ -54,6 +66,8 @@ export class ProjectService {
       createdAt: now,
       updatedAt: now,
       status: 'draft',
+      deployedNodes: [],
+      deployedEdges: [],
       logs: [],
     };
     return this.saveProject(project);

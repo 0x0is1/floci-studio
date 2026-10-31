@@ -1,6 +1,7 @@
 import { dockerReq } from './dockerService';
 import { getOsReleaseContent } from './webTemplates';
 import { projectService } from './projectService';
+import { parseDockerStream } from './dockerStreamParser';
 
 export interface ExecRequest {
   port: number;
@@ -15,11 +16,6 @@ export interface ExecResponse {
   output: string;
   exitCode: number;
   mode: 'ssh' | 'ssm';
-}
-
-function cleanDockerOutput(raw: any): string {
-  if (typeof raw !== 'string') return JSON.stringify(raw);
-  return raw.replace(/^[\x00-\x1F]{8}/, '').replace(/[\x00-\x08\x0B-\x1F]/g, '').trim();
 }
 
 function resolveAmi(port: number, containerAmi?: string): string {
@@ -74,14 +70,16 @@ export class Ec2ExecService {
       return { success: true, prompt, output: out, exitCode: 0, mode };
     }
 
+    const wrappedCmd = `[ -f /etc/environment ] && . /etc/environment 2>/dev/null; ${command}`;
     const createRes = await dockerReq('POST', `/containers/${targetContainer}/exec`, {
-      AttachStdout: true, AttachStderr: true, Tty: false, Cmd: ['sh', '-c', command],
+      AttachStdout: true, AttachStderr: true, Tty: false, Cmd: ['sh', '-c', wrappedCmd],
     });
     if (createRes.status !== 201 || !createRes.body?.Id) {
       return { success: false, prompt, output: 'Error: Unable to connect to EC2 container. Ensure instance is running.', exitCode: 1, mode };
     }
     const startRes = await dockerReq('POST', `/exec/${createRes.body.Id}/start`, { Detach: false, Tty: false });
-    return { success: true, prompt, output: cleanDockerOutput(startRes.body) || '(Command completed with 0 output)', exitCode: 0, mode };
+    const output = parseDockerStream(startRes.body);
+    return { success: true, prompt, output: output || '(Command completed with 0 output)', exitCode: 0, mode };
   }
 }
 

@@ -35,7 +35,7 @@ function CustomAwsNodeComponent(props: any) {
   }, [showAddMenu, isHovered]);
 
   const borderColor = selected ? tokens.borderFocus : isRunning ? tokens.statusRunning : isDeploying ? tokens.statusDeploying : isError ? tokens.statusError : tokens.border;
-  const hasTargetHandle = nodeData.serviceType !== 'cloudfront';
+  const hasTargetHandle = !['cloudfront', 'vpc', 'route53'].includes(nodeData.serviceType);
   const hasSourceHandle = !['rds', 'dynamodb', 's3'].includes(nodeData.serviceType);
 
   return (

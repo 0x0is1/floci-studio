@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
+const isExport = process.env.BUILD_MODE === 'export';
+
 const nextConfig: NextConfig = {
-  output: 'export',
+  output: isExport ? 'export' : undefined,
   turbopack: {
     rules: {
       "*.css": {
@@ -13,3 +15,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

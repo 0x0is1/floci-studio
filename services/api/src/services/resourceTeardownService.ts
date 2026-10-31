@@ -9,6 +9,9 @@ import { DeleteTopicCommand } from '@aws-sdk/client-sns';
 import { DeleteSecretCommand } from '@aws-sdk/client-secrets-manager';
 import { DeleteLogGroupCommand } from '@aws-sdk/client-cloudwatch-logs';
 import { DeleteEventBusCommand } from '@aws-sdk/client-eventbridge';
+import { ScheduleKeyDeletionCommand } from '@aws-sdk/client-kms';
+import { DeleteKeyPairCommand } from '@aws-sdk/client-ec2';
+import { purgeKmsKeys, purgeEc2KeyPairs, purgeIamRoles } from './deepPurgeService';
 
 export async function deleteS3Bucket(bucket: string): Promise<void> {
   try {
@@ -42,6 +45,8 @@ export async function deleteResourceByName(service: string, rawId: string): Prom
   else if (service === 'secrets') await awsClients.secrets.send(new DeleteSecretCommand({ SecretId: id, ForceDeleteWithoutRecovery: true })).catch(() => {});
   else if (service === 'logs') await awsClients.logs.send(new DeleteLogGroupCommand({ logGroupName: id })).catch(() => {});
   else if (service === 'eventbridge') await awsClients.eventbridge.send(new DeleteEventBusCommand({ Name: id })).catch(() => {});
+  else if (service === 'kms') await awsClients.kms.send(new ScheduleKeyDeletionCommand({ KeyId: id, PendingWindowInDays: 7 })).catch(() => {});
+  else if (service === 'keypair') await awsClients.ec2.send(new DeleteKeyPairCommand({ KeyName: id })).catch(() => {});
 }
 
 export async function teardownSessionResources(params: {
@@ -63,4 +68,7 @@ export async function purgeAllFlociResources(): Promise<void> {
       if (c.Names?.some((n: string) => n.includes('floci-ec2'))) await dockerReq('DELETE', `/containers/${c.Id}?force=true`).catch(() => {});
     }
   }
+  await purgeKmsKeys();
+  await purgeEc2KeyPairs();
+  await purgeIamRoles();
 }

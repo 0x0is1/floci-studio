@@ -9,6 +9,8 @@ export type AppEdge = Edge<AwsEdgeData>;
 interface PlaygroundState extends ProjectStateSlice {
   nodes: AppNode[];
   edges: AppEdge[];
+  deployedNodes: AppNode[];
+  deployedEdges: AppEdge[];
   isExecuting: boolean;
   isDeployed: boolean;
   selectedNodeId: string | null;
@@ -18,6 +20,8 @@ interface PlaygroundState extends ProjectStateSlice {
   onEdgesChange: OnEdgesChange<AppEdge>;
   setNodes: (nodes: AppNode[]) => void;
   setEdges: (edges: AppEdge[]) => void;
+  setDeployedState: (nodes: AppNode[], edges: AppEdge[]) => void;
+  clearDeployedState: () => void;
   selectNode: (id: string | null) => void;
   selectEdge: (id: string | null) => void;
   deleteNode: (id: string) => void;
@@ -33,25 +37,19 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   ...createProjectSlice(set, get),
   nodes: [],
   edges: [],
+  deployedNodes: [],
+  deployedEdges: [],
   isExecuting: false,
   isDeployed: false,
   selectedNodeId: null,
   selectedEdgeId: null,
 
-  onNodesChange: (changes) => {
-    if (get().isExecuting) return;
-    set({
-      nodes: applyNodeChanges(changes, get().nodes),
-    });
-  },
-  onEdgesChange: (changes) => {
-    if (get().isExecuting) return;
-    set({
-      edges: applyEdgeChanges(changes, get().edges),
-    });
-  },
+  onNodesChange: (c) => !get().isExecuting && set({ nodes: applyNodeChanges(c, get().nodes) }),
+  onEdgesChange: (c) => !get().isExecuting && set({ edges: applyEdgeChanges(c, get().edges) }),
   setNodes: (nodes) => set({ nodes, isDirty: true }),
   setEdges: (edges) => set({ edges, isDirty: true }),
+  setDeployedState: (deployedNodes, deployedEdges) => set({ deployedNodes, deployedEdges }),
+  clearDeployedState: () => set({ deployedNodes: [], deployedEdges: [], isDeployed: false }),
   selectNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null }),
   selectEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null }),
 
@@ -59,16 +57,14 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     set({
       nodes: get().nodes.filter((n) => n.id !== id),
       edges: get().edges.filter((e) => e.source !== id && e.target !== id),
-      selectedNodeId: null,
-      isDirty: true,
+      selectedNodeId: null, isDirty: true,
     });
   },
 
   deleteEdge: (id) => {
     set({
       edges: get().edges.filter((e) => e.id !== id),
-      selectedEdgeId: null,
-      isDirty: true,
+      selectedEdgeId: null, isDirty: true,
     });
   },
 
@@ -90,7 +86,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   setDeployed: (deployed) => set({ isDeployed: deployed }),
   updateNodeStatus: (id, status, liveUrl, port) => {
     set({
-      nodes: get().nodes.map((n) =>
+      deployedNodes: get().deployedNodes.map((n) =>
         n.id === id ? { ...n, data: { ...n.data, status, liveUrl: liveUrl || n.data.liveUrl, config: port ? { ...n.data.config, port } : n.data.config } } : n
       ),
     });

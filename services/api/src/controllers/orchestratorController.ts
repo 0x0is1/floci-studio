@@ -20,11 +20,11 @@ export const orchestratorController = new Elysia({ prefix: '/api/orchestrator' }
       if (projectId) {
         const proj = projectService.getProject(projectId);
         if (proj) {
-          const updatedNodes = (proj.nodes || []).map((n) => {
+          const deployedNodes = (nodes || []).map((n: any) => {
             const r = results.find((res) => res.nodeId === n.id);
             return r ? { ...n, data: { ...n.data, status: r.status, liveUrl: r.liveUrl } } : n;
           });
-          projectService.saveProject({ ...proj, nodes: updatedNodes, logs, status: 'running' });
+          projectService.saveProject({ ...proj, deployedNodes, deployedEdges: edges || [], logs, status: 'running' });
         }
       }
       return { success: true, results, logs };
@@ -45,11 +45,7 @@ export const orchestratorController = new Elysia({ prefix: '/api/orchestrator' }
       if (projectId) {
         const proj = projectService.getProject(projectId);
         if (proj) {
-          const draftNodes = (proj.nodes || []).map((n) => ({
-            ...n,
-            data: { ...n.data, status: 'draft' as const, liveUrl: undefined },
-          }));
-          projectService.saveProject({ ...proj, nodes: draftNodes, status: 'draft' });
+          projectService.saveProject({ ...proj, deployedNodes: [], deployedEdges: [], status: 'draft' });
         }
       }
       return { success: true, message: 'Resources cleaned up' };

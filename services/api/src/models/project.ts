@@ -23,6 +23,8 @@ export const ProjectSchema = z.object({
   description: z.string().default(''),
   nodes: z.array(CanvasNodeSchema).default([]),
   edges: z.array(CanvasEdgeSchema).default([]),
+  deployedNodes: z.array(CanvasNodeSchema).optional().default([]),
+  deployedEdges: z.array(CanvasEdgeSchema).optional().default([]),
   createdAt: z.string(),
   updatedAt: z.string().optional().default(() => new Date().toISOString()),
   status: z.enum(['draft', 'deploying', 'running', 'error']).default('draft'),

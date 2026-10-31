@@ -4,7 +4,7 @@ import React from 'react';
 import { useBottomTrayStore } from '@/store/bottomTrayStore';
 import { useCanvasTabStore } from '@/store/canvasTabStore';
 import { useTheme } from '@/theme/ThemeProvider';
-import { LuTerminal, LuActivity, LuChevronUp, LuSquareTerminal } from 'react-icons/lu';
+import { LuTerminal, LuChevronUp, LuSquareTerminal } from 'react-icons/lu';
 
 export function BottomTrayMinimized({ hasEc2, runningCount }: { hasEc2: boolean; runningCount: number }) {
   const { setActiveTab, toggleOpen, logs } = useBottomTrayStore();
@@ -41,20 +41,7 @@ export function BottomTrayMinimized({ hasEc2, runningCount }: { hasEc2: boolean;
           </button>
         )}
 
-        <button
-          onClick={() => handleTabClick('live')}
-          aria-label="Live Infrastructure / Live Resources"
-          style={{ color: tokens.textSecondary }}
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded hover:opacity-85 transition-colors cursor-pointer"
-        >
-          <LuActivity className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Live Infrastructure</span>
-          {runningCount > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 font-mono">
-              {runningCount}
-            </span>
-          )}
-        </button>
+
       </div>
 
       <button onClick={toggleOpen} style={{ color: tokens.textMuted }} className="p-1 rounded hover:opacity-85 cursor-pointer" title="Open console">

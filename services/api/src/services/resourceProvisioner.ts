@@ -9,6 +9,7 @@ import { provisionNetworkResource } from './networkProvisioner';
 import { provisionServerless } from './serverlessProvisioner';
 import { provisionAiResource } from './aiProvisioner';
 import { findAvailablePort } from './portFinder';
+import { resolveInjectedEnvVars } from './envResolver';
 
 export interface ProvisionContext {
   nodeId: string;
@@ -16,8 +17,9 @@ export interface ProvisionContext {
   label: string;
   config: Record<string, any>;
   resourceMap: Record<string, string>;
-  edges: Array<{ source: string; target: string }>;
+  edges: Array<{ source: string; target: string; data?: any }>;
   projectId?: string;
+  nodes?: Array<any>;
 }
 
 export async function provisionResource(ctx: ProvisionContext, logs: TerminalLog[]) {
@@ -67,18 +69,18 @@ export async function provisionResource(ctx: ProvisionContext, logs: TerminalLog
     const instanceId = runRes.Instances?.[0]?.InstanceId || `i-${Date.now().toString().slice(-8)}`;
     logs.push(logStdout(nodeId, type, runRes, `EC2 Instance ${instanceId} state: RUNNING`));
 
-    const s3Target = edges.find((e) => e.source === nodeId && resourceMap[e.target]);
-    const sqsTarget = edges.find((e) => e.source === nodeId && resourceMap[e.target]);
+    const envVars = resolveInjectedEnvVars(nodeId, edges, resourceMap, ctx.nodes);
     logs.push(logStdin(nodeId, type, `docker run -d --name floci-ec2-web-${port} -p ${port}:80 nginx:alpine`, 'docker'));
     await dockerService.launchEc2Web(port, {
       id: instanceId,
       name: label,
-      s3: s3Target ? resourceMap[s3Target.target] : undefined,
-      sqs: sqsTarget ? resourceMap[sqsTarget.target] : undefined,
+      s3: envVars.S3_BUCKET || envVars.BUCKET_NAME,
+      sqs: envVars.SQS_QUEUE_URL || envVars.QUEUE_URL,
       template: config.template || 'nginx',
       ami,
       instanceType: instType,
       projectId,
+      envVars,
     });
     const liveUrl = `http://localhost:${port}`;
     logs.push(logStdout(nodeId, type, { port, liveUrl, instanceId }, `Container running on host port ${port} -> ${liveUrl}`, 'docker'));

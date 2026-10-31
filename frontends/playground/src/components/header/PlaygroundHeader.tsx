@@ -42,7 +42,13 @@ export function PlaygroundHeader() {
       const res = await deployInfrastructure(nodes, edges, activeProjectId);
       if (res?.logs?.length) addLogs(res.logs);
       if (res?.success && res.results) {
-        res.results.forEach((item: any) => updateNodeStatus(item.nodeId, item.status, item.liveUrl, item.port));
+        const deployedSnapshot = nodes.map((n) => {
+          const item = res.results.find((r: any) => r.nodeId === n.id);
+          return item
+            ? { ...n, data: { ...n.data, status: item.status, liveUrl: item.liveUrl, config: item.port ? { ...n.data.config, port: item.port } : n.data.config } }
+            : { ...n, data: { ...n.data, status: 'draft' as const } };
+        });
+        usePlaygroundStore.getState().setDeployedState(deployedSnapshot, [...edges]);
         setDeployed(true);
         useCanvasTabStore.getState().setActiveTab('deployed');
         mutate(`/api/orchestrator/runtime-state?projectId=${activeProjectId}`);
@@ -50,11 +56,9 @@ export function PlaygroundHeader() {
         await saveCurrentProject().catch(() => {});
         toast.success('Deployment Complete', { description: 'AWS infrastructure is live on localhost!' });
       } else {
-        nodes.forEach((n) => updateNodeStatus(n.id, 'error'));
         toast.error('Deployment Failed', { description: res?.error || 'Docker services paused or inactive.' });
       }
     } catch (err: any) {
-      nodes.forEach((n) => updateNodeStatus(n.id, 'error'));
       toast.error('Deployment Failed', { description: err.message });
     } finally { setExecuting(false); }
   };
@@ -67,10 +71,7 @@ export function PlaygroundHeader() {
       const buckets = nodes.filter((n) => n.data.serviceType === 's3').map((n) => n.data.resourceId || n.data.config?.bucketName).filter(Boolean);
       const queues = nodes.filter((n) => n.data.serviceType === 'sqs').map((n) => n.data.resourceId || n.data.config?.queueName).filter(Boolean);
       await teardownInfrastructure({ ports, buckets, queues, projectId: activeProjectId }).catch(() => {});
-      usePlaygroundStore.setState({
-        nodes: nodes.map((n) => ({ ...n, data: { ...n.data, status: 'draft' as const, liveUrl: undefined } })),
-        isDeployed: false, isExecuting: false,
-      });
+      usePlaygroundStore.getState().clearDeployedState();
       useCanvasTabStore.getState().setActiveTab('editor');
       mutate(`/api/orchestrator/runtime-state?projectId=${activeProjectId}`);
       mutate(`/api/projects/${activeProjectId}`);

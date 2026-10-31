@@ -32,10 +32,13 @@ export const createProjectSlice = (set: any, get: any) => ({
     const res = await getProject(id);
     if (res?.success && res.data) {
       const runtime = await fetchRuntimeState(id).catch(() => null);
-      const { nodes: updatedNodes, isDeployed } = reconcileNodeStates(res.data.nodes || [], runtime, res.data.edges || [], res.data.status);
+      const rawDeployed = res.data.deployedNodes || [];
+      const { nodes: recDeployed } = reconcileNodeStates(rawDeployed, runtime, res.data.deployedEdges || [], res.data.status);
+      const isDeployed = recDeployed.some((n) => n.data.status === 'running');
       useBottomTrayStore.getState().setLogs(res.data.logs || []);
       set({
-        activeProjectId: id, projectName: res.data.name, nodes: updatedNodes, edges: res.data.edges || [],
+        activeProjectId: id, projectName: res.data.name, nodes: res.data.nodes || [], edges: res.data.edges || [],
+        deployedNodes: recDeployed, deployedEdges: res.data.deployedEdges || [],
         isDeployed, isDirty: false, selectedNodeId: null, selectedEdgeId: null, projectLoadStatus: 'loaded',
       });
       return true;
@@ -74,11 +77,15 @@ export const createProjectSlice = (set: any, get: any) => ({
   },
 
   saveCurrentProject: async (): Promise<boolean> => {
-    const { activeProjectId, projectName, nodes, edges, isDeployed } = get();
+    const { activeProjectId, projectName, nodes, edges, deployedNodes, deployedEdges, isDeployed } = get();
     if (!activeProjectId) return false;
     const now = new Date().toISOString();
     const currentLogs = useBottomTrayStore.getState().logs || [];
-    const res = await saveProject({ id: activeProjectId, name: projectName, nodes, edges, createdAt: now, updatedAt: now, status: isDeployed ? 'running' : 'draft', logs: currentLogs });
+    const res = await saveProject({
+      id: activeProjectId, name: projectName, nodes, edges,
+      deployedNodes: deployedNodes || [], deployedEdges: deployedEdges || [],
+      createdAt: now, updatedAt: now, status: isDeployed ? 'running' : 'draft', logs: currentLogs,
+    });
     if (res?.success) {
       set({ isDirty: false });
       mutate('/api/projects');
