@@ -1,0 +1,266 @@
+{
+  "id": "1793532936885",
+  "name": "a",
+  "description": "",
+  "nodes": [
+    {
+      "id": "vpc-default",
+      "type": "custom",
+      "position": {
+        "x": -239.480326621382,
+        "y": -183.8726269566912
+      },
+      "data": {
+        "serviceType": "vpc",
+        "label": "Default VPC",
+        "status": "draft",
+        "config": {
+          "uuid": "vpc-default",
+          "vpcId": "vpc-default",
+          "cidrBlock": "172.31.0.0/16",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "subnet-default",
+      "type": "custom",
+      "position": {
+        "x": 190.25983668930905,
+        "y": -223.09028877615785
+      },
+      "data": {
+        "serviceType": "subnet",
+        "label": "Default Subnet (172.31.1.0/24)",
+        "status": "draft",
+        "config": {
+          "uuid": "subnet-default",
+          "subnetId": "subnet-default-1a",
+          "cidrBlock": "172.31.1.0/24",
+          "vpcId": "vpc-default",
+          "isDefault": true
+        }
+      }
+    },
+    {
+      "id": "ec2-default",
+      "type": "custom",
+      "position": {
+        "x": 658.6666666666666,
+        "y": -4
+      },
+      "data": {
+        "serviceType": "ec2",
+        "label": "Web Server",
+        "status": "draft",
+        "config": {
+          "ami": "ami-al2023",
+          "instanceType": "t3.micro",
+          "template": "nginx",
+          "port": 8080,
+          "publicIp": true,
+          "rootVolumeSize": 20
+        }
+      }
+    },
+    {
+      "id": "s3-default",
+      "type": "custom",
+      "position": {
+        "x": 1034.6666666666665,
+        "y": -81.33333333333333
+      },
+      "data": {
+        "serviceType": "s3",
+        "label": "App Storage Bucket",
+        "status": "draft",
+        "config": {
+          "bucketName": "app-storage",
+          "accessControl": "private",
+          "versioning": false,
+          "encryption": "AES256",
+          "networkAccess": "public_external"
+        }
+      }
+    },
+    {
+      "id": "sqs-default",
+      "type": "custom",
+      "position": {
+        "x": 1315.1752041383638,
+        "y": 146.3324848995514
+      },
+      "data": {
+        "serviceType": "sqs",
+        "label": "App Queue",
+        "status": "draft",
+        "config": {
+          "queueName": "app-queue",
+          "queueType": "standard",
+          "visibilityTimeout": 30,
+          "messageRetentionDays": 4
+        }
+      }
+    },
+    {
+      "id": "kinesis-c61a8696",
+      "type": "custom",
+      "position": {
+        "x": 429.67265883701805,
+        "y": 514.2470039148243
+      },
+      "data": {
+        "serviceType": "kinesis",
+        "label": "Kinesis Stream",
+        "status": "draft",
+        "config": {
+          "streamName": "analytics-stream",
+          "shardCount": 1,
+          "retentionHours": 24,
+          "uuid": "c61a8696-f3a6-45f3-a344-8efcfa9248e5"
+        }
+      }
+    },
+    {
+      "id": "ec2-40e11475",
+      "type": "custom",
+      "position": {
+        "x": 739.5047673309758,
+        "y": 590.7926147995288
+      },
+      "data": {
+        "serviceType": "ec2",
+        "label": "EC2 Instance",
+        "status": "draft",
+        "config": {
+          "ami": "ami-al2023",
+          "instanceType": "t3.micro",
+          "template": "nginx",
+          "port": 8080,
+          "publicIp": true,
+          "rootVolumeSize": 20,
+          "uuid": "40e11475-c306-4e74-876e-cde09e2d3bca"
+        }
+      }
+    },
+    {
+      "id": "logs-46301764",
+      "type": "custom",
+      "position": {
+        "x": 1300.9298970911032,
+        "y": 371.4791953763395
+      },
+      "data": {
+        "serviceType": "logs",
+        "label": "CloudWatch Logs",
+        "status": "draft",
+        "config": {
+          "logGroupName": "/aws/app-logs",
+          "retentionInDays": 14,
+          "uuid": "46301764-5d07-40df-9c0a-c78e4e8ce607"
+        }
+      }
+    },
+    {
+      "id": "testrunner-ceec8ea5",
+      "type": "custom",
+      "position": {
+        "x": 1001.4495704697212,
+        "y": -318.83101770937014
+      },
+      "data": {
+        "serviceType": "testrunner",
+        "label": "Test Runner",
+        "status": "draft",
+        "config": {
+          "networkAccess": "vpc_only",
+          "uuid": "ceec8ea5-c453-4c1b-8b06-4ae7939752ad"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-vpc-subnet",
+      "source": "vpc-default",
+      "target": "subnet-default",
+      "type": "custom",
+      "data": {
+        "protocol": "VPC CIDR Association",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-subnet-ec2",
+      "source": "subnet-default",
+      "target": "ec2-default",
+      "type": "custom",
+      "data": {
+        "protocol": "Subnet Placement",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-s3",
+      "source": "ec2-default",
+      "target": "s3-default",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "s3:PutObject,s3:GetObject",
+        "envVarName": "S3_BUCKET_NAME",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-sqs",
+      "source": "ec2-default",
+      "target": "sqs-default",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "sqs:SendMessage,sqs:ReceiveMessage",
+        "envVarName": "QUEUE_URL",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-kinesis-c61a8696-ec2-40e11475",
+      "source": "kinesis-c61a8696",
+      "target": "ec2-40e11475",
+      "type": "custom",
+      "targetHandle": "top",
+      "data": {
+        "protocol": "Kinesis Stream Consumer",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-default-logs-46301764",
+      "source": "ec2-default",
+      "target": "logs-46301764",
+      "type": "custom",
+      "sourceHandle": "bottom",
+      "data": {
+        "iamPolicy": "logs:PutLogEvents",
+        "envVarName": "LOG_GROUP_NAME",
+        "isConfigured": true
+      }
+    },
+    {
+      "id": "e-ec2-default-testrunner-ceec8ea5",
+      "source": "ec2-default",
+      "target": "testrunner-ceec8ea5",
+      "type": "custom",
+      "sourceHandle": "right",
+      "data": {
+        "protocol": "Test Target",
+        "isConfigured": true
+      }
+    }
+  ],
+  "deployedNodes": [],
+  "deployedEdges": [],
+  "createdAt": "2026-11-01T11:35:36.885Z",
+  "updatedAt": "2026-11-01T11:44:00.195Z",
+  "status": "draft",
+  "logs": []
+}

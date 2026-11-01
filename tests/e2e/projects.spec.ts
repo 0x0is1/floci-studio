@@ -18,10 +18,10 @@ test.describe('Project Lifecycle & Boilerplate E2E', () => {
 
     // Verify starter boilerplate nodes appear on the canvas
     const canvas = page.locator('.react-flow');
-    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'CloudFront CDN' })).toBeVisible();
-    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Production Web Server' })).toBeVisible();
-    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Static Media Bucket' })).toBeVisible();
-    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Background Job Queue' })).toBeVisible();
+    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Browser Client' })).toBeVisible();
+    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Web Server' })).toBeVisible();
+    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'App Storage Bucket' })).toBeVisible();
+    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'App Queue' })).toBeVisible();
 
     // Click Save button
     await page.getByRole('button', { name: 'Save' }).click();

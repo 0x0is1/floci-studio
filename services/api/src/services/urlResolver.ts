@@ -25,7 +25,7 @@ export function buildSqsUrls(queue: string, endpoint: string) {
 
 export function buildRdsUrls(db: string, cfg: Record<string, any> = {}) {
   const engine = cfg.engine || 'postgres';
-  const proto = engine.includes('mysql') ? 'mysql' : 'postgres';
+  const proto = engine.includes('mysql') || engine.includes('mariadb') ? 'mysql' : 'postgres';
   const port = cfg.port || (proto === 'mysql' ? 3306 : 5432);
   const user = cfg.username || 'admin';
   const pass = cfg.password || 'Password123!';

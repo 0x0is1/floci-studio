@@ -47,6 +47,6 @@ export const NETWORKING_PALETTE_ITEMS: AwsPaletteItem[] = [
     name: 'Route 53 DNS',
     description: 'Scalable cloud Domain Name System (DNS) web traffic routing',
     flociStatus: 'ready',
-    defaultConfig: { domainName: 'example.com', recordType: 'A', ttl: 300 },
+    defaultConfig: { domainName: 'example.com', recordType: 'A', ttl: 300, routingPolicy: 'simple' },
   },
 ];

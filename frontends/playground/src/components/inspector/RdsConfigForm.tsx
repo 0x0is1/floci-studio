@@ -25,6 +25,7 @@ export function RdsConfigForm({ config, onChange }: Props) {
           <option value="postgres-16">PostgreSQL 16.3 (Latest standard)</option>
           <option value="postgres-15">PostgreSQL 15.6</option>
           <option value="mysql-8">MySQL 8.0.35</option>
+          <option value="mariadb-10">MariaDB 10.11</option>
         </select>
       </div>
 
@@ -79,6 +80,21 @@ export function RdsConfigForm({ config, onChange }: Props) {
           <option value={20}>20 GiB (Standard Dev Size)</option>
           <option value={50}>50 GiB</option>
           <option value={100}>100 GiB</option>
+        </select>
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-[10px] font-medium" style={{ color: tokens.textMuted }}>Backup Retention</label>
+        <select
+          value={config.backupRetentionDays ?? 7}
+          onChange={(e) => onChange('backupRetentionDays', Number(e.target.value))}
+          style={inputStyle}
+          className="w-full rounded border px-2 py-1.5 text-xs focus:outline-none focus:border-sky-500"
+        >
+          <option value={0}>Disabled</option>
+          <option value={1}>1 Day</option>
+          <option value={7}>7 Days (Default)</option>
+          <option value={35}>35 Days (Maximum)</option>
         </select>
       </div>
     </div>

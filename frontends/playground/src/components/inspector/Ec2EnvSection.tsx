@@ -4,31 +4,12 @@ import React from 'react';
 import { useTheme } from '@/theme/ThemeProvider';
 import { LuVariable, LuCopy } from 'react-icons/lu';
 import { toast } from 'sonner';
+import { resolveDisplayValue } from '@shared/envValueResolver';
 
 interface Props {
   envEdges: any[];
   nodes: any[];
   nodeId?: string;
-}
-
-function getResolvedEnvValue(node: any): string {
-  if (!node) return 'configured';
-  const type = node.data?.serviceType;
-  const cfg = node.data?.config || {};
-  const endpoint = 'http://localhost:4566';
-
-  if (type === 'sqs') return `${endpoint}/000000000000/${cfg.queueName || 'app-queue'}`;
-  if (type === 's3') return `${endpoint}/${cfg.bucketName || 'app-bucket'}`;
-  if (type === 'rds') {
-    const user = cfg.user || 'postgres', pass = cfg.password || 'floci123', port = cfg.port || 5432, db = cfg.databaseName || cfg.dbName || 'postgres';
-    return `postgresql://${user}:${pass}@localhost:${port}/${db}`;
-  }
-  if (type === 'dynamodb') return `${endpoint}/tables/${cfg.tableName || 'app-table'}`;
-  if (type === 'bedrock') return `${endpoint}/bedrock`;
-  if (type === 'sns') return `arn:aws:sns:us-east-1:000000000000:${cfg.topicName || 'app-topic'}`;
-  if (type === 'secretsmanager' || type === 'secrets') return `arn:aws:secretsmanager:us-east-1:000000000000:secret:${cfg.secretName || 'app-secret'}`;
-  if (type === 'elasticache') return `redis://localhost:${cfg.port || 6379}`;
-  return cfg.bucketName || cfg.queueName || cfg.tableName || cfg.dbName || cfg.topicName || cfg.modelId || cfg.functionName || node.data?.label || 'configured';
 }
 
 export function Ec2EnvSection({ envEdges, nodes, nodeId }: Props) {
@@ -50,7 +31,7 @@ export function Ec2EnvSection({ envEdges, nodes, nodeId }: Props) {
         {envEdges.map((e) => {
           const peerId = nodeId ? (e.source === nodeId ? e.target : e.source) : e.target;
           const targetNode = nodes.find((n) => n.id === peerId);
-          const val = getResolvedEnvValue(targetNode);
+          const val = resolveDisplayValue(targetNode);
           const varName = e.data?.envVarName || 'ENV_VAR';
           return (
             <div key={e.id} className="flex items-center justify-between p-1.5 rounded border font-mono text-[11px]" style={{ backgroundColor: tokens.cardBg, borderColor: tokens.border }}>

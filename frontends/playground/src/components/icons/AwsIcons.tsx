@@ -4,10 +4,11 @@ import {
   AmazonSimpleQueueService, AmazonRds, AmazonDynamoDb, AwsLambda, ElasticLoadBalancing,
   AmazonElasticContainerService, AmazonElasticKubernetesService, AmazonSimpleNotificationService,
   AmazonEventBridge, AwsStepFunctions, AmazonBedrock, AwsSecretsManager,
-  AwsKeyManagementService, AmazonCloudWatch,
+  AwsKeyManagementService, AmazonCloudWatch, AmazonElastiCache, AmazonKinesis,
+  AmazonRoute53, AmazonEfs,
 } from '@aws-icons/react/architecture-service';
 import { VirtualPrivateCloudVpc, PublicSubnet } from '@aws-icons/react/architecture-group';
-import { FaAws } from 'react-icons/fa6';
+import { FaAws, FaUser, FaFlask } from 'react-icons/fa6';
 
 interface IconProps {
   type: string;
@@ -39,6 +40,12 @@ export function AwsIcon({ type, size = 20, className = '' }: IconProps) {
     case 'secretsmanager': return <span className={c}><AwsSecretsManager width={size} height={size} /></span>;
     case 'kms': return <span className={c}><AwsKeyManagementService width={size} height={size} /></span>;
     case 'logs': case 'monitoring': return <span className={c}><AmazonCloudWatch width={size} height={size} /></span>;
+    case 'elasticache': return <span className={c}><AmazonElastiCache width={size} height={size} /></span>;
+    case 'kinesis': return <span className={c}><AmazonKinesis width={size} height={size} /></span>;
+    case 'route53': return <span className={c}><AmazonRoute53 width={size} height={size} /></span>;
+    case 'efs': return <span className={c}><AmazonEfs width={size} height={size} /></span>;
+    case 'client': return <span className={c}><FaUser className="text-emerald-400" style={{ width: size, height: size }} /></span>;
+    case 'testrunner': return <span className={c}><FaFlask className="text-fuchsia-400" style={{ width: size, height: size }} /></span>;
     default: return <span className={c}><FaAws className="text-amber-500" style={{ width: size, height: size }} /></span>;
   }
 }

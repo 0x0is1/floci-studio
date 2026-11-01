@@ -7,8 +7,8 @@
       "id": "vpc-default",
       "type": "custom",
       "position": {
-        "x": 60,
-        "y": 40
+        "x": -290.6666666666667,
+        "y": -236
       },
       "data": {
         "serviceType": "vpc",
@@ -26,8 +26,8 @@
       "id": "subnet-default",
       "type": "custom",
       "position": {
-        "x": 340,
-        "y": 40
+        "x": 200,
+        "y": -160
       },
       "data": {
         "serviceType": "subnet",
@@ -71,8 +71,8 @@
       "id": "bedrock-1",
       "type": "custom",
       "position": {
-        "x": 513.2165688403894,
-        "y": 71.20138523630244
+        "x": 679.9295069969666,
+        "y": 84.53115922425802
       },
       "data": {
         "serviceType": "bedrock",
@@ -90,8 +90,8 @@
       "id": "s3-1",
       "type": "custom",
       "position": {
-        "x": 535.9523173380454,
-        "y": 318.3550878106503
+        "x": 593.2856506713788,
+        "y": 399.68842114398365
       },
       "data": {
         "serviceType": "s3",
@@ -102,6 +102,41 @@
           "networkAccess": "public_external"
         },
         "resourceId": "genai-prompt-cache-1793"
+      }
+    },
+    {
+      "id": "testrunner-d9e4e663",
+      "type": "custom",
+      "position": {
+        "x": 671.6539756890913,
+        "y": -183.63536353254187
+      },
+      "data": {
+        "serviceType": "testrunner",
+        "label": "Test Runner",
+        "status": "draft",
+        "config": {
+          "networkAccess": "vpc_only",
+          "uuid": "d9e4e663-63d9-4407-86d5-6ee647a89866"
+        }
+      }
+    },
+    {
+      "id": "client-44cbe617",
+      "type": "custom",
+      "position": {
+        "x": 1015.6620913059753,
+        "y": -96.25104561786938
+      },
+      "data": {
+        "serviceType": "client",
+        "label": "Client",
+        "status": "draft",
+        "config": {
+          "requestMethod": "GET",
+          "requestPath": "/",
+          "uuid": "44cbe617-a04c-46c9-abfc-5176f4e8e752"
+        }
       }
     }
   ],
@@ -147,10 +182,23 @@
         "protocol": "Subnet Placement",
         "isConfigured": true
       }
+    },
+    {
+      "id": "e-ec2-1-testrunner-d9e4e663",
+      "source": "ec2-1",
+      "target": "testrunner-d9e4e663",
+      "type": "custom",
+      "sourceHandle": "right",
+      "data": {
+        "protocol": "Test Target",
+        "isConfigured": true
+      }
     }
   ],
+  "deployedNodes": [],
+  "deployedEdges": [],
   "createdAt": "2026-10-29T18:30:08.829Z",
-  "updatedAt": "2026-10-29T18:30:08.874Z",
+  "updatedAt": "2026-11-01T11:34:36.421Z",
   "status": "draft",
   "logs": [
     {
@@ -161,85 +209,6 @@
       "nodeId": "system",
       "serviceType": "orchestrator",
       "message": "DAG planned: 3 nodes execution order."
-    },
-    {
-      "id": "log_1793298606559_zhdr",
-      "timestamp": "18:30:06.559",
-      "source": "aws-sdk",
-      "type": "stdin",
-      "nodeId": "ec2-1",
-      "serviceType": "iam",
-      "command": "aws iam create-role --role-name genai-api-server-role",
-      "message": "$ aws iam create-role --role-name genai-api-server-role"
-    },
-    {
-      "id": "log_1793298606570_ke3b",
-      "timestamp": "18:30:06.570",
-      "source": "aws-sdk",
-      "type": "stdin",
-      "nodeId": "ec2-1",
-      "serviceType": "iam",
-      "command": "aws iam put-role-policy --role-name genai-api-server-role --policy-name genai-api-server-role-policy",
-      "message": "$ aws iam put-role-policy --role-name genai-api-server-role --policy-name genai-api-server-role-policy"
-    },
-    {
-      "id": "log_1793298606605_n46t",
-      "timestamp": "18:30:06.605",
-      "source": "aws-sdk",
-      "type": "stdout",
-      "nodeId": "ec2-1",
-      "serviceType": "iam",
-      "message": "Attached policy 'genai-api-server-role-policy' with [bedrock:InvokeModel, s3:PutObject, s3:GetObject].",
-      "rawOutput": "{\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"096d00cc-47bd-4b2e-8a0a-33fc081f64da\",\n    \"extendedRequestId\": \"096d00cc-47bd-4b2e-8a0a-33fc081f64da\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
-    },
-    {
-      "id": "log_1793298606605_zouq",
-      "timestamp": "18:30:06.605",
-      "source": "system",
-      "type": "info",
-      "nodeId": "ec2-1",
-      "serviceType": "ec2",
-      "message": "Provisioning GenAI API Server..."
-    },
-    {
-      "id": "log_1793298606720_92pu",
-      "timestamp": "18:30:06.720",
-      "source": "aws-sdk",
-      "type": "stdin",
-      "nodeId": "ec2-1",
-      "serviceType": "ec2",
-      "command": "aws ec2 run-instances --image-id ami-ubuntu2404-amd64 --instance-type t3.medium --count 1",
-      "message": "$ aws ec2 run-instances --image-id ami-ubuntu2404-amd64 --instance-type t3.medium --count 1"
-    },
-    {
-      "id": "log_1793298606764_wag2",
-      "timestamp": "18:30:06.763",
-      "source": "aws-sdk",
-      "type": "stdout",
-      "nodeId": "ec2-1",
-      "serviceType": "ec2",
-      "message": "EC2 Instance i-35743122859fb85ea state: RUNNING",
-      "rawOutput": "{\n  \"ReservationId\": \"r-aab9055853323e080\",\n  \"OwnerId\": \"000000000000\",\n  \"Groups\": [],\n  \"Instances\": [\n    {\n      \"Architecture\": \"x86_64\",\n      \"BlockDeviceMappings\": [\n        {\n          \"DeviceName\": \"/dev/xvda\",\n          \"Ebs\": {\n            \"AttachTime\": \"2026-10-29T18:30:06.723Z\",\n            \"DeleteOnTermination\": true,\n            \"Status\": \"attached\",\n            \"VolumeId\": \"vol-a77623eb14d44f8df\"\n          }\n        }\n      ],\n      \"ClientToken\": \"40b5f0d1-f477-4cf1-b40a-7278c352931f\",\n      \"EbsOptimized\": false,\n      \"EnaSupport\": true,\n      \"Hypervisor\": \"xen\",\n      \"NetworkInterfaces\": [\n        {\n          \"Attachment\": {\n            \"AttachTime\": \"2026-10-29T18:30:06.723Z\",\n            \"AttachmentId\": \"eni-attach-cafbdc2537f91ad62\",\n            \"DeleteOnTermination\": true,\n            \"DeviceIndex\": 0,\n            \"Status\": \"attached\"\n          },\n          \"Groups\": [\n            {\n              \"GroupId\": \"sg-default-us-east-1\",\n              \"GroupName\": \"default\"\n            }\n          ],\n          \"NetworkInterfaceId\": \"eni-8833fca9a2787a5e9\",\n          \"OwnerId\": \"000000000000\",\n          \"PrivateDnsName\": \"ip-172-31-32-155.ec2.internal\",\n          \"PrivateIpAddress\": \"172.31.32.155\",\n          \"PrivateIpAddresses\": [\n            {\n              \"Primary\": true,\n              \"PrivateDnsName\": \"ip-172-31-32-155.ec2.internal\",\n              \"PrivateIpAddress\": \"172.31.32.155\"\n            }\n          ],\n          \"SourceDestCheck\": true,\n          \"Status\": \"in-use\",\n          \"SubnetId\": \"subnet-default-us-east-1-c\",\n          \"VpcId\": \"vpc-default-us-east-1\"\n        }\n      ],\n      \"RootDeviceName\": \"/dev/xvda\",\n      \"RootDeviceType\": \"ebs\",\n      \"SecurityGroups\": [\n        {\n          \"GroupId\": \"sg-default-us-east-1\",\n          \"GroupName\": \"default\"\n        }\n      ],\n      \"SourceDestCheck\": true,\n      \"Tags\": [\n        {\n          \"Key\": \"Name\",\n          \"Value\": \"GenAI API Server\"\n        }\n      ],\n      \"VirtualizationType\": \"hvm\",\n      \"CpuOptions\": {\n        \"CoreCount\": 1,\n        \"ThreadsPerCore\": 1\n      },\n      \"CapacityReservationSpecification\": {\n        \"CapacityReservationPreference\": \"open\"\n      },\n      \"HibernationOptions\": {\n        \"Configured\": false\n      },\n      \"MetadataOptions\": {\n        \"State\": \"applied\",\n        \"HttpTokens\": \"optional\",\n        \"HttpPutResponseHopLimit\": 1,\n        \"HttpEndpoint\": \"enabled\",\n        \"HttpProtocolIpv6\": \"disabled\",\n        \"InstanceMetadataTags\": \"disabled\"\n      },\n      \"EnclaveOptions\": {\n        \"Enabled\": false\n      },\n      \"PlatformDetails\": \"Linux/UNIX\",\n      \"PrivateDnsNameOptions\": {\n        \"HostnameType\": \"ip-name\",\n        \"EnableResourceNameDnsARecord\": false,\n        \"EnableResourceNameDnsAAAARecord\": false\n      },\n      \"MaintenanceOptions\": {\n        \"AutoRecovery\": \"default\"\n      },\n      \"InstanceId\": \"i-35743122859fb85ea\",\n      \"ImageId\": \"ami-ubuntu2404-amd64\",\n      \"State\": {\n        \"Code\": 0,\n        \"Name\": \"pending\"\n      },\n      \"PrivateDnsName\": \"ip-172-31-32-155.ec2.internal\",\n      \"AmiLaunchIndex\": 0,\n      \"InstanceType\": \"t3.medium\",\n      \"LaunchTime\": \"2026-10-29T18:30:06.723Z\",\n      \"Placement\": {\n        \"Tenancy\": \"default\",\n        \"AvailabilityZone\": \"us-east-1c\"\n      },\n      \"Monitoring\": {\n        \"State\": \"disabled\"\n      },\n      \"SubnetId\": \"subnet-default-us-east-1-c\",\n      \"VpcId\": \"vpc-default-us-east-1\",\n      \"PrivateIpAddress\": \"172.31.32.155\"\n    }\n  ],\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"f7351a09-3257-4a57-98b9-38445f3e8439\",\n    \"extendedRequestId\": \"f7351a09-3257-4a57-98b9-38445f3e8439\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
-    },
-    {
-      "id": "log_1793298606764_imv0",
-      "timestamp": "18:30:06.764",
-      "source": "docker",
-      "type": "stdin",
-      "nodeId": "ec2-1",
-      "serviceType": "ec2",
-      "command": "docker run -d --name floci-ec2-web-8092 -p 8092:80 nginx:alpine",
-      "message": "$ docker run -d --name floci-ec2-web-8092 -p 8092:80 nginx:alpine"
-    },
-    {
-      "id": "log_1793298607346_npey",
-      "timestamp": "18:30:07.346",
-      "source": "docker",
-      "type": "stdout",
-      "nodeId": "ec2-1",
-      "serviceType": "ec2",
-      "message": "Container running on host port 8092 -> http://localhost:8092",
-      "rawOutput": "{\n  \"port\": 8092,\n  \"liveUrl\": \"http://localhost:8092\",\n  \"instanceId\": \"i-35743122859fb85ea\"\n}"
     },
     {
       "id": "log_1793298607346_eiqs",
@@ -307,6 +276,676 @@
       "nodeId": "system",
       "serviceType": "orchestrator",
       "message": "Execution complete. Total events logged: 15."
+    },
+    {
+      "id": "log_1793522127848_xzjf",
+      "timestamp": "08:35:27.836",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 5 nodes execution order."
+    },
+    {
+      "id": "log_1793522127872_ppzo",
+      "timestamp": "08:35:27.872",
+      "source": "system",
+      "type": "info",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Provisioning Default VPC..."
+    },
+    {
+      "id": "log_1793522127875_qu4b",
+      "timestamp": "08:35:27.875",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "command": "aws ec2 create-vpc --cidr-block 172.31.0.0/16",
+      "message": "$ aws ec2 create-vpc --cidr-block 172.31.0.0/16"
+    },
+    {
+      "id": "log_1793522127889_ko1y",
+      "timestamp": "08:35:27.889",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "VPC 'vpc-ad6b8fdb' available (172.31.0.0/16).",
+      "rawOutput": "{\n  \"Vpc\": {\n    \"OwnerId\": \"000000000000\",\n    \"InstanceTenancy\": \"default\",\n    \"Ipv6CidrBlockAssociationSet\": [],\n    \"CidrBlockAssociationSet\": [\n      {\n        \"AssociationId\": \"vpc-cidr-assoc-105252e6\",\n        \"CidrBlock\": \"172.31.0.0/16\",\n        \"CidrBlockState\": {\n          \"State\": \"associated\"\n        }\n      }\n    ],\n    \"IsDefault\": false,\n    \"Tags\": [],\n    \"VpcId\": \"vpc-ad6b8fdb\",\n    \"State\": \"available\",\n    \"CidrBlock\": \"172.31.0.0/16\",\n    \"DhcpOptionsId\": \"dopt-default\"\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"d9274c1e-7cf2-4005-9f30-d1c40b599366\",\n    \"extendedRequestId\": \"d9274c1e-7cf2-4005-9f30-d1c40b599366\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793522127889_d968",
+      "timestamp": "08:35:27.889",
+      "source": "system",
+      "type": "info",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Provisioning Claude 3 Sonnet..."
+    },
+    {
+      "id": "log_1793522127889_jamm",
+      "timestamp": "08:35:27.889",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "command": "aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'",
+      "message": "$ aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'"
+    },
+    {
+      "id": "log_1793522127919_zvxs",
+      "timestamp": "08:35:27.919",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Bedrock Foundation Model 'anthropic.claude-3-sonnet-20240229-v1:0' provisioned & active.",
+      "rawOutput": "{\n  \"modelId\": \"anthropic.claude-3-sonnet-20240229-v1:0\",\n  \"status\": \"AVAILABLE\",\n  \"temperature\": 0.7,\n  \"maxTokens\": 2048,\n  \"probeResponse\": \"{\\\"id\\\":\\\"msg_stub\\\",\\\"type\\\":\\\"message\\\",\\\"role\\\":\\\"assistant\\\",\\\"content\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"Floci stub response\\\"}],\\\"model\\\":\\\"anthropic.claude-3-sonnet-20240229-v1:0\\\",\\\"stop_reason\\\":\\\"end_turn\\\",\\\"usage\\\":{\\\"input_tokens\\\":10,\\\"output_tokens\\\":12}}\"\n}"
+    },
+    {
+      "id": "log_1793522127919_m1s6",
+      "timestamp": "08:35:27.919",
+      "source": "system",
+      "type": "info",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Provisioning Prompt Cache Bucket..."
+    },
+    {
+      "id": "log_1793522127919_3kmb",
+      "timestamp": "08:35:27.919",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "command": "aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external",
+      "message": "$ aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external"
+    },
+    {
+      "id": "log_1793522127930_df90",
+      "timestamp": "08:35:27.930",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Bucket 'genai-prompt-cache-1793' ready (public_external).",
+      "rawOutput": "{\n  \"Location\": \"/genai-prompt-cache-1793\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"a298cdc2-2984-465b-8f51-c6c84c59b8b4\",\n    \"extendedRequestId\": \"a298cdc2-2984-465b-8f51-c6c84c59b8b4\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793522127930_mr3z",
+      "timestamp": "08:35:27.930",
+      "source": "system",
+      "type": "info",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Provisioning Default Subnet (172.31.1.0/24)..."
+    },
+    {
+      "id": "log_1793522127930_0ojj",
+      "timestamp": "08:35:27.930",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "command": "aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24",
+      "message": "$ aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24"
+    },
+    {
+      "id": "log_1793522127940_q8p9",
+      "timestamp": "08:35:27.940",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Subnet 'subnet-127940' bound to vpc-default.",
+      "rawOutput": "{\n  \"subnetId\": \"subnet-127940\",\n  \"vpcId\": \"vpc-default\"\n}"
+    },
+    {
+      "id": "log_1793522129239_mxxk",
+      "timestamp": "08:35:29.239",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 22."
+    },
+    {
+      "id": "log_1793522257481_33xy",
+      "timestamp": "08:37:37.481",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 5 nodes execution order."
+    },
+    {
+      "id": "log_1793522257492_nrzn",
+      "timestamp": "08:37:37.492",
+      "source": "system",
+      "type": "info",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Provisioning Default VPC..."
+    },
+    {
+      "id": "log_1793522257492_1zxj",
+      "timestamp": "08:37:37.492",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "command": "aws ec2 create-vpc --cidr-block 172.31.0.0/16",
+      "message": "$ aws ec2 create-vpc --cidr-block 172.31.0.0/16"
+    },
+    {
+      "id": "log_1793522257500_cgv1",
+      "timestamp": "08:37:37.500",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "VPC 'vpc-d827cf84' available (172.31.0.0/16).",
+      "rawOutput": "{\n  \"Vpc\": {\n    \"OwnerId\": \"000000000000\",\n    \"InstanceTenancy\": \"default\",\n    \"Ipv6CidrBlockAssociationSet\": [],\n    \"CidrBlockAssociationSet\": [\n      {\n        \"AssociationId\": \"vpc-cidr-assoc-9980237f\",\n        \"CidrBlock\": \"172.31.0.0/16\",\n        \"CidrBlockState\": {\n          \"State\": \"associated\"\n        }\n      }\n    ],\n    \"IsDefault\": false,\n    \"Tags\": [],\n    \"VpcId\": \"vpc-d827cf84\",\n    \"State\": \"available\",\n    \"CidrBlock\": \"172.31.0.0/16\",\n    \"DhcpOptionsId\": \"dopt-default\"\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"d3307d37-7b02-48f6-850a-939032bc49ec\",\n    \"extendedRequestId\": \"d3307d37-7b02-48f6-850a-939032bc49ec\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793522257500_2hid",
+      "timestamp": "08:37:37.500",
+      "source": "system",
+      "type": "info",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Provisioning Claude 3 Sonnet..."
+    },
+    {
+      "id": "log_1793522257500_w7g9",
+      "timestamp": "08:37:37.500",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "command": "aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'",
+      "message": "$ aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'"
+    },
+    {
+      "id": "log_1793522257510_hwdf",
+      "timestamp": "08:37:37.510",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Bedrock Foundation Model 'anthropic.claude-3-sonnet-20240229-v1:0' provisioned & active.",
+      "rawOutput": "{\n  \"modelId\": \"anthropic.claude-3-sonnet-20240229-v1:0\",\n  \"status\": \"AVAILABLE\",\n  \"temperature\": 0.7,\n  \"maxTokens\": 2048,\n  \"probeResponse\": \"{\\\"id\\\":\\\"msg_stub\\\",\\\"type\\\":\\\"message\\\",\\\"role\\\":\\\"assistant\\\",\\\"content\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"Floci stub response\\\"}],\\\"model\\\":\\\"anthropic.claude-3-sonnet-20240229-v1:0\\\",\\\"stop_reason\\\":\\\"end_turn\\\",\\\"usage\\\":{\\\"input_tokens\\\":10,\\\"output_tokens\\\":12}}\"\n}"
+    },
+    {
+      "id": "log_1793522257510_u4xi",
+      "timestamp": "08:37:37.510",
+      "source": "system",
+      "type": "info",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Provisioning Prompt Cache Bucket..."
+    },
+    {
+      "id": "log_1793522257510_26ez",
+      "timestamp": "08:37:37.510",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "command": "aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external",
+      "message": "$ aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external"
+    },
+    {
+      "id": "log_1793522257515_h6fi",
+      "timestamp": "08:37:37.515",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Bucket 'genai-prompt-cache-1793' ready (public_external).",
+      "rawOutput": "{\n  \"Location\": \"/genai-prompt-cache-1793\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"7b1c2a95-645a-4ffd-98f9-4d0d8464696a\",\n    \"extendedRequestId\": \"7b1c2a95-645a-4ffd-98f9-4d0d8464696a\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793522257516_r7um",
+      "timestamp": "08:37:37.516",
+      "source": "system",
+      "type": "info",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Provisioning Default Subnet (172.31.1.0/24)..."
+    },
+    {
+      "id": "log_1793522257516_0dj4",
+      "timestamp": "08:37:37.516",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "command": "aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24",
+      "message": "$ aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24"
+    },
+    {
+      "id": "log_1793522257521_bkas",
+      "timestamp": "08:37:37.521",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Subnet 'subnet-257521' bound to vpc-default.",
+      "rawOutput": "{\n  \"subnetId\": \"subnet-257521\",\n  \"vpcId\": \"vpc-default\"\n}"
+    },
+    {
+      "id": "log_1793522258930_9fq5",
+      "timestamp": "08:37:38.930",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 21."
+    },
+    {
+      "id": "log_1793531674989_afuu",
+      "timestamp": "11:14:34.989",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 5 nodes execution order."
+    },
+    {
+      "id": "log_1793531675000_os32",
+      "timestamp": "11:14:35.000",
+      "source": "system",
+      "type": "info",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Provisioning Default VPC..."
+    },
+    {
+      "id": "log_1793531675000_6dhr",
+      "timestamp": "11:14:35.000",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "command": "aws ec2 create-vpc --cidr-block 172.31.0.0/16",
+      "message": "$ aws ec2 create-vpc --cidr-block 172.31.0.0/16"
+    },
+    {
+      "id": "log_1793531675027_ljzp",
+      "timestamp": "11:14:35.027",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "VPC 'vpc-6a7b6876' available (172.31.0.0/16).",
+      "rawOutput": "{\n  \"Vpc\": {\n    \"OwnerId\": \"000000000000\",\n    \"InstanceTenancy\": \"default\",\n    \"Ipv6CidrBlockAssociationSet\": [],\n    \"CidrBlockAssociationSet\": [\n      {\n        \"AssociationId\": \"vpc-cidr-assoc-0f53dd88\",\n        \"CidrBlock\": \"172.31.0.0/16\",\n        \"CidrBlockState\": {\n          \"State\": \"associated\"\n        }\n      }\n    ],\n    \"IsDefault\": false,\n    \"Tags\": [],\n    \"VpcId\": \"vpc-6a7b6876\",\n    \"State\": \"available\",\n    \"CidrBlock\": \"172.31.0.0/16\",\n    \"DhcpOptionsId\": \"dopt-default\"\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"ae8ead13-ef96-4770-904c-805879eed9ee\",\n    \"extendedRequestId\": \"ae8ead13-ef96-4770-904c-805879eed9ee\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793531675027_h9sc",
+      "timestamp": "11:14:35.027",
+      "source": "system",
+      "type": "info",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Provisioning Claude 3 Sonnet..."
+    },
+    {
+      "id": "log_1793531675027_50fm",
+      "timestamp": "11:14:35.027",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "command": "aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'",
+      "message": "$ aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'"
+    },
+    {
+      "id": "log_1793531675034_pvqw",
+      "timestamp": "11:14:35.034",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Bedrock Foundation Model 'anthropic.claude-3-sonnet-20240229-v1:0' provisioned & active.",
+      "rawOutput": "{\n  \"modelId\": \"anthropic.claude-3-sonnet-20240229-v1:0\",\n  \"status\": \"AVAILABLE\",\n  \"temperature\": 0.7,\n  \"maxTokens\": 2048,\n  \"probeResponse\": \"{\\\"id\\\":\\\"msg_stub\\\",\\\"type\\\":\\\"message\\\",\\\"role\\\":\\\"assistant\\\",\\\"content\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"Floci stub response\\\"}],\\\"model\\\":\\\"anthropic.claude-3-sonnet-20240229-v1:0\\\",\\\"stop_reason\\\":\\\"end_turn\\\",\\\"usage\\\":{\\\"input_tokens\\\":10,\\\"output_tokens\\\":12}}\"\n}"
+    },
+    {
+      "id": "log_1793531675034_92zb",
+      "timestamp": "11:14:35.034",
+      "source": "system",
+      "type": "info",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Provisioning Prompt Cache Bucket..."
+    },
+    {
+      "id": "log_1793531675035_rfxg",
+      "timestamp": "11:14:35.035",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "command": "aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external",
+      "message": "$ aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external"
+    },
+    {
+      "id": "log_1793531675042_g11v",
+      "timestamp": "11:14:35.042",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Bucket 'genai-prompt-cache-1793' ready (public_external).",
+      "rawOutput": "{\n  \"Location\": \"/genai-prompt-cache-1793\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"b33a40d1-5502-4bf4-918d-4ca8d1a48880\",\n    \"extendedRequestId\": \"b33a40d1-5502-4bf4-918d-4ca8d1a48880\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793531675042_e2gt",
+      "timestamp": "11:14:35.042",
+      "source": "system",
+      "type": "info",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Provisioning Default Subnet (172.31.1.0/24)..."
+    },
+    {
+      "id": "log_1793531675042_ncvx",
+      "timestamp": "11:14:35.042",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "command": "aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24",
+      "message": "$ aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24"
+    },
+    {
+      "id": "log_1793531675045_2tmc",
+      "timestamp": "11:14:35.045",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Subnet 'subnet-675045' bound to vpc-default.",
+      "rawOutput": "{\n  \"subnetId\": \"subnet-675045\",\n  \"vpcId\": \"vpc-default\"\n}"
+    },
+    {
+      "id": "log_1793531675657_ntfs",
+      "timestamp": "11:14:35.657",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 21."
+    },
+    {
+      "id": "log_1793532474394_ck5h",
+      "timestamp": "11:27:54.394",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 5 nodes execution order."
+    },
+    {
+      "id": "log_1793532474408_od13",
+      "timestamp": "11:27:54.408",
+      "source": "system",
+      "type": "info",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Provisioning Default VPC..."
+    },
+    {
+      "id": "log_1793532474408_yygn",
+      "timestamp": "11:27:54.408",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "command": "aws ec2 create-vpc --cidr-block 172.31.0.0/16",
+      "message": "$ aws ec2 create-vpc --cidr-block 172.31.0.0/16"
+    },
+    {
+      "id": "log_1793532474430_taya",
+      "timestamp": "11:27:54.430",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "VPC 'vpc-aba93c7e' available (172.31.0.0/16).",
+      "rawOutput": "{\n  \"Vpc\": {\n    \"OwnerId\": \"000000000000\",\n    \"InstanceTenancy\": \"default\",\n    \"Ipv6CidrBlockAssociationSet\": [],\n    \"CidrBlockAssociationSet\": [\n      {\n        \"AssociationId\": \"vpc-cidr-assoc-bddcb5b4\",\n        \"CidrBlock\": \"172.31.0.0/16\",\n        \"CidrBlockState\": {\n          \"State\": \"associated\"\n        }\n      }\n    ],\n    \"IsDefault\": false,\n    \"Tags\": [],\n    \"VpcId\": \"vpc-aba93c7e\",\n    \"State\": \"available\",\n    \"CidrBlock\": \"172.31.0.0/16\",\n    \"DhcpOptionsId\": \"dopt-default\"\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"be53394c-cc9c-4a27-a1cd-1e62c95d666a\",\n    \"extendedRequestId\": \"be53394c-cc9c-4a27-a1cd-1e62c95d666a\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793532474431_tino",
+      "timestamp": "11:27:54.431",
+      "source": "system",
+      "type": "info",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Provisioning Claude 3 Sonnet..."
+    },
+    {
+      "id": "log_1793532474431_lu0k",
+      "timestamp": "11:27:54.431",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "command": "aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'",
+      "message": "$ aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'"
+    },
+    {
+      "id": "log_1793532474439_izoe",
+      "timestamp": "11:27:54.439",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Bedrock Foundation Model 'anthropic.claude-3-sonnet-20240229-v1:0' provisioned & active.",
+      "rawOutput": "{\n  \"modelId\": \"anthropic.claude-3-sonnet-20240229-v1:0\",\n  \"status\": \"AVAILABLE\",\n  \"temperature\": 0.7,\n  \"maxTokens\": 2048,\n  \"probeResponse\": \"{\\\"id\\\":\\\"msg_stub\\\",\\\"type\\\":\\\"message\\\",\\\"role\\\":\\\"assistant\\\",\\\"content\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"Floci stub response\\\"}],\\\"model\\\":\\\"anthropic.claude-3-sonnet-20240229-v1:0\\\",\\\"stop_reason\\\":\\\"end_turn\\\",\\\"usage\\\":{\\\"input_tokens\\\":10,\\\"output_tokens\\\":12}}\"\n}"
+    },
+    {
+      "id": "log_1793532474439_h2a7",
+      "timestamp": "11:27:54.439",
+      "source": "system",
+      "type": "info",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Provisioning Prompt Cache Bucket..."
+    },
+    {
+      "id": "log_1793532474439_fg2s",
+      "timestamp": "11:27:54.439",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "command": "aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external",
+      "message": "$ aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external"
+    },
+    {
+      "id": "log_1793532474447_2ly0",
+      "timestamp": "11:27:54.447",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Bucket 'genai-prompt-cache-1793' ready (public_external).",
+      "rawOutput": "{\n  \"Location\": \"/genai-prompt-cache-1793\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"c38c15e1-a896-495b-97e0-8dc8b2c68e75\",\n    \"extendedRequestId\": \"c38c15e1-a896-495b-97e0-8dc8b2c68e75\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793532474447_65pg",
+      "timestamp": "11:27:54.447",
+      "source": "system",
+      "type": "info",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Provisioning Default Subnet (172.31.1.0/24)..."
+    },
+    {
+      "id": "log_1793532474447_1j02",
+      "timestamp": "11:27:54.447",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "command": "aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24",
+      "message": "$ aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24"
+    },
+    {
+      "id": "log_1793532474450_39jd",
+      "timestamp": "11:27:54.450",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Subnet 'subnet-474450' bound to vpc-default.",
+      "rawOutput": "{\n  \"subnetId\": \"subnet-474450\",\n  \"vpcId\": \"vpc-default\"\n}"
+    },
+    {
+      "id": "log_1793532475021_hwh9",
+      "timestamp": "11:27:55.021",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 21."
+    },
+    {
+      "id": "log_1793532502328_jd86",
+      "timestamp": "11:28:22.328",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "DAG planned: 5 nodes execution order."
+    },
+    {
+      "id": "log_1793532502342_1wb3",
+      "timestamp": "11:28:22.342",
+      "source": "system",
+      "type": "info",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "Provisioning Default VPC..."
+    },
+    {
+      "id": "log_1793532502343_g5on",
+      "timestamp": "11:28:22.343",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "command": "aws ec2 create-vpc --cidr-block 172.31.0.0/16",
+      "message": "$ aws ec2 create-vpc --cidr-block 172.31.0.0/16"
+    },
+    {
+      "id": "log_1793532502367_akbg",
+      "timestamp": "11:28:22.367",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "vpc-default",
+      "serviceType": "vpc",
+      "message": "VPC 'vpc-9a155643' available (172.31.0.0/16).",
+      "rawOutput": "{\n  \"Vpc\": {\n    \"OwnerId\": \"000000000000\",\n    \"InstanceTenancy\": \"default\",\n    \"Ipv6CidrBlockAssociationSet\": [],\n    \"CidrBlockAssociationSet\": [\n      {\n        \"AssociationId\": \"vpc-cidr-assoc-6f628744\",\n        \"CidrBlock\": \"172.31.0.0/16\",\n        \"CidrBlockState\": {\n          \"State\": \"associated\"\n        }\n      }\n    ],\n    \"IsDefault\": false,\n    \"Tags\": [],\n    \"VpcId\": \"vpc-9a155643\",\n    \"State\": \"available\",\n    \"CidrBlock\": \"172.31.0.0/16\",\n    \"DhcpOptionsId\": \"dopt-default\"\n  },\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"027c8f44-992c-4bf1-91b2-4bed2e24db52\",\n    \"extendedRequestId\": \"027c8f44-992c-4bf1-91b2-4bed2e24db52\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793532502367_0a7e",
+      "timestamp": "11:28:22.367",
+      "source": "system",
+      "type": "info",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Provisioning Claude 3 Sonnet..."
+    },
+    {
+      "id": "log_1793532502367_nlu0",
+      "timestamp": "11:28:22.367",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "command": "aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'",
+      "message": "$ aws bedrock-runtime invoke-model --model-id anthropic.claude-3-sonnet-20240229-v1:0 --body '{\"temperature\":0.7,\"max_tokens\":2048}'"
+    },
+    {
+      "id": "log_1793532502371_rfh7",
+      "timestamp": "11:28:22.371",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "bedrock-1",
+      "serviceType": "bedrock",
+      "message": "Bedrock Foundation Model 'anthropic.claude-3-sonnet-20240229-v1:0' provisioned & active.",
+      "rawOutput": "{\n  \"modelId\": \"anthropic.claude-3-sonnet-20240229-v1:0\",\n  \"status\": \"AVAILABLE\",\n  \"temperature\": 0.7,\n  \"maxTokens\": 2048,\n  \"probeResponse\": \"{\\\"id\\\":\\\"msg_stub\\\",\\\"type\\\":\\\"message\\\",\\\"role\\\":\\\"assistant\\\",\\\"content\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"Floci stub response\\\"}],\\\"model\\\":\\\"anthropic.claude-3-sonnet-20240229-v1:0\\\",\\\"stop_reason\\\":\\\"end_turn\\\",\\\"usage\\\":{\\\"input_tokens\\\":10,\\\"output_tokens\\\":12}}\"\n}"
+    },
+    {
+      "id": "log_1793532502371_3fpb",
+      "timestamp": "11:28:22.371",
+      "source": "system",
+      "type": "info",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Provisioning Prompt Cache Bucket..."
+    },
+    {
+      "id": "log_1793532502372_9tlm",
+      "timestamp": "11:28:22.371",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "command": "aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external",
+      "message": "$ aws s3api create-bucket --bucket genai-prompt-cache-1793 --network-access public_external"
+    },
+    {
+      "id": "log_1793532502378_zgu2",
+      "timestamp": "11:28:22.378",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "s3-1",
+      "serviceType": "s3",
+      "message": "Bucket 'genai-prompt-cache-1793' ready (public_external).",
+      "rawOutput": "{\n  \"Location\": \"/genai-prompt-cache-1793\",\n  \"$metadata\": {\n    \"httpStatusCode\": 200,\n    \"requestId\": \"fba64a0a-2656-4703-81df-098e0623d39c\",\n    \"extendedRequestId\": \"fba64a0a-2656-4703-81df-098e0623d39c\",\n    \"attempts\": 1,\n    \"totalRetryDelay\": 0\n  }\n}"
+    },
+    {
+      "id": "log_1793532502378_ia87",
+      "timestamp": "11:28:22.378",
+      "source": "system",
+      "type": "info",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Provisioning Default Subnet (172.31.1.0/24)..."
+    },
+    {
+      "id": "log_1793532502378_k6br",
+      "timestamp": "11:28:22.378",
+      "source": "aws-sdk",
+      "type": "stdin",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "command": "aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24",
+      "message": "$ aws ec2 create-subnet --vpc-id vpc-default --cidr-block 172.31.1.0/24"
+    },
+    {
+      "id": "log_1793532502385_l1z0",
+      "timestamp": "11:28:22.385",
+      "source": "aws-sdk",
+      "type": "stdout",
+      "nodeId": "subnet-default",
+      "serviceType": "subnet",
+      "message": "Subnet 'subnet-502385' bound to vpc-default.",
+      "rawOutput": "{\n  \"subnetId\": \"subnet-502385\",\n  \"vpcId\": \"vpc-default\"\n}"
+    },
+    {
+      "id": "log_1793532503021_hf5n",
+      "timestamp": "11:28:23.021",
+      "source": "system",
+      "type": "info",
+      "nodeId": "system",
+      "serviceType": "orchestrator",
+      "message": "Execution complete. Total events logged: 22."
     }
   ]
 }

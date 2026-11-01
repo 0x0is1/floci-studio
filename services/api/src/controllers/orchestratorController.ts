@@ -3,6 +3,7 @@ import { orchestrationService } from '@/services/orchestrationService';
 import { getRuntimeState } from '@/services/runtimeStateService';
 import { teardownSessionResources } from '@/services/resourceTeardownService';
 import { projectService } from '@/services/projectService';
+import { persistDeployResult } from '@/services/deployPersistService';
 
 export const orchestratorController = new Elysia({ prefix: '/api/orchestrator' })
   .get('/runtime-state', async ({ query }) => {
@@ -17,16 +18,7 @@ export const orchestratorController = new Elysia({ prefix: '/api/orchestrator' }
     async ({ body }) => {
       const { nodes, edges, projectId } = body;
       const { results, logs } = await orchestrationService.deployGraph(nodes as any, edges as any, projectId);
-      if (projectId) {
-        const proj = projectService.getProject(projectId);
-        if (proj) {
-          const deployedNodes = (nodes || []).map((n: any) => {
-            const r = results.find((res) => res.nodeId === n.id);
-            return r ? { ...n, data: { ...n.data, status: r.status, liveUrl: r.liveUrl } } : n;
-          });
-          projectService.saveProject({ ...proj, deployedNodes, deployedEdges: edges || [], logs, status: 'running' });
-        }
-      }
+      persistDeployResult(projectId, nodes, edges, results, logs);
       return { success: true, results, logs };
     },
     {
@@ -40,8 +32,14 @@ export const orchestratorController = new Elysia({ prefix: '/api/orchestrator' }
   .post(
     '/teardown',
     async ({ body }) => {
-      const { ports, buckets, queues, tables, projectId } = body;
-      await teardownSessionResources({ ports, buckets, queues, tables, projectId });
+      const {
+        ports, buckets, queues, tables, rdsInstances, lambdaFunctions, snsTopics, secrets, logGroups, eventBuses,
+        kinesisStreams, stateMachines, fileSystems, hostedZones, projectId,
+      } = body;
+      await teardownSessionResources({
+        ports, buckets, queues, tables, rdsInstances, lambdaFunctions, snsTopics, secrets, logGroups, eventBuses,
+        kinesisStreams, stateMachines, fileSystems, hostedZones, projectId,
+      });
       if (projectId) {
         const proj = projectService.getProject(projectId);
         if (proj) {
@@ -56,6 +54,16 @@ export const orchestratorController = new Elysia({ prefix: '/api/orchestrator' }
         buckets: t.Optional(t.Array(t.String())),
         queues: t.Optional(t.Array(t.String())),
         tables: t.Optional(t.Array(t.String())),
+        rdsInstances: t.Optional(t.Array(t.String())),
+        lambdaFunctions: t.Optional(t.Array(t.String())),
+        snsTopics: t.Optional(t.Array(t.String())),
+        secrets: t.Optional(t.Array(t.String())),
+        logGroups: t.Optional(t.Array(t.String())),
+        eventBuses: t.Optional(t.Array(t.String())),
+        kinesisStreams: t.Optional(t.Array(t.String())),
+        stateMachines: t.Optional(t.Array(t.String())),
+        fileSystems: t.Optional(t.Array(t.String())),
+        hostedZones: t.Optional(t.Array(t.String())),
         projectId: t.Optional(t.String()),
       }),
     }

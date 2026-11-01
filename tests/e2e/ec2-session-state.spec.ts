@@ -19,7 +19,7 @@ test.describe('EC2 Session State & Standby Reconciliation E2E', () => {
     await page.getByRole('button', { name: 'EC2 Shell' }).click();
 
     // Verify standby state message and disabled input
-    await expect(page.getByText('EC2 Instance Offline / Standby')).toBeVisible();
+    await expect(page.getByText('Container Offline / Standby')).toBeVisible();
     await expect(page.getByText('STANDBY', { exact: true })).toBeVisible();
     const input = page.getByPlaceholder(/Deploy instance to enable terminal shell/i);
     await expect(input).toBeDisabled();
@@ -37,7 +37,7 @@ test.describe('EC2 Session State & Standby Reconciliation E2E', () => {
 
     // Instance should now be RUNNING and input enabled
     await expect(page.getByText('RUNNING').first()).toBeVisible();
-    const activeInput = page.getByPlaceholder('Run remote command in EC2 container...');
+    const activeInput = page.getByPlaceholder('Run remote command in container...');
     await expect(activeInput).toBeEnabled();
 
     // Clean up

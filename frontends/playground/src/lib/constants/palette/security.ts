@@ -2,14 +2,6 @@ import { AwsPaletteItem } from '@/types/aws';
 
 export const SECURITY_PALETTE_ITEMS: AwsPaletteItem[] = [
   {
-    type: 'iam',
-    category: 'security',
-    name: 'IAM Role',
-    description: 'Fine-grained access control, IAM policies, and execution roles',
-    flociStatus: 'ready',
-    defaultConfig: { roleName: 'app-service-role', path: '/' },
-  },
-  {
     type: 'secretsmanager',
     category: 'security',
     name: 'Secrets Manager',

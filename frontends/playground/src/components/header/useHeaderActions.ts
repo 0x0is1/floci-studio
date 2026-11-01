@@ -3,13 +3,15 @@ import { usePlaygroundStore } from '@/store/playgroundStore';
 import { useBottomTrayStore } from '@/store/bottomTrayStore';
 import { useCanvasTabStore } from '@/store/canvasTabStore';
 import { toast } from 'sonner';
-import { validateVpcDeployment } from '@/lib/rules/vpcDeploymentValidator';
-import { deployInfrastructure, teardownInfrastructure } from '@/lib/api/flociClient';
+import { teardownInfrastructure } from '@/lib/api/flociClient';
+import { useDeployProgressStore } from '@/store/deployProgressStore';
+import { useDeployAction } from './useDeployAction';
 import { mutate } from 'swr';
 
 export function useHeaderActions(healthState: string) {
-  const { activeProjectId, saveCurrentProject, setExecuting, setDeployed, updateNodeStatus, nodes, edges } = usePlaygroundStore();
-  const { setActiveTab, addLogs } = useBottomTrayStore();
+  const { activeProjectId, saveCurrentProject, nodes } = usePlaygroundStore();
+  const { clearLogsForNodes } = useBottomTrayStore();
+  const { handleDeploy } = useDeployAction(healthState);
   const [isSaving, setIsSaving] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -42,55 +44,39 @@ export function useHeaderActions(healthState: string) {
     } finally { setIsRefreshing(false); }
   };
 
-  const handleDeploy = async () => {
-    if (!activeProjectId) return;
-    if (healthState !== 'healthy') {
-      toast.error('Deployment Blocked', { description: healthState === 'docker_not_running' ? 'Docker services paused.' : 'Backend is unreachable.' });
-      return;
-    }
-    const vpcCheck = validateVpcDeployment(nodes as any, edges as any);
-    if (!vpcCheck.valid) {
-      toast.error(vpcCheck.title || 'VPC Connection Required', { description: vpcCheck.description });
-      return;
-    }
-    setExecuting(true); setActiveTab('terminal');
-    toast.info('Starting Deployment', { description: 'Executing DAG against Floci emulator...' });
-    nodes.forEach((n) => updateNodeStatus(n.id, 'deploying'));
-    try {
-      const res = await deployInfrastructure(nodes, edges, activeProjectId);
-      if (res?.logs?.length) addLogs(res.logs);
-      if (res?.success && res.results) {
-        const snap = nodes.map((n) => {
-          const item = res.results.find((r: any) => r.nodeId === n.id);
-          return item ? { ...n, data: { ...n.data, status: item.status, liveUrl: item.liveUrl, config: item.port ? { ...n.data.config, port: item.port } : n.data.config } } : { ...n, data: { ...n.data, status: 'draft' as const } };
-        });
-        usePlaygroundStore.getState().setDeployedState(snap, [...edges]);
-        setDeployed(true); useCanvasTabStore.getState().setActiveTab('deployed');
-        mutate(`/api/orchestrator/runtime-state?projectId=${activeProjectId}`);
-        mutate(`/api/projects/${activeProjectId}`);
-        toast.success('Deployment Complete', { description: 'AWS infrastructure is live on localhost!' });
-      } else {
-        toast.error('Deployment Failed', { description: res?.error || 'Docker services paused.' });
-      }
-    } catch (err: any) {
-      toast.error('Deployment Failed', { description: err.message });
-    } finally { setExecuting(false); }
-  };
-
   const handleStop = async () => {
     if (!activeProjectId) return;
     setIsStopping(true);
     try {
+      const byType = (type: string, key: string) => nodes.filter((n) => n.data.serviceType === type).map((n) => n.data.config?.[key]).filter(Boolean);
       const ports = nodes.filter((n) => n.data.serviceType === 'ec2').map((n) => n.data.config?.port || 8080);
-      const buckets = nodes.filter((n) => n.data.serviceType === 's3').map((n) => n.data.resourceId || n.data.config?.bucketName).filter(Boolean);
-      const queues = nodes.filter((n) => n.data.serviceType === 'sqs').map((n) => n.data.resourceId || n.data.config?.queueName).filter(Boolean);
-      await teardownInfrastructure({ ports, buckets, queues, projectId: activeProjectId }).catch(() => {});
+      const buckets = byType('s3', 'bucketName');
+      const queues = byType('sqs', 'queueName');
+      const tables = byType('dynamodb', 'tableName');
+      const rdsInstances = byType('rds', 'dbName');
+      const lambdaFunctions = byType('lambda', 'functionName');
+      const snsTopics = byType('sns', 'topicName');
+      const secrets = byType('secretsmanager', 'secretName');
+      const logGroups = byType('logs', 'logGroupName');
+      const eventBuses = byType('events', 'busName');
+      const kinesisStreams = byType('kinesis', 'streamName');
+      const stateMachines = byType('states', 'stateMachineName');
+      let teardownFailed = false;
+      await teardownInfrastructure({
+        ports, buckets, queues, tables, rdsInstances, lambdaFunctions, snsTopics, secrets, logGroups, eventBuses,
+        kinesisStreams, stateMachines,
+        projectId: activeProjectId,
+      }).catch(() => { teardownFailed = true; });
       usePlaygroundStore.getState().clearDeployedState();
+      useDeployProgressStore.getState().reset();
+      const ec2NodeIds = nodes.filter((n) => n.data.serviceType === 'ec2').map((n) => n.id);
+      clearLogsForNodes(ec2NodeIds);
       useCanvasTabStore.getState().setActiveTab('editor');
       mutate(`/api/orchestrator/runtime-state?projectId=${activeProjectId}`);
       mutate(`/api/projects/${activeProjectId}`);
       await saveCurrentProject().catch(() => {});
-      toast.info('Playground Reset', { description: 'Infrastructure stopped and canvas unfrozen.' });
+      if (teardownFailed) toast.error('Teardown Incomplete', { description: 'Backend could not confirm resources were removed. Check Docker/Floci status.' });
+      else toast.info('Playground Reset', { description: 'Infrastructure stopped and canvas unfrozen.' });
     } finally { setIsStopping(false); }
   };
 

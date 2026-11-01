@@ -25,4 +25,12 @@ export const COMPUTE_PALETTE_ITEMS: AwsPaletteItem[] = [
     flociStatus: 'ready',
     defaultConfig: { clusterName: 'prod-cluster', launchType: 'FARGATE', image: 'nginx:alpine', containerPort: 80, cpu: 256, memory: 512, desiredCount: 1 },
   },
+  {
+    type: 'testrunner',
+    category: 'compute',
+    name: 'Test Runner',
+    description: 'Runs uploaded pytest/hurl/Playwright test files against deployed resources',
+    flociStatus: 'ready',
+    defaultConfig: { networkAccess: 'vpc_only' },
+  },
 ];

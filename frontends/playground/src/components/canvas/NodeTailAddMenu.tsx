@@ -4,6 +4,9 @@ import React, { useRef, useEffect } from 'react';
 import { AwsServiceType, AwsPaletteItem } from '@/types/aws';
 import { getValidNextTargets } from '@/lib/rules/validTargets';
 import { validateAwsConnection } from '@/lib/rules/connectionMatrix';
+import { computeHandleSide } from '@shared/connectionMatrix';
+
+const COMPUTE_TYPES = ['ec2', 'ecs', 'lambda'];
 import { usePlaygroundStore, AppNode, AppEdge } from '@/store/playgroundStore';
 import { AwsIcon } from '@/components/icons/AwsIcons';
 import { LuX } from 'react-icons/lu';
@@ -32,8 +35,8 @@ export function NodeTailAddMenu({ sourceId, sourceType, onClose }: Props) {
     const sourceNode = nodes.find((n) => n.id === sourceId);
     if (!sourceNode) return;
     const existingOutEdges = edges.filter((e) => e.source === sourceId);
-    const yOffset = (existingOutEdges.length - 0.5) * 80;
-    const position = { x: sourceNode.position.x + 260, y: sourceNode.position.y + yOffset };
+    const yOffset = (existingOutEdges.length - 0.5) * 160;
+    const position = { x: sourceNode.position.x + 300, y: sourceNode.position.y + yOffset };
     const uuid = crypto.randomUUID();
     const newNode: AppNode = {
       id: `${item.type}-${uuid.slice(0, 8)}`,
@@ -42,7 +45,17 @@ export function NodeTailAddMenu({ sourceId, sourceType, onClose }: Props) {
       data: { serviceType: item.type, label: item.name, status: 'draft', config: { ...item.defaultConfig, uuid } },
     };
     const validation = validateAwsConnection(sourceType, item.type);
-    const newEdge: AppEdge = { id: `e-${sourceId}-${newNode.id}`, source: sourceId, target: newNode.id, type: 'custom', data: validation.defaultData };
+    const sourceHandle = COMPUTE_TYPES.includes(sourceType) ? computeHandleSide(item.type, 'outgoing') : undefined;
+    const targetHandle = COMPUTE_TYPES.includes(item.type) ? computeHandleSide(sourceType, 'incoming') : undefined;
+    const newEdge: AppEdge = {
+      id: `e-${sourceId}-${newNode.id}`,
+      source: sourceId,
+      target: newNode.id,
+      sourceHandle,
+      targetHandle,
+      type: 'custom',
+      data: validation.defaultData,
+    };
     setNodes([...nodes, newNode]); setEdges([...edges, newEdge]); selectNode(newNode.id);
     toast.success('Architecture Branched', { description: `Added ${item.name} and auto-configured connection.` });
     onClose();

@@ -6,6 +6,8 @@ import { healthController } from '@/controllers/healthController';
 import { orchestratorController } from '@/controllers/orchestratorController';
 import { ec2Controller } from '@/controllers/ec2Controller';
 import { flociResourceController } from '@/controllers/flociResourceController';
+import { testRunnerController } from '@/controllers/testRunnerController';
+import { deployStreamController } from '@/controllers/deployStreamController';
 
 const app = new Elysia()
   .use(
@@ -20,6 +22,8 @@ const app = new Elysia()
   .use(orchestratorController)
   .use(ec2Controller)
   .use(flociResourceController)
+  .use(testRunnerController)
+  .use(deployStreamController)
   .listen(config.port);
 
 console.log(`Floci API server running at http://localhost:${config.port}`);

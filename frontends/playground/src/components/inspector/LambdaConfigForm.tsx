@@ -13,7 +13,7 @@ interface Props {
 export function LambdaConfigForm({ config, onChange }: Props) {
   const { tokens } = useTheme();
   const { edges, nodes, selectedNodeId } = usePlaygroundStore();
-  const envEdges = edges.filter((e) => e.source === selectedNodeId && e.data?.envVarName);
+  const envEdges = edges.filter((e) => (e.source === selectedNodeId || e.target === selectedNodeId) && e.data?.envVarName);
   const inputStyle = { backgroundColor: tokens.cardBgAlt, borderColor: tokens.border, color: tokens.textPrimary };
 
   return (
@@ -88,7 +88,7 @@ export function LambdaConfigForm({ config, onChange }: Props) {
         />
       </div>
 
-      <Ec2EnvSection envEdges={envEdges} nodes={nodes} />
+      <Ec2EnvSection envEdges={envEdges} nodes={nodes} nodeId={selectedNodeId ?? undefined} />
     </div>
   );
 }

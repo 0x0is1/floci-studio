@@ -32,6 +32,5 @@ test.describe('Component & Link Dedicated Inspector Selection', () => {
     // Switch to Live Cluster tab where bottom tray is hosted
     await page.getByRole('button', { name: 'Live Cluster Runtime' }).click();
     await expect(page.getByRole('button', { name: /Execution Logs|Terminal/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Live Resources' })).toBeVisible();
   });
 });

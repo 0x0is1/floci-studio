@@ -33,16 +33,16 @@ export const ec2Controller = new Elysia({ prefix: '/api/ec2' })
   .post(
     '/exec',
     async ({ body }) => {
-      const { port, command, mode, keyName } = body;
-      const res = await ec2ExecService.execute({ port, command, mode: mode as any, keyName });
+      const { port, command, keyName, projectId } = body;
+      const res = await ec2ExecService.execute({ port, command, keyName, projectId });
       return res;
     },
     {
       body: t.Object({
         port: t.Number(),
         command: t.String(),
-        mode: t.Optional(t.String()),
         keyName: t.Optional(t.String()),
+        projectId: t.Optional(t.String()),
       }),
     }
   );

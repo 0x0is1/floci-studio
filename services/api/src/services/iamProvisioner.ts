@@ -9,10 +9,10 @@ export class IamProvisioner {
 
     for (const node of nodes) {
       const type = node.data.serviceType;
-      const roleName = node.data.config?.iamRole || (['ec2', 'lambda'].includes(type) ? `${node.data.label.toLowerCase().replace(/[^a-z0-9-]/g, '-')}-role` : null);
+      const roleName = node.data.config?.iamRole || (['ec2', 'lambda', 'ecs'].includes(type) ? `${node.data.label.toLowerCase().replace(/[^a-z0-9-]/g, '-')}-role` : null);
       if (!roleName) continue;
 
-      const principal = type === 'lambda' ? 'lambda.amazonaws.com' : 'ec2.amazonaws.com';
+      const principal = type === 'lambda' ? 'lambda.amazonaws.com' : type === 'ecs' ? 'ecs-tasks.amazonaws.com' : 'ec2.amazonaws.com';
       if (!rolesToProvision[roleName]) {
         rolesToProvision[roleName] = { service: principal, actions: new Set<string>(), nodeId: node.id };
       }

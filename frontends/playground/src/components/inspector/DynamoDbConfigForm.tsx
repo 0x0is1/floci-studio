@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useTheme } from '@/theme/ThemeProvider';
+import { DynamoDbKeySection } from './DynamoDbKeySection';
 
 interface Props {
   config: Record<string, any>;
@@ -25,6 +26,8 @@ export function DynamoDbConfigForm({ config, onChange }: Props) {
           className="w-full rounded border px-2.5 py-1.5 text-xs focus:outline-none focus:border-sky-500 font-mono"
         />
       </div>
+
+      <DynamoDbKeySection config={config} onChange={onChange} />
 
       <div className="space-y-1">
         <label className="text-[10px] font-medium" style={{ color: tokens.textMuted }}>Network Accessibility</label>

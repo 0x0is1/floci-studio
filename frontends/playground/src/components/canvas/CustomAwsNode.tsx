@@ -35,8 +35,11 @@ function CustomAwsNodeComponent(props: any) {
   }, [showAddMenu, isHovered]);
 
   const borderColor = selected ? tokens.borderFocus : isRunning ? tokens.statusRunning : isDeploying ? tokens.statusDeploying : isError ? tokens.statusError : tokens.border;
+  const isComputeNode = ['ec2', 'ecs', 'lambda'].includes(nodeData.serviceType);
   const hasTargetHandle = !['cloudfront', 'vpc', 'route53'].includes(nodeData.serviceType);
   const hasSourceHandle = !['rds', 'dynamodb', 's3'].includes(nodeData.serviceType);
+
+  const dot = "!bg-sky-400 !w-2.5 !h-2.5 !rounded-full !border-2 !border-slate-900 transition-all hover:scale-125 hover:shadow-[0_0_8px_rgba(56,189,248,0.8)] !cursor-crosshair z-30";
 
   return (
     <div
@@ -47,24 +50,22 @@ function CustomAwsNodeComponent(props: any) {
       style={{ backgroundColor: tokens.cardBg, borderColor, boxShadow: tokens.cardShadow }}
       className={`relative min-w-[190px] rounded-lg border p-3 transition-colors ${selected ? 'ring-1 ring-sky-500/50' : ''}`}
     >
-      {hasTargetHandle && (
-        <Handle
-          type="target"
-          position={Position.Left}
-          className="!bg-sky-400 !w-2.5 !h-2.5 !rounded-full !border-2 !border-slate-900 transition-all hover:scale-125 hover:shadow-[0_0_8px_rgba(56,189,248,0.8)] !cursor-crosshair z-30"
-          style={{ cursor: 'crosshair' }}
-          title="Drop connection here"
-        />
-      )}
-
-      {hasSourceHandle && (
-        <Handle
-          type="source"
-          position={Position.Right}
-          className="!bg-sky-400 !w-2.5 !h-2.5 !rounded-full !border-2 !border-slate-900 transition-all hover:scale-125 hover:shadow-[0_0_8px_rgba(56,189,248,0.8)] !cursor-crosshair z-30 pointer-events-auto"
-          style={{ cursor: 'crosshair' }}
-          title="Drag to connect"
-        />
+      {isComputeNode ? (
+        <>
+          <Handle id="left" type="target" position={Position.Left} className={dot} style={{ cursor: 'crosshair' }} title="Network placement (VPC / Subnet)" />
+          <Handle id="top" type="target" position={Position.Top} className={dot} style={{ cursor: 'crosshair' }} title="Ingress / triggers (ALB, API Gateway, SQS, events...)" />
+          <Handle id="bottom" type="source" position={Position.Bottom} className={dot} style={{ cursor: 'crosshair' }} title="Resource dependencies (S3, RDS, SQS...) - env vars injected" />
+          <Handle id="right" type="source" position={Position.Right} className={`${dot} pointer-events-auto`} style={{ cursor: 'crosshair' }} title="Peer compute calls / test target" />
+        </>
+      ) : (
+        <>
+          {hasTargetHandle && (
+            <Handle type="target" position={Position.Left} className={dot} style={{ cursor: 'crosshair' }} title="Drop connection here" />
+          )}
+          {hasSourceHandle && (
+            <Handle type="source" position={Position.Right} className={`${dot} pointer-events-auto`} style={{ cursor: 'crosshair' }} title="Drag to connect" />
+          )}
+        </>
       )}
 
       <NodeCardBody nodeData={nodeData} nodeId={props.id} />

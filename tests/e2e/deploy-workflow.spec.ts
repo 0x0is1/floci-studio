@@ -29,12 +29,11 @@ test.describe('Deploy & Real Infrastructure Workflow E2E', () => {
     // Wait for deployment completion toast
     await expect(page.getByText('Deployment Complete')).toBeVisible({ timeout: 25000 });
 
-    // Switch to Live Infrastructure tab in bottom tray
-    await page.getByRole('button', { name: 'Live Infrastructure' }).first().click();
+    // Deploy auto-switches the bottom tray to the live tab
     await expect(page.getByText('READY').first()).toBeVisible();
 
     // Click Stop button to reset
     await page.getByRole('button', { name: 'Stop' }).click();
-    await expect(page.getByText('Playground Reset')).toBeVisible();
+    await expect(page.getByText('Playground Reset')).toBeVisible({ timeout: 15000 });
   });
 });

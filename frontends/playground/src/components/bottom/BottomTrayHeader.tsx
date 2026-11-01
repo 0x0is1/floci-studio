@@ -10,7 +10,6 @@ export function BottomTrayHeader() {
   const { activeTab, setActiveTab, setOpen, logs } = useBottomTrayStore();
   const { nodes } = usePlaygroundStore();
   const { tokens } = useTheme();
-  const runningCount = nodes.filter((n) => n.data.status === 'running' || n.data.liveUrl).length;
   const hasEc2 = nodes.some((n) => n.data.serviceType === 'ec2');
 
   const getTabStyle = (tab: any) => ({

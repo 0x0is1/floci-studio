@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { TerminalLog } from '@/types/aws';
 
-export type BottomTabType = 'terminal' | 'live' | 'ec2-terminal' | 'iam' | 'floci';
+export type BottomTabType = 'terminal' | 'live' | 'ec2-terminal';
 export type LogFilterType = 'all' | 'commands' | 'errors' | 'docker';
 
 interface BottomTrayState {
@@ -17,6 +17,7 @@ interface BottomTrayState {
   addLogs: (newLogs: TerminalLog[]) => void;
   setLogs: (logs: TerminalLog[]) => void;
   clearLogs: () => void;
+  clearLogsForNodes: (nodeIds: string[]) => void;
 }
 
 export const useBottomTrayStore = create<BottomTrayState>((set) => ({
@@ -32,4 +33,5 @@ export const useBottomTrayStore = create<BottomTrayState>((set) => ({
   addLogs: (newLogs) => set((s) => ({ logs: [...s.logs, ...newLogs] })),
   setLogs: (logs) => set({ logs }),
   clearLogs: () => set({ logs: [] }),
+  clearLogsForNodes: (nodeIds) => set((s) => ({ logs: s.logs.filter((l) => !nodeIds.includes(l.nodeId)) })),
 }));

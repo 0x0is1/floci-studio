@@ -10,20 +10,19 @@ import { Ec2TerminalInput } from './Ec2TerminalInput';
 import { LuPlay } from 'react-icons/lu';
 
 export function Ec2TerminalView() {
-  const { nodes, isDeployed } = usePlaygroundStore();
+  const { nodes, isDeployed, activeProjectId } = usePlaygroundStore();
   const { history, addCommand, clearHistory } = useEc2SessionStore();
   const { tokens } = useTheme();
-  const ec2Nodes = nodes.filter((n) => n.data.serviceType === 'ec2');
-  const defaultPort = Number(ec2Nodes[0]?.data?.config?.port) || 8080;
+  const execNodes = nodes.filter((n) => ['ec2', 'ecs'].includes(n.data.serviceType));
+  const defaultPort = Number(execNodes[0]?.data?.config?.port) || 8080;
 
   const [port, setPort] = useState(defaultPort);
-  const [mode, setMode] = useState<'ssh' | 'ssm'>('ssh');
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const activeNode = ec2Nodes.find((n) => (n.data.config?.port || 8080) === port) || ec2Nodes[0];
+  const activeNode = execNodes.find((n) => (n.data.config?.port || 8080) === port) || execNodes[0];
   const isInstanceRunning = Boolean(activeNode?.data?.status === 'running' || isDeployed);
-  const ami = activeNode?.data?.config?.ami || '';
+  const ami = activeNode?.data?.config?.ami || activeNode?.data?.config?.image || '';
   const osName = ami.includes('ubuntu') ? 'Ubuntu 24.04 LTS' : ami.includes('debian') ? 'Debian 12' : ami.includes('alpine') ? 'Alpine Linux' : 'Amazon Linux 2023';
 
   useEffect(() => {
@@ -34,22 +33,22 @@ export function Ec2TerminalView() {
     const cmd = input.trim();
     if (!cmd || !isInstanceRunning) return;
     setInput('');
-    const res = await executeEc2Command({ port, command: cmd, mode });
-    addCommand({ id: String(Date.now()), prompt: res.prompt || `${mode} $`, command: cmd, output: res.output });
+    const res = await executeEc2Command({ port, command: cmd, projectId: activeProjectId || undefined });
+    addCommand({ id: String(Date.now()), prompt: res.prompt || 'container $', command: cmd, output: res.output });
   };
 
   return (
     <div className="flex flex-col h-full font-mono text-xs transition-colors" style={{ backgroundColor: tokens.trayBg }}>
       <Ec2TerminalHeader
-        port={port} setPort={setPort} mode={mode} setMode={setMode}
-        ec2Nodes={ec2Nodes} isRunning={isInstanceRunning} onClear={clearHistory}
+        port={port} setPort={setPort}
+        execNodes={execNodes} isRunning={isInstanceRunning} onClear={clearHistory}
       />
 
       <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
         {!isInstanceRunning ? (
           <div className="p-6 text-center text-sm border border-dashed rounded-lg" style={{ borderColor: tokens.border, color: tokens.textMuted }}>
             <LuPlay className="w-6 h-6 mx-auto mb-2" style={{ color: tokens.textMuted }} />
-            <p className="font-semibold" style={{ color: tokens.textSecondary }}>EC2 Instance Offline / Standby</p>
+            <p className="font-semibold" style={{ color: tokens.textSecondary }}>Container Offline / Standby</p>
             <p className="text-xs mt-1" style={{ color: tokens.textMuted }}>
               Click &quot;Deploy&quot; in the header to provision resources and connect live interactive terminal session.
             </p>
@@ -77,7 +76,7 @@ export function Ec2TerminalView() {
       </div>
 
       <Ec2TerminalInput
-        mode={mode} input={input} setInput={setInput}
+        input={input} setInput={setInput}
         isInstanceRunning={isInstanceRunning} onRun={handleRun}
       />
     </div>

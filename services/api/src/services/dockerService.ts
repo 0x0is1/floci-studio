@@ -1,5 +1,6 @@
 import http from 'node:http';
 import { generateWebHtml, getOsReleaseContent } from './webTemplates';
+import { getBootstrapScript } from './aptShim';
 
 export function dockerReq(method: string, path: string, data?: any): Promise<{ status: number; body: any }> {
   return new Promise((resolve) => {
@@ -56,13 +57,13 @@ export class DockerService {
 
     const html = generateWebHtml({ port, id: info.id, name: info.name, s3: info.s3, sqs: info.sqs, template: info.template, ami: info.ami, instanceType: info.instanceType });
     const b64 = Buffer.from(html).toString('base64');
-    const osRelease = getOsReleaseContent(info.ami);
-    const osB64 = Buffer.from(osRelease).toString('base64');
+    const osB64 = Buffer.from(getOsReleaseContent(info.ami)).toString('base64');
     const envEntries = Object.entries(info.envVars || {});
     const envLines = envEntries.map(([k, v]) => `export ${k}='${v}'\n${k}='${v}'`).join('\n');
     const envB64 = Buffer.from(envLines).toString('base64');
 
-    const cmd = ['sh', '-c', `echo '${osB64}' | base64 -d > /etc/os-release && echo '${envB64}' | base64 -d > /etc/environment && mkdir -p /etc/profile.d && echo '${envB64}' | base64 -d > /etc/profile.d/floci_env.sh && echo '${envB64}' | base64 -d >> /etc/profile && echo '${envB64}' | base64 -d >> /root/.profile && echo '${envB64}' | base64 -d >> /root/.bashrc && echo '${b64}' | base64 -d > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'`];
+    const boot = getBootstrapScript();
+    const cmd = ['sh', '-c', `echo '${osB64}' | base64 -d > /etc/os-release && echo '${envB64}' | base64 -d > /etc/environment && mkdir -p /etc/profile.d && echo '${envB64}' | base64 -d > /etc/profile.d/floci_env.sh && echo '${envB64}' | base64 -d >> /etc/profile && echo '${envB64}' | base64 -d >> /root/.profile && echo '${envB64}' | base64 -d >> /root/.bashrc && echo '${b64}' | base64 -d > /usr/share/nginx/html/index.html && ${boot} && nginx -g 'daemon off;'`];
 
     const createRes = await dockerReq('POST', `/containers/create?name=${containerName}`, {
       Image: 'nginx:alpine',
@@ -72,6 +73,7 @@ export class DockerService {
       Labels: { 'floci.project': pid, 'floci.node': info.id, 'floci.port': String(port), 'floci.ami': info.ami || 'ami-ubuntu2404-amd64' },
       HostConfig: {
         PortBindings: { '80/tcp': [{ HostPort: String(port) }] },
+        NetworkMode: 'oss_floci_net',
         AutoRemove: true,
       },
     });

@@ -7,10 +7,10 @@ export interface DagNodeLevel {
 }
 
 const SERVICE_TIERS: Record<string, number> = {
-  vpc: 1, subnet: 2, iam: 10, kms: 10, secretsmanager: 10, secrets: 10,
-  s3: 20, sqs: 20, sns: 20, dynamodb: 20, rds: 20, elasticache: 20, efs: 20, kinesis: 20, bedrock: 20,
+  client: 5, vpc: 1, subnet: 2, iam: 10, kms: 10, secretsmanager: 10,
+  s3: 20, sqs: 20, sns: 20, dynamodb: 20, rds: 20, elasticache: 20, efs: 20, kinesis: 20, bedrock: 20, logs: 20, states: 20, events: 20,
   ec2: 30, ecs: 30, lambda: 30,
-  alb: 40, apigateway: 40, cloudfront: 50, route53: 60,
+  alb: 40, apigateway: 40, testrunner: 45, cloudfront: 50, route53: 60,
 };
 
 export function getServiceTier(serviceType: string): number {
@@ -72,10 +72,10 @@ export function sortNodesTopologically(nodes: CanvasNode[], edges: CanvasEdge[])
     }
   }
 
-  for (const node of nodes) {
-    if (!ordered.some((o) => o.node.id === node.id)) {
-      ordered.push({ level: 99, node, dependencies: dependencies[node.id] || [] });
-    }
+  const leftover = nodes.filter((node) => !ordered.some((o) => o.node.id === node.id));
+  if (leftover.length > 0) {
+    const names = leftover.map((n) => n.data?.label || n.id).join(', ');
+    throw new Error(`Dependency cycle detected involving: ${names}. Remove one of the connections to break the loop.`);
   }
 
   return ordered.sort((a, b) => a.level - b.level || getServiceTier(a.node.data.serviceType) - getServiceTier(b.node.data.serviceType));

@@ -13,7 +13,7 @@ test.describe('Bedrock AI Project Workflow E2E', () => {
 
     // Click Bedrock node to inspect configuration
     await bedrockNode.click();
-    await expect(page.getByText('Bedrock Model Configuration')).toBeVisible();
+    await expect(page.getByText('Bedrock & LLM Configuration')).toBeVisible();
 
     // Verify foundation model dropdown contains Claude
     const modelSelect = page.locator('select').first();

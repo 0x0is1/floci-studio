@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { useTheme } from '@/theme/ThemeProvider';
+import { usePlaygroundStore } from '@/store/playgroundStore';
+import { Ec2EnvSection } from './Ec2EnvSection';
 
 interface Props {
   config: Record<string, any>;
@@ -10,6 +12,8 @@ interface Props {
 
 export function EcsConfigForm({ config, onChange }: Props) {
   const { tokens } = useTheme();
+  const { edges, nodes, selectedNodeId } = usePlaygroundStore();
+  const envEdges = edges.filter((e) => (e.source === selectedNodeId || e.target === selectedNodeId) && e.data?.envVarName);
   const inputStyle = { backgroundColor: tokens.cardBgAlt, borderColor: tokens.border, color: tokens.textPrimary };
 
   return (
@@ -80,6 +84,8 @@ export function EcsConfigForm({ config, onChange }: Props) {
           </select>
         </div>
       </div>
+
+      <Ec2EnvSection envEdges={envEdges} nodes={nodes} nodeId={selectedNodeId ?? undefined} />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useTheme } from '@/theme/ThemeProvider';
+import { SqsDlqSection } from './SqsDlqSection';
 
 interface Props {
   config: Record<string, any>;
@@ -81,6 +82,8 @@ export function SqsConfigForm({ config, onChange }: Props) {
           <option value={14}>14 Days (Maximum)</option>
         </select>
       </div>
+
+      <SqsDlqSection config={config} onChange={onChange} />
     </div>
   );
 }

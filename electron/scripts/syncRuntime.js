@@ -9,11 +9,16 @@ if (fs.existsSync(dest)) {
 }
 fs.mkdirSync(dest, { recursive: true });
 
-// Copy docker-compose.yml
-fs.copyFileSync(
-  path.join(repoRoot, 'services/docker-compose.yml'),
-  path.join(dest, 'docker-compose.yml')
-);
+// Copy docker-compose.yml, rewriting the shared/ volume mount to match the
+// packaged layout (runtime-services/shared instead of the dev-mode ../shared)
+const composeContent = fs
+  .readFileSync(path.join(repoRoot, 'services/docker-compose.yml'), 'utf8')
+  .replace('../shared:/shared', './shared:/shared');
+fs.writeFileSync(path.join(dest, 'docker-compose.yml'), composeContent);
+
+// Copy shared/ (single source of truth for the connection matrix, consumed
+// by the API via @shared/* at build/runtime)
+fs.cpSync(path.join(repoRoot, 'shared'), path.join(dest, 'shared'), { recursive: true });
 
 // Copy API files (excluding node_modules)
 const apiDest = path.join(dest, 'api');

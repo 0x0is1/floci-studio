@@ -81,7 +81,7 @@ export function getKeyDownloadUrl(projectId: string, keyName: string): string {
   return `${API_BASE}/api/ec2/keys/${projectId}/${keyName}/download`;
 }
 
-export async function executeEc2Command(params: { port: number; command: string; mode?: string; keyName?: string }) {
+export async function executeEc2Command(params: { port: number; command: string; keyName?: string; projectId?: string }) {
   const res = await safeFetch('/api/ec2/exec', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

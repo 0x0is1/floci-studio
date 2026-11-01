@@ -9,6 +9,7 @@ export interface ProjectStateSlice {
   projects: Array<{ id: string; name: string; updatedAt: string; status: string }>;
   activeProjectId: string | null;
   projectName: string;
+  projectCreatedAt: string;
   isDirty: boolean;
   projectLoadStatus: ProjectLoadStatus;
   loadProjects: () => Promise<void>;
@@ -20,7 +21,7 @@ export interface ProjectStateSlice {
 }
 
 export const createProjectSlice = (set: any, get: any) => ({
-  projects: [], activeProjectId: null, projectName: '', isDirty: false, projectLoadStatus: 'idle' as ProjectLoadStatus,
+  projects: [], activeProjectId: null, projectName: '', projectCreatedAt: '', isDirty: false, projectLoadStatus: 'idle' as ProjectLoadStatus,
 
   loadProjects: async () => {
     const res = await listProjects();
@@ -37,7 +38,7 @@ export const createProjectSlice = (set: any, get: any) => ({
       const { nodes: recDeployed, isDeployed } = reconcileNodeStates(rawDeployed, runtime, rawEdges, res.data.status);
       useBottomTrayStore.getState().setLogs(res.data.logs || []);
       set({
-        activeProjectId: id, projectName: res.data.name, nodes: res.data.nodes || [], edges: res.data.edges || [],
+        activeProjectId: id, projectName: res.data.name, projectCreatedAt: res.data.createdAt, nodes: res.data.nodes || [], edges: res.data.edges || [],
         deployedNodes: recDeployed, deployedEdges: rawEdges,
         isDeployed, isDirty: false, selectedNodeId: null, selectedEdgeId: null, projectLoadStatus: 'loaded',
       });
@@ -77,14 +78,14 @@ export const createProjectSlice = (set: any, get: any) => ({
   },
 
   saveCurrentProject: async (): Promise<boolean> => {
-    const { activeProjectId, projectName, nodes, edges, deployedNodes, deployedEdges, isDeployed } = get();
+    const { activeProjectId, projectName, projectCreatedAt, nodes, edges, deployedNodes, deployedEdges, isDeployed } = get();
     if (!activeProjectId) return false;
     const now = new Date().toISOString();
     const currentLogs = useBottomTrayStore.getState().logs || [];
     const res = await saveProject({
       id: activeProjectId, name: projectName, nodes, edges,
       deployedNodes: deployedNodes || [], deployedEdges: deployedEdges || [],
-      createdAt: now, updatedAt: now, status: isDeployed ? 'running' : 'draft', logs: currentLogs,
+      createdAt: projectCreatedAt || now, updatedAt: now, status: isDeployed ? 'running' : 'draft', logs: currentLogs,
     });
     if (res?.success) {
       set({ isDirty: false });

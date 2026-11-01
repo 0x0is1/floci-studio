@@ -9,6 +9,7 @@ import { LiveQueueSpecs } from './LiveQueueSpecs';
 import { LiveCloudFrontSpecs } from './LiveCloudFrontSpecs';
 import { LiveEc2Specs } from './LiveEc2Specs';
 import { LiveServerlessSpecs } from './LiveServerlessSpecs';
+import { LiveEcsSpecs } from './LiveEcsSpecs';
 import { CliCommandSnippet } from './CliCommandSnippet';
 
 export function LiveServiceSpecs({ nodeData, nodeId }: { nodeData: AwsNodeData; nodeId?: string }) {
@@ -23,6 +24,7 @@ export function LiveServiceSpecs({ nodeData, nodeId }: { nodeData: AwsNodeData; 
   }
   if (serviceType === 'cloudfront') return <LiveCloudFrontSpecs nodeId={nodeId} />;
   if (serviceType === 'ec2') return <LiveEc2Specs config={config} isRunning={isRunning} nodeId={nodeId} />;
+  if (serviceType === 'ecs') return <LiveEcsSpecs config={config} isRunning={isRunning} nodeId={nodeId} />;
   if (serviceType === 'lambda' || serviceType === 'bedrock') {
     return <LiveServerlessSpecs serviceType={serviceType} config={config} isRunning={isRunning} nodeId={nodeId} />;
   }

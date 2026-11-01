@@ -1,7 +1,7 @@
 import { DedicatedProjectEditorClient } from './DedicatedProjectEditorClient';
 import { getProjectStaticParams } from '@/lib/projectParams';
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return getProjectStaticParams();

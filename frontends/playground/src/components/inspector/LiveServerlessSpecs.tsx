@@ -21,7 +21,7 @@ export function LiveServerlessSpecs({ serviceType, config, isRunning, nodeId }: 
   const name = isLambda ? (config.functionName || 'event-processor-fn') : (config.modelId || 'anthropic.claude-3-sonnet');
   const region = 'us-east-1';
 
-  const envEdges = edges.filter((e) => e.source === activeId && e.data?.envVarName);
+  const envEdges = edges.filter((e) => (e.source === activeId || e.target === activeId) && e.data?.envVarName);
 
   const lambdaCli = `aws --endpoint-url=http://localhost:4566 --region ${region} lambda invoke --function-name ${name} output.json`;
   const lambdaCurl = `curl -X POST http://localhost:4566/2015-03-31/functions/${name}/invocations -d '{"event":"test"}'`;
@@ -48,7 +48,7 @@ export function LiveServerlessSpecs({ serviceType, config, isRunning, nodeId }: 
         </div>
       </div>
 
-      {isLambda && <Ec2EnvSection envEdges={envEdges} nodes={nodes} />}
+      {isLambda && <Ec2EnvSection envEdges={envEdges} nodes={nodes} nodeId={activeId ?? undefined} />}
 
       {isRunning && isLambda && (
         <>

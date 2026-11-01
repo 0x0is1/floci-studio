@@ -1,16 +1,18 @@
 import { awsClients } from './awsClientService';
 import { dockerService } from './dockerService';
 import { CreateBucketCommand } from '@aws-sdk/client-s3';
-import { CreateQueueCommand } from '@aws-sdk/client-sqs';
 import { RunInstancesCommand } from '@aws-sdk/client-ec2';
 import { logStdin, logStdout, createLog, TerminalLog } from './loggerService';
 import { provisionDatabase } from './databaseProvisioner';
 import { provisionNetworkResource } from './networkProvisioner';
 import { provisionServerless } from './serverlessProvisioner';
 import { provisionAiResource } from './aiProvisioner';
+import { provisionSqs } from './sqsProvisioner';
+import { provisionEcs } from './ecsProvisioner';
+import { provisionElastiCache } from './elasticacheProvisioner';
+import { SIMPLE_PROVISIONERS } from './simpleResourceProvisioners';
 import { findAvailablePort } from './portFinder';
 import { resolveInjectedEnvVars } from './envResolver';
-import { normalizeFlociEndpoint } from './urlResolver';
 
 export interface ProvisionContext {
   nodeId: string;
@@ -18,6 +20,7 @@ export interface ProvisionContext {
   label: string;
   config: Record<string, any>;
   resourceMap: Record<string, string>;
+  portMap?: Record<string, number>;
   edges: Array<{ source: string; target: string; data?: any }>;
   projectId?: string;
   nodes?: Array<any>;
@@ -35,28 +38,26 @@ export async function provisionResource(ctx: ProvisionContext, logs: TerminalLog
     return { resourceId: bucket };
   }
 
-  if (type === 'sqs') {
-    const queue = config.queueName || `queue-${Date.now().toString().slice(-4)}`;
-    const access = config.networkAccess || 'vpc_only';
-    logs.push(logStdin(nodeId, type, `aws sqs create-queue --queue-name ${queue} --network-access ${access}`));
-    const res = await awsClients.sqs.send(new CreateQueueCommand({ QueueName: queue })).catch(() => ({ QueueUrl: `http://localhost:4566/000000000000/${queue}` }));
-    const cleanUrl = normalizeFlociEndpoint(res.QueueUrl || `http://localhost:4566/000000000000/${queue}`);
-    logs.push(logStdout(nodeId, type, res, `Queue '${queue}' active at ${cleanUrl} (${access})`));
-    return { resourceId: cleanUrl };
+  if (type === 'sqs') return provisionSqs(nodeId, type, config, logs);
+
+  if (type === 'client') {
+    logs.push(createLog(nodeId, type, 'info', `${label} is an external caller - nothing to provision.`));
+    return { resourceId: undefined };
+  }
+
+  if (type === 'testrunner') {
+    logs.push(createLog(nodeId, type, 'info', `${label} is ready. Upload test files and run on-demand from the inspector.`));
+    return { resourceId: undefined };
   }
 
   if (type === 'dynamodb' || type === 'rds') return provisionDatabase(nodeId, type, label, config, logs);
-  if (['vpc', 'subnet', 'alb', 'cloudfront', 'apigateway'].includes(type)) return provisionNetworkResource(nodeId, type, label, config, resourceMap, logs, edges);
+  if (['vpc', 'subnet', 'alb', 'cloudfront', 'apigateway'].includes(type)) return provisionNetworkResource(nodeId, type, label, config, resourceMap, logs, edges, ctx.portMap);
   if (type === 'lambda') return provisionServerless(nodeId, type, label, config, logs, edges as any, resourceMap, ctx.nodes);
   if (type === 'bedrock') return provisionAiResource(nodeId, type, label, config, logs);
 
-  if (type === 'ecs') {
-    const cluster = config.clusterName || 'default-ecs-cluster';
-    const envVars = resolveInjectedEnvVars(nodeId, edges, resourceMap, ctx.nodes);
-    logs.push(logStdin(nodeId, type, `aws ecs create-cluster --cluster-name ${cluster}`));
-    logs.push(logStdout(nodeId, type, { cluster, envCount: Object.keys(envVars).length }, `ECS Cluster '${cluster}' active with env vars [${Object.keys(envVars).join(', ')}].`));
-    return { resourceId: `arn:aws:ecs:us-east-1:000000000000:cluster/${cluster}` };
-  }
+  if (type === 'ecs') return provisionEcs(nodeId, type, label, config, logs, edges, resourceMap, ctx.nodes, projectId);
+  if (type === 'elasticache') return provisionElastiCache(nodeId, type, config, logs, projectId);
+  if (SIMPLE_PROVISIONERS[type]) return SIMPLE_PROVISIONERS[type](nodeId, type, config, logs);
 
   if (type === 'ec2') {
     const requestedPort = Number(config.port) || 8080;

@@ -20,7 +20,7 @@ export function LiveEc2Specs({ config, isRunning, nodeId }: Props) {
   const port = config.port || 8080;
   const region = 'us-east-1';
 
-  const envEdges = edges.filter((e) => e.source === activeId && e.data?.envVarName);
+  const envEdges = edges.filter((e) => (e.source === activeId || e.target === activeId) && e.data?.envVarName);
   const iamEdges = edges.filter((e) => (e.source === activeId || e.target === activeId) && e.data?.iamPolicy);
   const curlCmd = `curl http://localhost:${port}`;
   const amiLabel = config.ami?.includes('ubuntu') ? 'Ubuntu 24.04 LTS' : (config.ami?.includes('2023') ? 'Amazon Linux 2023' : (config.ami || 'Ubuntu 24.04 LTS'));
@@ -52,7 +52,7 @@ export function LiveEc2Specs({ config, isRunning, nodeId }: Props) {
         </div>
       </div>
 
-      <Ec2EnvSection envEdges={envEdges} nodes={nodes} />
+      <Ec2EnvSection envEdges={envEdges} nodes={nodes} nodeId={activeId ?? undefined} />
 
       {iamEdges.length > 0 && (
         <div className="p-3 rounded-lg border space-y-1.5 text-xs select-text" style={{ backgroundColor: tokens.cardBgAlt, borderColor: tokens.border }}>

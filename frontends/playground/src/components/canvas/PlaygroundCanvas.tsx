@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useCallback, useRef } from 'react';
-import { ReactFlow, Controls, Background, BackgroundVariant, Connection, Edge, useReactFlow } from '@xyflow/react';
-import { toast } from 'sonner';
+import { ReactFlow, Controls, Background, BackgroundVariant, useReactFlow } from '@xyflow/react';
 import { usePlaygroundStore, AppNode } from '@/store/playgroundStore';
 import { useCanvasTabStore } from '@/store/canvasTabStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import { useCanvasKeyboardShortcuts } from '@/lib/hooks/useCanvasKeyboardShortcuts';
+import { useAutosave } from '@/lib/hooks/useAutosave';
+import { useCanvasConnections } from '@/lib/hooks/useCanvasConnections';
 import { CustomAwsNode } from './CustomAwsNode';
 import { CustomAwsEdge } from './CustomAwsEdge';
 import { CanvasSearchBar } from './CanvasSearchBar';
-import { validateAwsConnection } from '@/lib/rules/connectionMatrix';
 import { AWS_PALETTE_ITEMS } from '@/lib/constants/paletteItems';
 
 const nodeTypes = { custom: CustomAwsNode };
@@ -26,6 +26,7 @@ export function PlaygroundCanvas() {
   const { tokens } = useTheme();
 
   useCanvasKeyboardShortcuts();
+  useAutosave();
 
   const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }, []);
 
@@ -41,31 +42,7 @@ export function PlaygroundCanvas() {
     setNodes([...nodes, newNode]); selectNode(newNode.id);
   }, [nodes, setNodes, selectNode, screenToFlowPosition, isExecuting, isReadOnly]);
 
-  const isValidConnection = useCallback((c: Connection | Edge) => {
-    const s = nodes.find((n) => n.id === c.source); const t = nodes.find((n) => n.id === c.target);
-    return s && t ? validateAwsConnection(s.data.serviceType, t.data.serviceType).allowed : false;
-  }, [nodes]);
-
-  const onConnect = useCallback((params: Connection) => {
-    if (isExecuting || isReadOnly) return;
-    const s = nodes.find((n) => n.id === params.source); const t = nodes.find((n) => n.id === params.target);
-    if (!s || !t) return;
-    const res = validateAwsConnection(s.data.serviceType, t.data.serviceType);
-    if (!res.allowed) { toast.error('Invalid AWS Connection', { description: res.reason }); return; }
-    const newEdge: Edge = { id: `e-${params.source}-${params.target}`, source: params.source, target: params.target, type: 'custom', data: res.defaultData };
-    setEdges([...edges, newEdge as any]); selectEdge(newEdge.id);
-    toast.success('Connection Configured', { description: `Connected ${s.data.label}` });
-  }, [nodes, edges, setEdges, selectEdge, isExecuting, isReadOnly]);
-
-  const onReconnect = useCallback((oldEdge: Edge, newConn: Connection) => {
-    if (isExecuting || isReadOnly) return;
-    const s = nodes.find((n) => n.id === newConn.source); const t = nodes.find((n) => n.id === newConn.target);
-    if (!s || !t) return;
-    const res = validateAwsConnection(s.data.serviceType, t.data.serviceType);
-    if (!res.allowed) { toast.error('Invalid AWS Connection', { description: res.reason }); return; }
-    setEdges(edges.map((e) => e.id === oldEdge.id ? { ...e, source: newConn.source, target: newConn.target, type: 'custom', data: res.defaultData } : e));
-    toast.success('Connection Reconnected', { description: `Reconnected to ${t.data.label}` });
-  }, [nodes, edges, setEdges, isExecuting, isReadOnly]);
+  const { isValidConnection, onConnect, onReconnect } = useCanvasConnections({ nodes, edges, setEdges, selectEdge, isExecuting, isReadOnly });
 
   const onWheel = useCallback((e: React.WheelEvent) => {
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 2) {

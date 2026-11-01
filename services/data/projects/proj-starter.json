@@ -7,8 +7,8 @@
       "id": "vpc-default",
       "type": "custom",
       "position": {
-        "x": 60,
-        "y": 40
+        "x": -122.5788802658472,
+        "y": -295.313135872854
       },
       "data": {
         "serviceType": "vpc",
@@ -26,8 +26,8 @@
       "id": "subnet-default",
       "type": "custom",
       "position": {
-        "x": 340,
-        "y": 40
+        "x": 304.8886768719525,
+        "y": -316.37992974968245
       },
       "data": {
         "serviceType": "subnet",
@@ -46,8 +46,8 @@
       "id": "cf-1",
       "type": "custom",
       "position": {
-        "x": 60,
-        "y": 160
+        "x": -155.93463723749238,
+        "y": 77.48839064908829
       },
       "data": {
         "serviceType": "cloudfront",
@@ -65,8 +65,8 @@
       "id": "ec2-1",
       "type": "custom",
       "position": {
-        "x": 380,
-        "y": 160
+        "x": 372.97773537439053,
+        "y": 66.95499371067403
       },
       "data": {
         "serviceType": "ec2",
@@ -94,8 +94,8 @@
       "id": "s3-1",
       "type": "custom",
       "position": {
-        "x": 720,
-        "y": 70
+        "x": 932.4235049246876,
+        "y": -65.17859404298302
       },
       "data": {
         "serviceType": "s3",
@@ -113,8 +113,8 @@
       "id": "sqs-1",
       "type": "custom",
       "position": {
-        "x": 720,
-        "y": 250
+        "x": 328.50874712227,
+        "y": 458.9123726118828
       },
       "data": {
         "serviceType": "sqs",
@@ -132,8 +132,8 @@
       "id": "bedrock-de86a879",
       "type": "custom",
       "position": {
-        "x": 349.8002778905636,
-        "y": -76.62660645704455
+        "x": 839.6032355268267,
+        "y": 335.4924282132519
       },
       "data": {
         "serviceType": "bedrock",
@@ -201,10 +201,23 @@
         "protocol": "Subnet Placement",
         "isConfigured": true
       }
+    },
+    {
+      "id": "e-ec2-bedrock",
+      "source": "ec2-1",
+      "target": "bedrock-de86a879",
+      "type": "custom",
+      "data": {
+        "iamPolicy": "bedrock:InvokeModel",
+        "envVarName": "MODEL_ID",
+        "isConfigured": true
+      }
     }
   ],
+  "deployedNodes": [],
+  "deployedEdges": [],
   "createdAt": "2026-10-31T15:53:26.903Z",
-  "updatedAt": "2026-10-31T15:53:27.041Z",
+  "updatedAt": "2026-11-01T11:35:20.738Z",
   "status": "draft",
   "logs": [
     {

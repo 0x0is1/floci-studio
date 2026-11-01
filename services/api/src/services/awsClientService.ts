@@ -12,6 +12,12 @@ import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { KMSClient } from '@aws-sdk/client-kms';
 import { CloudWatchLogsClient } from '@aws-sdk/client-cloudwatch-logs';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
+import { ECSClient } from '@aws-sdk/client-ecs';
+import { ElastiCacheClient } from '@aws-sdk/client-elasticache';
+import { Route53Client } from '@aws-sdk/client-route-53';
+import { KinesisClient } from '@aws-sdk/client-kinesis';
+import { SFNClient } from '@aws-sdk/client-sfn';
+import { EFSClient } from '@aws-sdk/client-efs';
 import { config } from '@/config/env';
 
 export const clientConfig = {
@@ -38,4 +44,10 @@ export const awsClients = {
   kms: new KMSClient(clientConfig),
   logs: new CloudWatchLogsClient(clientConfig),
   eventbridge: new EventBridgeClient(clientConfig),
+  ecs: new ECSClient(clientConfig),
+  elasticache: new ElastiCacheClient(clientConfig),
+  route53: new Route53Client(clientConfig),
+  kinesis: new KinesisClient(clientConfig),
+  states: new SFNClient(clientConfig),
+  efs: new EFSClient(clientConfig),
 };

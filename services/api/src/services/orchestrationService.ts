@@ -1,59 +1,70 @@
 import { CanvasNode, CanvasEdge } from '@/models/project';
-import { sortNodesTopologically } from './dagSorter';
 import { createLog, TerminalLog } from './loggerService';
 import { provisionResource } from './resourceProvisioner';
 import { iamProvisioner } from './iamProvisioner';
-import { getVpcConnectedNodeIds } from './vpcValidator';
+import { checkVpcIsolation, planExecutionOrder } from './deployPreflight';
 
 export interface ProvisionResult {
   nodeId: string;
-  status: 'running' | 'error' | 'draft';
+  status: 'running' | 'error' | 'draft' | 'skipped';
   resourceId?: string;
   liveUrl?: string;
   port?: number;
   error?: string;
 }
 
+export type DeployProgressListener = (result: ProvisionResult) => void;
+
 export class OrchestrationService {
-  public async deployGraph(nodes: CanvasNode[], edges: CanvasEdge[], projectId?: string): Promise<{ results: ProvisionResult[]; logs: TerminalLog[] }> {
+  public async deployGraph(
+    nodes: CanvasNode[],
+    edges: CanvasEdge[],
+    projectId?: string,
+    onProgress?: DeployProgressListener
+  ): Promise<{ results: ProvisionResult[]; logs: TerminalLog[] }> {
     const results: ProvisionResult[] = [];
     const logs: TerminalLog[] = [];
     const stateMap: Record<string, 'running' | 'error'> = {};
     const resourceMap: Record<string, string> = {};
+    const portMap: Record<string, number> = {};
+    const emit = (r: ProvisionResult) => { results.push(r); onProgress?.(r); };
+    let hasFailed = false;
 
-    const vpcConnected = getVpcConnectedNodeIds(nodes, edges);
-    const unconnected = nodes.filter((n) => !vpcConnected.has(n.id));
-    if (unconnected.length > 0) {
-      const names = unconnected.map((n) => n.data?.label || n.id).join(', ');
-      const errMsg = `AWS Network Isolation Violation: [${names}] not connected to VPC & Subnet network. Deployment aborted. 0 resources provisioned.`;
-      logs.push(createLog('system', 'vpc', 'error', `[VPC & SUBNET REQUIRED] ${errMsg}`));
-      return {
-        results: nodes.map((n) => ({
-          nodeId: n.id,
-          status: 'error',
-          error: unconnected.some((u) => u.id === n.id) ? errMsg : 'Aborted due to network isolation violation',
-        })),
-        logs,
-      };
+    const isolationErrors = checkVpcIsolation(nodes, edges, logs);
+    if (isolationErrors) {
+      for (const e of isolationErrors) emit({ nodeId: e.nodeId, status: 'error', error: e.error });
+      return { results, logs };
     }
 
-    const ordered = sortNodesTopologically(nodes, edges);
-    logs.push(createLog('system', 'orchestrator', 'info', `DAG planned: ${ordered.length} nodes execution order.`));
+    const plan = planExecutionOrder(nodes, edges, logs);
+    if ('error' in plan) {
+      for (const n of nodes) emit({ nodeId: n.id, status: 'error', error: plan.error });
+      return { results, logs };
+    }
 
     await iamProvisioner.provisionProjectIam(nodes, edges, logs);
 
-    for (const item of ordered) {
+    for (const item of plan.ordered) {
       const { node, dependencies } = item;
       const type = node.data.serviceType;
       const config = node.data.config || {};
       const label = node.data.label || type;
+
+      if (hasFailed) {
+        const errMsg = `Skipped: deployment aborted after an earlier failure.`;
+        logs.push(createLog(node.id, type, 'warn', `[SKIPPED] ${label}: ${errMsg}`));
+        stateMap[node.id] = 'error';
+        emit({ nodeId: node.id, status: 'skipped', error: errMsg });
+        continue;
+      }
 
       const failedDep = dependencies.find((d) => stateMap[d] === 'error');
       if (failedDep) {
         const errMsg = `Dependency '${failedDep}' failed. Blocking execution of '${label}'.`;
         logs.push(createLog(node.id, type, 'error', `[SEMAPHORE BLOCKED] ${errMsg}`));
         stateMap[node.id] = 'error';
-        results.push({ nodeId: node.id, status: 'error', error: errMsg });
+        hasFailed = true;
+        emit({ nodeId: node.id, status: 'error', error: errMsg });
         continue;
       }
 
@@ -61,14 +72,16 @@ export class OrchestrationService {
 
       try {
         const edgeList = edges.map((e) => ({ source: e.source, target: e.target, data: e.data }));
-        const res = await provisionResource({ nodeId: node.id, type, label, config, resourceMap, edges: edgeList, projectId, nodes }, logs);
+        const res = await provisionResource({ nodeId: node.id, type, label, config, resourceMap, portMap, edges: edgeList, projectId, nodes }, logs);
         if (res.resourceId) resourceMap[node.id] = res.resourceId;
+        if ((res as any).port) portMap[node.id] = (res as any).port;
         stateMap[node.id] = 'running';
-        results.push({ nodeId: node.id, status: 'running', resourceId: res.resourceId, liveUrl: res.liveUrl, port: (res as any).port });
+        emit({ nodeId: node.id, status: 'running', resourceId: res.resourceId, liveUrl: (res as any).liveUrl, port: (res as any).port });
       } catch (err: any) {
         logs.push(createLog(node.id, type, 'error', `Provision failed for ${label}: ${err.message}`));
         stateMap[node.id] = 'error';
-        results.push({ nodeId: node.id, status: 'error', error: err.message });
+        hasFailed = true;
+        emit({ nodeId: node.id, status: 'error', error: err.message });
       }
     }
 
