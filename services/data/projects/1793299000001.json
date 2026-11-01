@@ -120,24 +120,6 @@
           "uuid": "d9e4e663-63d9-4407-86d5-6ee647a89866"
         }
       }
-    },
-    {
-      "id": "client-44cbe617",
-      "type": "custom",
-      "position": {
-        "x": 1015.6620913059753,
-        "y": -96.25104561786938
-      },
-      "data": {
-        "serviceType": "client",
-        "label": "Client",
-        "status": "draft",
-        "config": {
-          "requestMethod": "GET",
-          "requestPath": "/",
-          "uuid": "44cbe617-a04c-46c9-abfc-5176f4e8e752"
-        }
-      }
     }
   ],
   "edges": [

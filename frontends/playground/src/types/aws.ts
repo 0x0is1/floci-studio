@@ -1,5 +1,4 @@
 export type AwsServiceCategory =
-  | 'client'
   | 'compute'
   | 'storage'
   | 'database'

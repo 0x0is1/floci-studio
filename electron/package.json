@@ -1,7 +1,7 @@
 {
   "name": "floci-studio-desktop",
   "productName": "Floci Studio",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "AWS Visual Cloud Infrastructure Playground",
   "private": true,
   "main": "dist/main/index.js",

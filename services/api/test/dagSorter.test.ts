@@ -28,7 +28,7 @@ describe('dagSorter', () => {
   });
 
   it('throws a dependency cycle error naming the involved nodes when a cycle exists', () => {
-    const nodes = [node('a', 'client'), node('b', 'client')];
+    const nodes = [node('a', 'sqs'), node('b', 'sqs')];
     const edges = [
       { id: 'e0', source: 'a', target: 'b' },
       { id: 'e1', source: 'b', target: 'a' },
@@ -37,7 +37,7 @@ describe('dagSorter', () => {
   });
 
   it('throws on a larger cycle that leaves only the looping subset unresolved', () => {
-    const nodes = [node('v', 'vpc'), node('a', 'client'), node('b', 'client'), node('c', 'client')];
+    const nodes = [node('v', 'vpc'), node('a', 'sqs'), node('b', 'sqs'), node('c', 'sqs')];
     const edges = [
       { id: 'e0', source: 'v', target: 'a' },
       { id: 'e1', source: 'a', target: 'b' },

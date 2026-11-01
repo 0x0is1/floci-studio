@@ -7,7 +7,7 @@ export interface DagNodeLevel {
 }
 
 const SERVICE_TIERS: Record<string, number> = {
-  client: 5, vpc: 1, subnet: 2, iam: 10, kms: 10, secretsmanager: 10,
+  vpc: 1, subnet: 2, iam: 10, kms: 10, secretsmanager: 10,
   s3: 20, sqs: 20, sns: 20, dynamodb: 20, rds: 20, elasticache: 20, efs: 20, kinesis: 20, bedrock: 20, logs: 20, states: 20, events: 20,
   ec2: 30, ecs: 30, lambda: 30,
   alb: 40, apigateway: 40, testrunner: 45, cloudfront: 50, route53: 60,

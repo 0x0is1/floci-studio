@@ -7,7 +7,7 @@ function node(id: string, serviceType: string, config: Record<string, any> = {})
 
 describe('OrchestrationService fail-fast + progress streaming', () => {
   it('blocks the whole deployment with per-node error events on VPC isolation violation', async () => {
-    const nodes = [node('a', 'client')] as any;
+    const nodes = [node('a', 'ec2')] as any;
     const events: any[] = [];
     const { results } = await orchestrationService.deployGraph(nodes, [], undefined, (r) => events.push(r));
     expect(results).toHaveLength(1);
@@ -17,7 +17,7 @@ describe('OrchestrationService fail-fast + progress streaming', () => {
   });
 
   it('emits per-node error events for every node when a dependency cycle is detected', async () => {
-    const nodes = [node('v', 'vpc'), node('s', 'subnet'), node('a', 'client'), node('b', 'client')] as any;
+    const nodes = [node('v', 'vpc'), node('s', 'subnet'), node('a', 'sqs'), node('b', 'sqs')] as any;
     const edges = [
       { id: 'e0', source: 'v', target: 's' }, { id: 'e1', source: 's', target: 'a' }, { id: 'e2', source: 's', target: 'b' },
       { id: 'e3', source: 'a', target: 'b' }, { id: 'e4', source: 'b', target: 'a' },

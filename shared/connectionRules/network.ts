@@ -13,10 +13,7 @@ export function networkRule(source: string, target: string): EdgeData | undefine
   if (source === 'route53' && ['cloudfront', 'alb', 'apigateway', 'ec2', 'ecs', 's3'].includes(target)) {
     return { protocol: 'DNS Routing Record', isConfigured: true };
   }
-  if (source === 'client' && ['alb', 'apigateway', 'cloudfront', 'route53', 'ec2', 'ecs', 'lambda'].includes(target)) {
-    return { protocol: 'Direct Client Call', isConfigured: true };
-  }
-  const placementTargets = ['ec2', 'rds', 'ecs', 'alb', 'elasticache', 'lambda', 'efs', 'client', 'testrunner'];
+  const placementTargets = ['ec2', 'rds', 'ecs', 'alb', 'elasticache', 'lambda', 'efs', 'testrunner'];
   if (source === 'vpc' && (target === 'subnet' || placementTargets.includes(target))) {
     return { protocol: 'VPC Network Association', isConfigured: true };
   }

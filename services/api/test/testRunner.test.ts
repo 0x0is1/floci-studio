@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { config } from '../src/config/env';
 import { saveTestFile, getTestDir } from '../src/services/testRunnerFileService';
 import { runTests } from '../src/services/testRunnerExecService';
+import { dockerReq } from '../src/services/dockerService';
 
 const projectId = `tr-test-${Date.now()}`;
 const nodeId = 'tr-node';
@@ -21,6 +22,8 @@ describe('Test Runner node: file-backed Docker execution', () => {
   });
 
   it('runs an uploaded pytest file inside floci-testrunner and reports a pass', async () => {
+    const ping = await dockerReq('GET', '/_ping');
+    if (ping.status !== 200) return;
     const passing = 'def test_ok():\n    assert 1 + 1 == 2\n';
     await saveTestFile(projectId, nodeId, 'test_pass.py', new File([passing], 'test_pass.py'));
     const result = await runTests(projectId, nodeId, 'external');
@@ -30,6 +33,8 @@ describe('Test Runner node: file-backed Docker execution', () => {
   }, 60000);
 
   it('runs an uploaded pytest file inside floci-testrunner and reports a failure', async () => {
+    const ping = await dockerReq('GET', '/_ping');
+    if (ping.status !== 200) return;
     const failingProject = `${projectId}-fail`;
     const failing = 'def test_bad():\n    assert 1 == 2\n';
     await saveTestFile(failingProject, nodeId, 'test_fail.py', new File([failing], 'test_fail.py'));

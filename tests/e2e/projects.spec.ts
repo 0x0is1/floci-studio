@@ -16,12 +16,12 @@ test.describe('Project Lifecycle & Boilerplate E2E', () => {
 
     await expect(page.locator('header').getByText(projectName)).toBeVisible();
 
-    // Verify starter boilerplate nodes appear on the canvas
+    // Verify default network foundation appears on the canvas
     const canvas = page.locator('.react-flow');
-    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Browser Client' })).toBeVisible();
-    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Web Server' })).toBeVisible();
-    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'App Storage Bucket' })).toBeVisible();
-    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'App Queue' })).toBeVisible();
+    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Default VPC' })).toBeVisible();
+    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Default Subnet' })).toBeVisible();
+    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Browser Client' })).toHaveCount(0);
+    await expect(canvas.locator('.react-flow__node').filter({ hasText: 'Web Server' })).toHaveCount(0);
 
     // Click Save button
     await page.getByRole('button', { name: 'Save' }).click();

@@ -23,7 +23,6 @@ const COMPUTE_INGRESS_SOURCES: Record<string, EdgeData> = {
   apigateway: { protocol: 'API Gateway Integration', isConfigured: true },
   cloudfront: { protocol: 'HTTP Custom Origin', port: 8080, isConfigured: true },
   route53: { protocol: 'DNS Routing Record', isConfigured: true },
-  client: { protocol: 'Direct Client Call', isConfigured: true },
   sqs: { protocol: 'SQS Poller / Trigger', isConfigured: true },
   sns: { protocol: 'SNS Subscription', isConfigured: true },
   events: { protocol: 'EventBridge Target', isConfigured: true },

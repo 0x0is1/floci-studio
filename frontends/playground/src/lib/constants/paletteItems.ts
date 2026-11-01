@@ -1,5 +1,4 @@
 import { AwsPaletteItem, AwsServiceCategory } from '@/types/aws';
-import { CLIENT_PALETTE_ITEMS } from './palette/client';
 import { COMPUTE_PALETTE_ITEMS } from './palette/compute';
 import { STORAGE_PALETTE_ITEMS } from './palette/storage';
 import { DATABASE_PALETTE_ITEMS } from './palette/database';
@@ -14,7 +13,6 @@ export interface PaletteCategoryMeta {
 }
 
 export const PALETTE_CATEGORIES: PaletteCategoryMeta[] = [
-  { id: 'client', name: 'Client' },
   { id: 'compute', name: 'Compute' },
   { id: 'storage', name: 'Storage' },
   { id: 'database', name: 'Database' },
@@ -25,7 +23,6 @@ export const PALETTE_CATEGORIES: PaletteCategoryMeta[] = [
 ];
 
 export const AWS_PALETTE_ITEMS: AwsPaletteItem[] = [
-  ...CLIENT_PALETTE_ITEMS,
   ...COMPUTE_PALETTE_ITEMS,
   ...STORAGE_PALETTE_ITEMS,
   ...DATABASE_PALETTE_ITEMS,

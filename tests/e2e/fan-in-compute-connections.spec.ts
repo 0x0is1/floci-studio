@@ -75,14 +75,14 @@ test.describe('Compute-to-compute and fan-in connection E2E', () => {
     const ec2Node = page.locator('.react-flow__node').filter({ hasText: /Web Server/i }).first();
     await expect(ec2Node).toBeVisible();
 
-    await dropPaletteItem(page, 'Client', 800, 650);
-    const clientNode = page.locator('.react-flow__node').filter({ hasText: 'Client' }).first();
-    await expect(clientNode).toBeVisible();
+    await dropPaletteItem(page, 'App Load Balancer', 800, 650);
+    const albNode = page.locator('.react-flow__node').filter({ hasText: 'App Load Balancer' }).first();
+    await expect(albNode).toBeVisible();
     await page.waitForTimeout(300);
 
     await dragHandleToHandle(
       page,
-      clientNode.locator('.react-flow__handle-right').first(),
+      albNode.locator('.react-flow__handle-right').first(),
       ec2Node.locator('.react-flow__handle-top').first(),
     );
 

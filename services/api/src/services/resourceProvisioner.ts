@@ -40,11 +40,6 @@ export async function provisionResource(ctx: ProvisionContext, logs: TerminalLog
 
   if (type === 'sqs') return provisionSqs(nodeId, type, config, logs);
 
-  if (type === 'client') {
-    logs.push(createLog(nodeId, type, 'info', `${label} is an external caller - nothing to provision.`));
-    return { resourceId: undefined };
-  }
-
   if (type === 'testrunner') {
     logs.push(createLog(nodeId, type, 'info', `${label} is ready. Upload test files and run on-demand from the inspector.`));
     return { resourceId: undefined };
